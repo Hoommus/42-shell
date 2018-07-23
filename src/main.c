@@ -18,7 +18,7 @@ ssize_t	goats_teleported(void)
 	}
 }
 
-char	**wait_for_input()
+char	**wait_for_input(void)
 {
 	char	*line;
 	char	**args;
@@ -29,7 +29,7 @@ char	**wait_for_input()
 		{
 			if (ft_strlen(line) == 0)
 				return (NULL);
-			args = ft_strsplit_wht(line);
+			args = ft_strsplit(line, ' ');
 			free(line);
 			break ;
 		}
@@ -37,49 +37,50 @@ char	**wait_for_input()
 	return (args);
 }
 
-void	display_prompt(char **environ)
+void	display_prompt(void)
 {
 	char	hostname[1024];
-	char	*pwd;
+	char	*cwd;
 	char	*user;
 	char	*swap;
 	char	*home;
 
-	user = get_env("USER", environ);
-	home = get_env("HOME", environ);
-	pwd = get_env("PWD", environ);
-	if (ft_strstr(pwd, home) != 0)
+	user = get_env("USER");
+	home = get_env("HOME");
+	cwd = ft_strnew(1024);
+	getcwd(cwd, 1024);
+	if (ft_strstr(cwd, home) != 0)
 	{
-		swap = ft_strsub(pwd, ft_strlen(home) - 1,
-						ft_strlen(pwd) - ft_strlen(home) + 1);
-		free(pwd);
-		pwd = swap;
-		pwd[0] = '~';
+		swap = ft_strsub(cwd, ft_strlen(home) - 1,
+						ft_strlen(cwd) - ft_strlen(home) + 1);
+		free(cwd);
+		cwd = swap;
+		cwd[0] = '~';
 	}
 	 gethostname(hostname, 1024);
 	 hostname[6] = 0;
-	ft_printf(PROMPT, user, hostname, pwd);
+	ft_printf(PROMPT, user, hostname, cwd);
 	free(home);
 	free(user);
-	free(pwd);
+	free(cwd);
 }
 
-int		shell_loop(void)
+int		shell_loop()
 {
 	int			status;
-	extern char	**environ;
 	char		**args;
 
 	while (goats_teleported())
 	{
-		display_prompt(environ);
+		display_prompt();
 		args = wait_for_input();
 		if (args == NULL)
 			continue ;
-		status = execute(args, environ);
+		status = execute(args);
 
 		if (status != 0)
-			ft_printf("minishell: command not found: %s\n", args[0]);
+			ft_dprintf(2, "minishell: command not found: %s\n", args[0]);
+		free_array(args);
 	}
 	return (0);
 }
@@ -87,14 +88,14 @@ int		shell_loop(void)
 int		main(int argc, char **argv, char **env)
 {
 	struct winsize	term;
+	extern char		**environ;
 
-	argv[argc - 1] = env[0];
+	*argv = argv[argc - argc];
 	ioctl(1, TIOCGWINSZ, &term);
-	ft_printf("%*s\n%*s\n%*s\n%*s\n",
-			term.ws_col / 2 + 14, "/***************************\\",
-			term.ws_col / 2 + 14, "| Willkommen und bienvenue. |",
-			term.ws_col / 2 + 14, "|  Welcome to Minishell 2.  |",
-			term.ws_col / 2 + 14, "\\***************************/");
+	ft_printf("\n%*s\n%*s\n\n",
+			term.ws_col / 2 + 12, "Willkommen und bienvenue.",
+			term.ws_col / 2 + 12, " Welcome to Minishell 2. ");
+	g_environ = copy_env(env, environ);
 	shell_loop();
 	return (0);
 }

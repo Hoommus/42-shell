@@ -49,6 +49,7 @@ int						hs_setenv(char **args);
 int						hs_unsetenv(char **args);
 int						hs_help(char **args);
 int						hs_exit(char **args);
+int						hs_where(char **args);
 
 static char				*g_builtins[] = {
 		"alias",
@@ -58,7 +59,9 @@ static char				*g_builtins[] = {
 		"setenv",
 		"unsetenv",
 		"help",
-		"exit"
+		"exit",
+		"quit",
+		"where"
 };
 
 static t_builtin_func	g_builtin_func[] = {
@@ -70,18 +73,26 @@ static t_builtin_func	g_builtin_func[] = {
 		&hs_unsetenv,
 		&hs_help,
 		&hs_exit,
+		&hs_exit,
+		&hs_where
 };
 
 struct s_map			*g_aliases;
+char					**g_environ;
+/*
+** What is it? A design pattern? Really???
+*/
+int						execute(char **args);
+char					*get_env(char *name);
+int						set_env(char *key, char *value);
+int						unset_env(char *name);
+char					**copy_env(char **argenv, char **environ);
+void					free_array(char **array);
 
 /*
-** What is it? A design pattern?? Really?
+** Auxilia
 */
-int						execute(char **args, char **paths);
-char					*get_env(char *name, char **env);
-
-
-
+void					hs_where_auxilia(char **paths, char *arg);
 
 
 #endif

@@ -83,7 +83,7 @@ int				ft_strequ(char const *a, char const *b);
 int				ft_strnequ(char const *s1, char const *s2, size_t n);
 char			*ft_strsub(char const *s, unsigned int start, size_t len);
 char			*ft_strjoin(char const *s1, char const *s2);
-char			*ft_strings_join(char *delimiter, ...);
+char			*ft_strings_join(size_t args_size, char *delimiter, ...);
 char			*ft_strarr_join(char *delimiter, char **array);
 char			*ft_strtrim(char const *s);
 

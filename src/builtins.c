@@ -15,15 +15,25 @@ int				hs_echo(char **args)
 
 int				hs_cd(char **args)
 {
-	*args = args[0];
+	char		*home;
 
+	home = get_env("HOME");
+	if (args == NULL)
+		return (1);
+	if (args[0] != NULL && ft_strcmp(args[0], "~") != 0)
+		chdir(args[0]);
+	else if (args[0] != NULL && ft_strcmp(args[0], "~") == 0)
+		chdir(home);
+	else
+		chdir(home);
+	if (home != NULL)
+		free(home);
 	return (0);
 }
 
 int				hs_alias(char **args)
 {
 	*args = args[0];
-
 	return (0);
 }
 
@@ -34,9 +44,9 @@ int				hs_help(char **args)
 	*args = args[0];
 	ft_printf("Existing builtins:\n");
 	i = 0;
-	while (i < 7)
+	while (i < 9)
 		ft_printf("%s, ", g_builtins[i++]);
-	ft_printf("%s\n", g_builtins[7]);
+	ft_printf("%s\n", g_builtins[9]);
 	return (0);
 }
 

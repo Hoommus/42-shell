@@ -22,7 +22,7 @@ LIB_DIR = ./printf
 LIB_NAME = libftprintf.a
 
 SHELL_SRC = main.c environ_utils.c commands_execution.c builtins.c builtins2.c \
-
+            memory.c auxilia.c\
 
 OBJ = $(addprefix $(OBJ_DIR), $(SHELL_SRC:.c=.o))
 
