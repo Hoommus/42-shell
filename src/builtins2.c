@@ -28,7 +28,12 @@ int				hs_setenv(char **args)
 	else
 	{
 		swap = ft_strsplit(args[0], '=');
-		set_env(swap[0], swap[1]);
+		if (ft_strlen(swap[1]) == 0)
+			set_env(swap[0], "''");
+		else if (swap[2] == NULL)
+			set_env(swap[0], swap[1]);
+		else
+			ft_printf("setenv: arguments not valid in this context.\n");
 		free_array(swap);
 	}
 	return (0);
@@ -37,26 +42,23 @@ int				hs_setenv(char **args)
 int				hs_unsetenv(char **args)
 {
 	int		len;
+	int		i;
 
+	i = 0;
 	len = 0;
 	while (args[len])
 		len++;
-	if (len > 1 || len == 0)
+	if (len == 0)
 		ft_printf("usage:\nunsetenv KEY [KEY ...]\n");
 	else
-	{
-		if (ft_strcmp(args[0], "all") == 0)
-		{
-			len = 0;
-			while (g_environ[len])
-				free(g_environ[len++]);
-		}
-		else
-			unset_env(args[0]);
-	}
+		while (i < len)
+			unset_env(args[i++]);
 	return (0);
 }
 
+/*
+** TODO: seems like some code is shared with try_binary
+*/
 int				hs_where(char **args)
 {
 	char	*swap;

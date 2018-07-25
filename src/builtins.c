@@ -4,8 +4,8 @@ int				hs_echo(char **args)
 {
 	char	*str;
 
-	ft_printf("Echoing...\n");
 	str = ft_strarr_join(" ", args);
+	replace_variables(str);
 	if (str == 0)
 		return (1);
 	ft_printf("%s\n", str);
@@ -22,9 +22,11 @@ int				hs_cd(char **args)
 		return (1);
 	if (args[0] != NULL && ft_strcmp(args[0], "~") != 0)
 		chdir(args[0]);
-	else if (args[0] != NULL && ft_strcmp(args[0], "~") == 0)
+	else if (ft_strcmp(args[0], "-") == 0)
+		chdir(args[0]);
+	else if (home != NULL && args[0] != NULL && ft_strcmp(args[0], "~") == 0)
 		chdir(home);
-	else
+	else if (home != NULL)
 		chdir(home);
 	if (home != NULL)
 		free(home);

@@ -93,6 +93,8 @@ void					free_array(char **array);
 ** Auxilia
 */
 void					hs_where_auxilia(char **paths, char *arg);
-
+int						is_valid_var(char *var);
+char					*replace_variables(char *line);
+char					*replace_home(char *line);
 
 #endif

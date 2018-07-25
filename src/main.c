@@ -49,7 +49,7 @@ void	display_prompt(void)
 	home = get_env("HOME");
 	cwd = ft_strnew(1024);
 	getcwd(cwd, 1024);
-	if (ft_strstr(cwd, home) != 0)
+	if (home != NULL && ft_strstr(cwd, home) != 0)
 	{
 		swap = ft_strsub(cwd, ft_strlen(home) - 1,
 						ft_strlen(cwd) - ft_strlen(home) + 1);
@@ -65,7 +65,7 @@ void	display_prompt(void)
 	free(cwd);
 }
 
-int		shell_loop()
+int		shell_loop(void)
 {
 	int			status;
 	char		**args;
@@ -77,7 +77,6 @@ int		shell_loop()
 		if (args == NULL)
 			continue ;
 		status = execute(args);
-
 		if (status != 0)
 			ft_dprintf(2, "minishell: command not found: %s\n", args[0]);
 		free_array(args);

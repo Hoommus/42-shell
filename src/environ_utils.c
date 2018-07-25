@@ -6,6 +6,11 @@ char	*get_env(char *name)
 	char	**swap;
 	char	*dummy;
 
+	if (!is_valid_var(name))
+	{
+		ft_printf("env: not valid in this context: %s\n", name);
+		return (0);
+	}
 	dummy = NULL;
 	i = 0;
 	while (g_environ[i])
@@ -15,7 +20,7 @@ char	*get_env(char *name)
 			swap = ft_strsplit(g_environ[i], '=');
 			dummy = ft_strdup(swap[1]);
 			free_array(swap);
-			break;
+			break ;
 		}
 		i++;
 	}
@@ -111,4 +116,3 @@ char	**copy_env(char **argenv, char **globalenv)
 	}
 	return (new);
 }
-

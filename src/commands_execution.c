@@ -31,9 +31,7 @@ int		forknrun(char *bare_bin, char *bin, char **args)
 		pid = wait(&status);
 		return (0);
 	}
-	return (1);
 }
-
 
 int		try_binary(char *binary, char **args)
 {
@@ -65,10 +63,25 @@ int		try_binary(char *binary, char **args)
 int		try_local_binary(char *bin, char **args)
 {
 	int		status;
+	char	*swap;
+	char	*env;
 
 	status = 1;
+	swap = NULL;
+	if (*bin == '~')
+	{
+		env = get_env("HOME");
+		if (env != NULL)
+		{
+			swap = ft_strings_join(2, "", env, ++bin);
+			free(env);
+			bin = swap;
+		}
+	}
 	if (access(bin, X_OK) == 0 && !forknrun(bin, bin, args))
 		status = 0;
+	if (swap != NULL)
+		free(swap);
 	return (status);
 }
 

@@ -1,5 +1,21 @@
 #include "../include/minishell.h"
 
+int				is_valid_var(char *var)
+{
+	int		i;
+
+	if (var == NULL)
+		return (0);
+	i = 0;
+	while (var[i])
+	{
+		if (!(ft_isalnum(var[i]) || var[i] == '_' || var[i] == '$'))
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
 char			*is_builtin(char *arg)
 {
 	int		i;
