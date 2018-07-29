@@ -21,14 +21,19 @@ ssize_t	goats_teleported(void)
 char	**wait_for_input(void)
 {
 	char	*line;
+	char	*swap;
 	char	**args;
 
 	while (1)
 	{
-		if (get_next_line(STDIN_FILENO, &line))
+		if (get_next_line(STDIN_FILENO, &line) > 0)
 		{
 			if (ft_strlen(line) == 0)
 				return (NULL);
+			swap = replace_home(line);
+			free(line);
+			line = replace_variables(swap);
+			free(swap);
 			args = ft_strsplit(line, ' ');
 			free(line);
 			break ;
@@ -57,12 +62,10 @@ void	display_prompt(void)
 		cwd = swap;
 		cwd[0] = '~';
 	}
-	 gethostname(hostname, 1024);
-	 hostname[6] = 0;
+	gethostname(hostname, 1024);
+	hostname[6] = 0;
 	ft_printf(PROMPT, user, hostname, cwd);
-	free(home);
-	free(user);
-	free(cwd);
+	chfree_n(3, home, user, cwd);
 }
 
 int		shell_loop(void)

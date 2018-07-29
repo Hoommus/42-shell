@@ -33,26 +33,26 @@ int		set_env(char *key, char *value)
 	char	**swap;
 	char	*dummy;
 
-	i = 0;
+	i = -1;
 	dummy = get_env(key);
 	if (dummy == NULL)
 	{
-		while (g_environ[i])
-			i++;
+		while (g_environ[++i])
+			;
 		swap = (char **)ft_memalloc(sizeof(char *) * (i + 2));
 		ft_memcpy(swap, g_environ, sizeof(char *) * (i));
 		swap[i] = ft_strings_join(2, "=", key, value);
 		free(g_environ);
 		g_environ = swap;
 	}
-	while (dummy && g_environ[i])
-	{
-		swap = ft_strsplit(g_environ[i], '=');
-		if (ft_strcmp(swap[0], g_environ[i]) == 0)
+	while (dummy && g_environ[++i])
+		if (ABS(ft_strcmp(key, g_environ[i])) == '=')
+		{
+			swap = ft_strsplit(g_environ[i], '=');
+			free(g_environ[i]);
 			g_environ[i] = ft_strings_join(2, "=", key, value);
-		free_array(swap);
-		i++;
-	}
+			free_array(swap);
+		}
 	return (0);
 }
 
@@ -60,7 +60,6 @@ char	**remove_env(char *name, int environ_len)
 {
 	int		i;
 	int		j;
-	char	**swap;
 	char	**new_env;
 
 	new_env = (char **)ft_memalloc(sizeof(char *) * environ_len);
@@ -68,12 +67,10 @@ char	**remove_env(char *name, int environ_len)
 	j = 0;
 	while (g_environ[i])
 	{
-		swap = ft_strsplit(g_environ[i], '=');
-		if (ft_strcmp(swap[0], name) != 0)
-			new_env[j++] = ft_strdup(g_environ[i]);
+		if (ABS(ft_strcmp(g_environ[i], name)) != '=')
+			new_env[j++] = g_environ[i];
 		else
 			free(g_environ[i]);
-		free_array(swap);
 		i++;
 	}
 	return (new_env);
@@ -92,7 +89,7 @@ int		unset_env(char *name)
 	while (g_environ[len])
 		len++;
 	new_env = remove_env(name, len);
-	free(g_environ);
+	chfree_n(2, g_environ, dummy);
 	g_environ = new_env;
 	return (0);
 }

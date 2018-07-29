@@ -1,6 +1,6 @@
 #include "../include/minishell.h"
 
-int				is_valid_var(char *var)
+int			is_valid_var(char *var)
 {
 	int		i;
 
@@ -16,7 +16,7 @@ int				is_valid_var(char *var)
 	return (1);
 }
 
-char			*is_builtin(char *arg)
+char		*is_builtin(char *arg)
 {
 	int		i;
 
@@ -32,7 +32,7 @@ char			*is_builtin(char *arg)
 	return (NULL);
 }
 
-void			hs_where_auxilia(char **paths, char *arg)
+void		hs_where_auxilia(char **paths, char *arg)
 {
 	int		i;
 	char	*swap;

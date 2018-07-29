@@ -89,7 +89,8 @@ int		execute(char **args)
 {
 	int		status;
 
-	status = try_builtin(args[0], args + 1);
+	status = 1;
+	IFNNULL(args, status = try_builtin(args[0], args + 1));
 	if (status == 0)
 		return (0);
 	status = try_binary(args[0], args);

@@ -2,11 +2,11 @@
 
 int				hs_env(char **args)
 {
-	int			i;
+	char		*str;
 
-	i = 0;
-	while (g_environ[i])
-		ft_printf("%s\n", g_environ[i++]);
+	str = ft_strarr_join("\n", g_environ);
+	ft_printf("%s\n", str);
+	free(str);
 	*args = args[0];
 	return (0);
 }
@@ -59,6 +59,7 @@ int				hs_unsetenv(char **args)
 /*
 ** TODO: seems like some code is shared with try_binary
 */
+
 int				hs_where(char **args)
 {
 	char	*swap;

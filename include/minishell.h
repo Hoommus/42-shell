@@ -16,6 +16,8 @@
 # include "../libft/libft.h"
 # include "../libft/get_next_line.h"
 
+# define IFNNULL(a, b) if ((a) != NULL) (b);
+# define SNWH (copy[i + 1] == '/' || copy[i + 1] == 0 || ft_iswhsp(copy[i + 1]))
 # define ABS(a) (a < 0 ? -(a) : a)
 # define PROMPT "\x001b[40\x001b[38;5;2m[%s@%s] \x001b[37;1m%s $> \x001b[0m"
 /*
@@ -96,5 +98,12 @@ void					hs_where_auxilia(char **paths, char *arg);
 int						is_valid_var(char *var);
 char					*replace_variables(char *line);
 char					*replace_home(char *line);
+
+/*
+** Memory utils
+*/
+void	chfree(void *obj);
+void	chfree_n(int n, ...);
+
 
 #endif
