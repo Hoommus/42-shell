@@ -15,7 +15,7 @@
 
 # define BUFF_SIZE 255
 
-# include "../../filler/libft/libft.h"
+# include "libft.h"
 
 int			get_next_line(const int fd, char **line);
 
