@@ -55,5 +55,23 @@ void		hs_where_auxilia(char **paths, char *arg)
 		free(where);
 	}
 	else if (!is_builtin(arg))
-		ft_printf("%s not found\n", arg);
+		ft_printf("%s: not found\n", arg);
+}
+
+void		restore_variables(void)
+{
+	char	*var;
+
+	if ((var = get_env("PWD")) == NULL)
+		set_env("PWD", " ");
+	chfree(var);
+	if ((var = get_env("HOME")) == NULL)
+		set_env("HOME", " ");
+	chfree(var);
+	if ((var = get_env("OLDPWD")) == NULL)
+		set_env("OLDPWD", (var = get_env("HOME")));
+	chfree(var);
+	if ((var = get_env("PATH")) == NULL)
+		set_env("PATH", " ");
+	chfree(var);
 }

@@ -21,25 +21,24 @@ ssize_t	goats_teleported(void)
 char	**wait_for_input(void)
 {
 	char	*line;
-	char	*swap;
-	char	**args;
+	char	**commands;
 
-	while (1)
+	commands = NULL;
+	while (goats_teleported())
 	{
 		if (get_next_line(STDIN_FILENO, &line) > 0)
 		{
 			if (ft_strlen(line) == 0)
+			{
+				chfree(line);
 				return (NULL);
-			swap = replace_home(line);
-			free(line);
-			line = replace_variables(swap);
-			free(swap);
-			args = ft_strsplit(line, ' ');
+			}
+			commands = ft_strsplit(line, ';');
 			free(line);
 			break ;
 		}
 	}
-	return (args);
+	return (commands);
 }
 
 void	display_prompt(void)
@@ -56,7 +55,7 @@ void	display_prompt(void)
 	getcwd(cwd, 1024);
 	if (home != NULL && ft_strstr(cwd, home) != 0)
 	{
-		swap = ft_strsub(cwd, ft_strlen(home) - 1,
+		swap = ft_strsub(cwd, ft_strlen(home) == 0 ? 0 : ft_strlen(home) - 1,
 						ft_strlen(cwd) - ft_strlen(home) + 1);
 		free(cwd);
 		cwd = swap;
@@ -71,18 +70,27 @@ void	display_prompt(void)
 int		shell_loop(void)
 {
 	int			status;
+	int			i;
+	char		**commands;
 	char		**args;
 
 	while (goats_teleported())
 	{
 		display_prompt();
-		args = wait_for_input();
-		if (args == NULL)
-			continue ;
-		status = execute(args);
-		if (status != 0)
-			ft_dprintf(2, "minishell: command not found: %s\n", args[0]);
-		free_array(args);
+		commands = wait_for_input();
+		i = 0;
+		while (commands && commands[i])
+		{
+			restore_variables();
+			expand_variables(&commands[i]);
+			args = ft_strsplit(commands[i], ' ');
+			status = execute(args);
+			if (status != 0)
+				ft_dprintf(2, "minishell: command not found: %s\n", args[0]);
+			free_array(args);
+			i++;
+		}
+		free_array(commands);
 	}
 	return (0);
 }
@@ -98,6 +106,7 @@ int		main(int argc, char **argv, char **env)
 			term.ws_col / 2 + 12, "Willkommen und bienvenue.",
 			term.ws_col / 2 + 12, " Welcome to Minishell 2. ");
 	g_environ = copy_env(env, environ);
+	setup_signal_handlers();
 	shell_loop();
 	return (0);
 }

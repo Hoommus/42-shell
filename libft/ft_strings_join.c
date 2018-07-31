@@ -12,8 +12,8 @@
 
 #include "libft.h"
 
-static size_t	malloc_str(size_t args_size, va_list *args, size_t delimiter_size,
-							char **whereto)
+static size_t	malloc_str(size_t args_size, va_list *args,
+							size_t delimiter_size, char **whereto)
 {
 	char		*str;
 	size_t		whole_size;

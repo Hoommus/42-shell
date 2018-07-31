@@ -49,19 +49,15 @@ int		get_variable_end(char *line)
 	int		i;
 
 	i = 0;
-	while (line[i])
-	{
-		if (!(ft_isalnum(line[i]) || line[i] == '_' || line[i] == '$'))
-			break ;
+	while (ft_isalnum(line[i]) || line[i] == '_' || line[i] == '$')
 		i++;
-	}
-	return (i);
+	return (i - 1);
 }
 
 char	*replace_variables(char *line)
 {
 	int		i;
-	int		end;
+	int		len;
 	char	*new;
 	char	*var;
 	char	*swap;
@@ -72,11 +68,11 @@ char	*replace_variables(char *line)
 	{
 		if (new[i] == '$')
 		{
-			end = get_variable_end(line + i) + i;
-			if (!is_valid_var((swap = ft_strsub(line, i + 1, end))))
+			len = get_variable_end(new + i);
+			if (!is_valid_var((swap = ft_strsub(new, i + 1, len))))
 				continue ;
 			var = get_env(swap);
-			line = ft_strinsert_range(new, var, i, end);
+			line = ft_strinsert_range(new, var, i, len + i + 1);
 			free(new);
 			new = line;
 			chfree_n(2, swap, var);
@@ -85,4 +81,14 @@ char	*replace_variables(char *line)
 		i++;
 	}
 	return (new);
+}
+
+void	expand_variables(char **line)
+{
+	char	*swap;
+
+	swap = replace_home(*line);
+	free(*line);
+	*line = replace_variables(swap);
+	free(swap);
 }

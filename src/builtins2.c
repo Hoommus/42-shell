@@ -57,7 +57,7 @@ int				hs_unsetenv(char **args)
 }
 
 /*
-** TODO: seems like some code is shared with try_binary
+** seems like some code is shared with try_binary
 */
 
 int				hs_where(char **args)
@@ -67,7 +67,7 @@ int				hs_where(char **args)
 
 	swap = get_env("PATH");
 	if (swap == NULL)
-		return (1);
+		swap = ft_strdup("");
 	paths = ft_strsplit(swap, ':');
 	free(swap);
 	while (*args)

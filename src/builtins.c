@@ -5,13 +5,18 @@ int				hs_echo(char **args)
 	char	*str;
 	char	*swap;
 
+	if (args == NULL || args[0] == NULL)
+	{
+		ft_printf("\n");
+		return (0);
+	}
 	str = ft_strarr_join(" ", args);
 	swap = replace_variables(str);
-	free(str);
+	chfree(str);
 	if (swap == NULL)
 		return (1);
 	ft_printf("%s\n", swap);
-	free(swap);
+	chfree(swap);
 	return (0);
 }
 
@@ -38,5 +43,4 @@ int				hs_exit(char **args)
 {
 	*args = args[0];
 	exit(0);
-	return (0);
 }

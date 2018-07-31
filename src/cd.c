@@ -25,8 +25,9 @@ int				try_cd(char *path, char *oldpwd)
 		status = try_access_and_cd(home);
 	else if (ft_strcmp(path, "-") == 0)
 	{
-		if (oldpwd != NULL)
-			ft_printf("%s\n", oldpwd);
+		if (oldpwd == NULL)
+			oldpwd = home;
+		ft_printf("%s\n", oldpwd);
 		status = try_access_and_cd(oldpwd);
 	}
 	else
@@ -43,6 +44,8 @@ int				hs_cd(char **args)
 	char		pwd[1024];
 	int			status;
 
+	if (args == NULL || args[1] != NULL)
+		return (0);
 	swap = replace_home(args[0]);
 	oldpwd = get_env("OLDPWD");
 	getcwd(currpwd, 1024);

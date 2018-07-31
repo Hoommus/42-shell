@@ -34,8 +34,7 @@ int		set_env(char *key, char *value)
 	char	*dummy;
 
 	i = -1;
-	dummy = get_env(key);
-	if (dummy == NULL)
+	if ((dummy = get_env(key)) == NULL)
 	{
 		while (g_environ[++i])
 			;
@@ -53,6 +52,7 @@ int		set_env(char *key, char *value)
 			g_environ[i] = ft_strings_join(2, "=", key, value);
 			free_array(swap);
 		}
+	chfree(dummy);
 	return (0);
 }
 

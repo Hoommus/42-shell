@@ -5,7 +5,7 @@ int		try_builtin(char *builtin, char **args)
 	int		i;
 
 	i = 0;
-	while (i < 10)
+	while (i < 10 && builtin)
 	{
 		if (ft_strcmp(builtin, g_builtins[i]) == 0)
 			return (g_builtin_func[i](args));
@@ -14,21 +14,20 @@ int		try_builtin(char *builtin, char **args)
 	return (1);
 }
 
-int		forknrun(char *bare_bin, char *bin, char **args)
+int		forknrun(char *bin, char **args)
 {
-	pid_t	pid;
 	int		status;
 
-	*bare_bin = bare_bin[0];
-	pid = fork();
-	if (pid == 0)
+	g_running_process = fork();
+	if (g_running_process == 0)
 	{
 		execve(bin, args, g_environ);
 		exit(0);
 	}
 	else
 	{
-		pid = wait(&status);
+		wait(&status);
+		g_running_process = 0;
 		return (0);
 	}
 }
@@ -51,7 +50,7 @@ int		try_binary(char *binary, char **args)
 	{
 		swap = ft_strings_join(2, "/", paths[i], binary, NULL);
 		if (access(swap, X_OK) == 0)
-			if (!forknrun(binary, swap, args))
+			if (!forknrun(swap, args))
 				status = 0;
 		free(swap);
 		i++;
@@ -64,24 +63,12 @@ int		try_local_binary(char *bin, char **args)
 {
 	int		status;
 	char	*swap;
-	char	*env;
 
 	status = 1;
-	swap = NULL;
-	if (*bin == '~')
-	{
-		env = get_env("HOME");
-		if (env != NULL)
-		{
-			swap = ft_strings_join(2, "", env, ++bin);
-			free(env);
-			bin = swap;
-		}
-	}
-	if (access(bin, X_OK) == 0 && !forknrun(bin, bin, args))
+	swap = replace_home(bin);
+	if (access(swap, X_OK) == 0 && !forknrun(swap, args))
 		status = 0;
-	if (swap != NULL)
-		free(swap);
+	chfree(swap);
 	return (status);
 }
 
@@ -90,7 +77,8 @@ int		execute(char **args)
 	int		status;
 
 	status = 1;
-	IFNNULL(args, status = try_builtin(args[0], args + 1));
+	if (args != NULL)
+		status = try_builtin(args[0], args + 1);
 	if (status == 0)
 		return (0);
 	status = try_binary(args[0], args);

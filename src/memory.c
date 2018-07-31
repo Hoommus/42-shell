@@ -7,7 +7,7 @@ void	free_array(char **array)
 	i = 0;
 	while (array[i])
 	{
-		free(array[i]);
+		chfree(array[i]);
 		i++;
 	}
 	free(array);
