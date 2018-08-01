@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:52:08 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/07/31 14:52:08 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/08/01 12:58:03 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ char					**copy_env(char **argenv, char **environ);
 /*
 ** Auxilia
 */
-void					hs_where_auxilia(char **paths, char *arg);
+void					increment_shlvl(void);
 char					*replace_variables(char *line);
 char					*replace_home(char *line);
 void					restore_variables(void);

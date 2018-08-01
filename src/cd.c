@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:58 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/07/31 14:45:58 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/08/01 12:43:27 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,13 @@ int				try_cd(char *path, char *oldpwd)
 	char	*home;
 
 	home = get_env("HOME");
-	if (path == NULL)
-		status = try_access_and_cd(home);
+	if (path == NULL || ft_strlen(path) == 0)
+	{
+		if (home != NULL)
+			status = try_access_and_cd(home);
+		else
+			return (0);
+	}
 	else if (ft_strcmp(path, "-") == 0)
 	{
 		if (oldpwd == NULL)
@@ -44,7 +49,7 @@ int				try_cd(char *path, char *oldpwd)
 	}
 	else
 		status = try_access_and_cd(path);
-	free(home);
+	chfree(home);
 	return (status);
 }
 
@@ -56,9 +61,7 @@ int				hs_cd(char **args)
 	char		pwd[1024];
 	int			status;
 
-	if (args == NULL || args[1] != NULL)
-		return (0);
-	swap = replace_home(args[0]);
+	swap = ft_strdup(args[0]);
 	oldpwd = get_env("OLDPWD");
 	getcwd(currpwd, 1024);
 	status = try_cd(swap, oldpwd);

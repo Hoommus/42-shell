@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:45 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/07/31 14:45:45 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/07/31 15:20:54 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,12 +17,12 @@ void	free_array(char **array)
 	int		i;
 
 	i = 0;
-	while (array[i])
+	while (array && array[i])
 	{
 		chfree(array[i]);
 		i++;
 	}
-	free(array);
+	chfree(array);
 }
 
 void	chfree(void *obj)
@@ -40,7 +40,7 @@ void	chfree_n(int n, ...)
 	while (n)
 	{
 		if ((dummy = va_arg(list, void *)))
-			free(dummy);
+			chfree(dummy);
 		n--;
 	}
 	va_end(list);

@@ -94,7 +94,7 @@ int		shell_loop(void)
 		while (commands && commands[i])
 		{
 			restore_variables();
-			expand_variables(&commands[i]);
+			expand_variables(commands + i);
 			args = ft_strsplit(commands[i], ' ');
 			status = execute(args);
 			if (status != 0)
@@ -118,6 +118,7 @@ int		main(int argc, char **argv, char **env)
 			term.ws_col / 2 + 12, "Willkommen und bienvenue.",
 			term.ws_col / 2 + 12, " Welcome to Minishell 2. ");
 	g_environ = copy_env(env, environ);
+	increment_shlvl();
 	setup_signal_handlers();
 	shell_loop();
 	return (0);

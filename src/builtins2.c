@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:46:04 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/07/31 14:46:04 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/08/01 12:52:09 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ int				hs_setenv(char **args)
 		else if (swap[2] == NULL)
 			set_env(swap[0], swap[1]);
 		else
-			ft_printf("setenv: arguments not valid in this context.\n");
+			ft_dprintf(2, "setenv: arguments not valid in this context.\n");
 		free_array(swap);
 	}
 	return (0);
@@ -65,25 +65,5 @@ int				hs_unsetenv(char **args)
 	else
 		while (i < len)
 			unset_env(args[i++]);
-	return (0);
-}
-
-/*
-** seems like some code is shared with try_binary
-*/
-
-int				hs_where(char **args)
-{
-	char	*swap;
-	char	**paths;
-
-	swap = get_env("PATH");
-	if (swap == NULL)
-		swap = ft_strdup("");
-	paths = ft_strsplit(swap, ':');
-	free(swap);
-	while (*args)
-		hs_where_auxilia(paths, *args++);
-	free_array(paths);
 	return (0);
 }
