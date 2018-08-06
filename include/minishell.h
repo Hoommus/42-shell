@@ -36,7 +36,6 @@ typedef int				(*t_builtin_func) (char **);
 /*
 ** Builtins
 */
-int						hs_alias(char **args);
 int						hs_cd(char **args);
 int						hs_echo(char **args);
 int						hs_env(char **args);
@@ -47,7 +46,6 @@ int						hs_exit(char **args);
 int						hs_where(char **args);
 
 static char				*g_builtins[] = {
-	"alias",
 	"cd",
 	"echo",
 	"env",
@@ -60,7 +58,6 @@ static char				*g_builtins[] = {
 };
 
 static t_builtin_func	g_builtin_func[] = {
-	&hs_alias,
 	&hs_cd,
 	&hs_echo,
 	&hs_env,

@@ -61,7 +61,7 @@ int				hs_cd(char **args)
 	char		pwd[1024];
 	int			status;
 
-	swap = ft_strdup(args[0]);
+	swap = args[0] == NULL ? ft_strnew(0) : ft_strdup(args[0]);
 	oldpwd = get_env("OLDPWD");
 	getcwd(currpwd, 1024);
 	status = try_cd(swap, oldpwd);

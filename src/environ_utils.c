@@ -30,7 +30,7 @@ char	*get_env(char *name)
 		if (ABS(ft_strcmp(name, g_environ[i])) == '=')
 		{
 			swap = ft_strsplit(g_environ[i], '=');
-			dummy = ft_strdup(swap[1]);
+			dummy = swap[1] == NULL ? ft_strnew(0) : ft_strdup(swap[1]);
 			free_array(swap);
 			break ;
 		}

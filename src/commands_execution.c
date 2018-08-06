@@ -17,7 +17,7 @@ int		try_builtin(char *builtin, char **args)
 	int		i;
 
 	i = 0;
-	while (i < 10 && builtin)
+	while (i < 9 && builtin)
 	{
 		if (ft_strcmp(builtin, g_builtins[i]) == 0)
 			return (g_builtin_func[i](args));
