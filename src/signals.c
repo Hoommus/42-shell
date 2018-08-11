@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../include/twenty_one_sh.h"
 
 void	ignore(int sig)
 {

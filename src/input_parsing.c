@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../include/twenty_one_sh.h"
 
 char	*ft_strinsert_range(char *str, char *insert, size_t start, size_t end)
 {
@@ -52,7 +52,6 @@ char	*replace_home(char *line)
 			copy = swap;
 		}
 	}
-	chfree(dummy);
 	return (copy);
 }
 
@@ -88,7 +87,7 @@ char	*replace_variables(char *line)
 			free(new);
 			new = line;
 			i = var == NULL ? i : i - 1;
-			chfree_n(2, swap, var);
+			chfree(swap);
 		}
 	}
 	return (new);

@@ -10,14 +10,14 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../include/twenty_one_sh.h"
 
 int		try_builtin(char *builtin, char **args)
 {
 	int		i;
 
 	i = 0;
-	while (i < 9 && builtin)
+	while (i < 10 && builtin)
 	{
 		if (ft_strcmp(builtin, g_builtins[i]) == 0)
 			return (g_builtin_func[i](args));
@@ -55,7 +55,6 @@ int		try_binary(char *binary, char **args)
 	if (swap == NULL)
 		return (1);
 	paths = ft_strsplit(swap, ':');
-	free(swap);
 	i = 0;
 	status = 1;
 	while (paths[i] && status)

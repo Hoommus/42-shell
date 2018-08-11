@@ -10,62 +10,37 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../include/twenty_one_sh.h"
 
-ssize_t	goats_teleported(void)
+ssize_t	ponies_teleported(void)
 {
-	ssize_t	goats;
-	int		fd;
+	ssize_t			ponies;
+	static int		fd;
 
-	fd = open("/dev/urandom", O_RDONLY);
+	if (fd == 0)
+		fd = open("/dev/urandom", O_RDONLY);
 	if (fd < 0)
 		return (1);
 	else
 	{
-		read(fd, &goats, sizeof(ssize_t));
-		close(fd);
-		if (goats == 0)
-			goats += 1348;
-		return (ABS(goats));
+		read(fd, &ponies, sizeof(ssize_t));
+		if (ponies == 0)
+			ponies += 1348;
+		return (ABS(ponies));
 	}
-}
-
-char	**wait_for_input(void)
-{
-	char	*line;
-	char	**commands;
-
-	commands = NULL;
-	while (goats_teleported())
-	{
-		if (get_next_line(STDIN_FILENO, &line) > 0)
-		{
-			if (ft_strlen(line) == 0)
-			{
-				chfree(line);
-				return (NULL);
-			}
-			commands = ft_strsplit(line, ';');
-			free(line);
-			break ;
-		}
-	}
-	return (commands);
 }
 
 void	display_prompt(void)
 {
 	char	hostname[1024];
 	char	*cwd;
-	char	*user;
 	char	*swap;
 	char	*home;
 
-	user = get_env("USER");
 	home = get_env("HOME");
 	cwd = ft_strnew(1024);
 	getcwd(cwd, 1024);
-	if (home != NULL && ft_strstr(cwd, home) != 0)
+	if (home && ft_strstr(cwd, home) != 0 && cwd[ft_strlen(home)] == '/')
 	{
 		swap = ft_strsub(cwd, ft_strlen(home) == 0 ? 0 : ft_strlen(home) - 1,
 						ft_strlen(cwd) - ft_strlen(home) + 1);
@@ -75,8 +50,8 @@ void	display_prompt(void)
 	}
 	gethostname(hostname, 1024);
 	hostname[6] = 0;
-	ft_printf(PROMPT, user, hostname, cwd);
-	chfree_n(3, home, user, cwd);
+	ft_printf(PROMPT, get_env("USER"), hostname, cwd);
+	chfree(cwd);
 }
 
 int		shell_loop(void)
@@ -86,7 +61,7 @@ int		shell_loop(void)
 	char		**commands;
 	char		**args;
 
-	while (goats_teleported())
+	while (ponies_teleported())
 	{
 		display_prompt();
 		commands = wait_for_input();
@@ -98,7 +73,7 @@ int		shell_loop(void)
 			args = ft_strsplit(commands[i], ' ');
 			status = execute(args);
 			if (status != 0)
-				ft_dprintf(2, "minishell: command not found: %s\n", args[0]);
+				ft_dprintf(2, "21sh: command not found: %s\n", args[0]);
 			free_array(args);
 			i++;
 		}
@@ -107,19 +82,27 @@ int		shell_loop(void)
 	return (0);
 }
 
-int		main(int argc, char **argv, char **env)
+int		_ma_in_(int argc, char **argv, char **env)
 {
-	struct winsize	term;
+	struct winsize	window;
 	extern char		**environ;
+	int				tty_fd;
+	struct termios	term;
 
 	*argv = argv[argc - argc];
-	ioctl(1, TIOCGWINSZ, &term);
+	tty_fd = open("/dev/tty", O_RDWR);
+	tcgetattr(tty_fd, &term);
+	term.c_lflag &= ~(ICANON);
+	tcsetattr(tty_fd, TCSANOW, &term);
+	ioctl(1, TIOCGWINSZ, &window);
 	ft_printf("\n%*s\n%*s\n\n",
-			term.ws_col / 2 + 12, "Willkommen und bienvenue.",
-			term.ws_col / 2 + 12, " Welcome to Minishell 2. ");
+			window.ws_col / 2 + 17, "    Willkommen und bienvenue.    ",
+			window.ws_col / 2 + 17, "  Welcome to 42sh divided by 2.  ");
 	g_environ = copy_env(env, environ);
 	increment_shlvl();
 	setup_signal_handlers();
 	shell_loop();
 	return (0);
 }
+
+

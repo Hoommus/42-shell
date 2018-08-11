@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../include/twenty_one_sh.h"
 
 char	*is_builtin(char *arg)
 {
@@ -65,7 +65,7 @@ int		hs_where(char **args)
 
 	swap = get_env("PATH");
 	if (swap == NULL)
-		swap = ft_strdup("");
+		swap = ft_strnew(0);
 	paths = ft_strsplit(swap, ':');
 	free(swap);
 	while (*args)

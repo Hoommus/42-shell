@@ -22,7 +22,7 @@ LIB_DIR = ../libft
 LIB_NAME = libft.a
 
 PRINTF_SRC = stringf.c integerf.c nbr_util.c ft_printf.c generic_functions.c \
-            generic_functions2.c util.c unicode.c parsing.c evals.c evals2.c \
+            generic_functions2.c util.c parsing.c evals.c evals2.c           \
             variations.c
 
 OBJ = $(addprefix $(OBJ_DIR), $(PRINTF_SRC:.c=.o))

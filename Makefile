@@ -10,7 +10,7 @@
 #                                                                              #
 # **************************************************************************** #
 
-NAME = minishell
+NAME = 21sh
 
 FLAGS = -std=c99 -Wall -Wextra -Werror
 
@@ -22,7 +22,9 @@ LIB_DIR = ./printf
 LIB_NAME = libftprintf.a
 
 SHELL_SRC = main.c environ_utils.c commands_execution.c builtins.c builtins2.c \
-            memory.c auxilia.c input_parsing.c cd.c signals.c where.c \
+            memory.c auxilia.c input_parsing.c cd.c signals.c where.c          \
+            input_processing.c keyhooks.c \
+            lexer/smart_split.c lexer/tokenizer.c lexer/tokens_mem.c
 
 OBJ = $(addprefix $(OBJ_DIR), $(SHELL_SRC:.c=.o))
 
@@ -30,11 +32,11 @@ $(NAME): $(OBJ)
 	make -C $(LIB_DIR)
 	@mkdir -p $(OBJ_DIR)
 	cp $(LIB_DIR)/$(LIB_NAME) ./$(LIB_NAME)
-	gcc $(FLAGS) -o $(NAME) $(OBJ) -I $(HEADER) $(LIB_NAME)
+	gcc $(FLAGS) -o $(NAME) $(addprefix $(OBJ_DIR), $(notdir $(OBJ))) -I $(HEADER) $(LIB_NAME)
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
 	@mkdir -p $(OBJ_DIR)
-	gcc $(FLAGS) -I $(HEADER) -o $@ -c $<
+	gcc $(FLAGS) -I $(HEADER) -o $(addprefix $(OBJ_DIR), $(notdir $@)) -c $<
 
 all: $(NAME)
 

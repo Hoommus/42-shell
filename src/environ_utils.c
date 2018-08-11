@@ -10,12 +10,11 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../include/twenty_one_sh.h"
 
 char	*get_env(char *name)
 {
 	int		i;
-	char	**swap;
 	char	*dummy;
 
 	if (!is_valid_var(name))
@@ -29,9 +28,7 @@ char	*get_env(char *name)
 	{
 		if (ABS(ft_strcmp(name, g_environ[i])) == '=')
 		{
-			swap = ft_strsplit(g_environ[i], '=');
-			dummy = swap[1] == NULL ? ft_strnew(0) : ft_strdup(swap[1]);
-			free_array(swap);
+			dummy = ft_strchr(g_environ[i], '=') + 1;
 			break ;
 		}
 		i++;
@@ -64,7 +61,6 @@ int		set_env(char *key, char *value)
 			g_environ[i] = ft_strings_join(2, "=", key, value);
 			free_array(swap);
 		}
-	chfree(dummy);
 	return (0);
 }
 
@@ -92,16 +88,14 @@ int		unset_env(char *name)
 {
 	int		len;
 	char	**new_env;
-	char	*dummy;
 
-	dummy = get_env(name);
-	if (dummy == NULL)
+	if (get_env(name) == NULL)
 		return (0);
 	len = 0;
 	while (g_environ[len])
 		len++;
 	new_env = remove_env(name, len);
-	chfree_n(2, g_environ, dummy);
+	chfree(g_environ);
 	g_environ = new_env;
 	return (0);
 }

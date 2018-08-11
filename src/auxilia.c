@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../include/twenty_one_sh.h"
 
 int			is_valid_var(char *var)
 {
@@ -32,15 +32,12 @@ void		restore_variables(void)
 {
 	char	*var;
 
-	if ((var = get_env("PWD")) == NULL)
+	if (get_env("PWD") == NULL)
 		set_env("PWD", "");
-	chfree(var);
-	if ((var = get_env("OLDPWD")) == NULL)
+	if (get_env("OLDPWD") == NULL)
 		set_env("OLDPWD", (var = get_env("HOME")) == NULL ? "" : var);
-	chfree(var);
-	if ((var = get_env("PATH")) == NULL)
+	if (get_env("PATH") == NULL)
 		set_env("PATH", "");
-	chfree(var);
 }
 
 void		increment_shlvl(void)

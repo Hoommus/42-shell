@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../include/twenty_one_sh.h"
 
 int				hs_echo(char **args)
 {
@@ -32,6 +32,12 @@ int				hs_echo(char **args)
 	return (0);
 }
 
+int				hs_alias(char **args)
+{
+	*args = args[0];
+	return (0);
+}
+
 int				hs_help(char **args)
 {
 	int		i;
@@ -39,9 +45,9 @@ int				hs_help(char **args)
 	*args = args[0];
 	ft_printf("Existing builtins:\n");
 	i = 0;
-	while (i < 8)
+	while (i < 9)
 		ft_printf("%s, ", g_builtins[i++]);
-	ft_printf("%s\n", g_builtins[8]);
+	ft_printf("%s\n", g_builtins[9]);
 	return (0);
 }
 

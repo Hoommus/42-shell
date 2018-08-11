@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../include/twenty_one_sh.h"
 
 int				try_access_and_cd(char *path)
 {
@@ -49,22 +49,19 @@ int				try_cd(char *path, char *oldpwd)
 	}
 	else
 		status = try_access_and_cd(path);
-	chfree(home);
 	return (status);
 }
 
 int				hs_cd(char **args)
 {
-	char		*swap;
 	char		*oldpwd;
 	char		currpwd[1024];
 	char		pwd[1024];
 	int			status;
 
-	swap = args[0] == NULL ? ft_strnew(0) : ft_strdup(args[0]);
 	oldpwd = get_env("OLDPWD");
 	getcwd(currpwd, 1024);
-	status = try_cd(swap, oldpwd);
+	status = try_cd(args[0], oldpwd);
 	if (status == 0)
 	{
 		getcwd(pwd, 1024);
@@ -72,9 +69,8 @@ int				hs_cd(char **args)
 		set_env("OLDPWD", currpwd);
 	}
 	else if (status == 1348)
-		ft_dprintf(2, "cd: permission denied: %s\n", swap);
+		ft_dprintf(2, "cd: permission denied: %s\n", args[0]);
 	else
-		ft_dprintf(2, "cd: no such file or directory: %s\n", swap);
-	chfree_n(2, swap, oldpwd);
+		ft_dprintf(2, "cd: no such file or directory: %s\n", args[0]);
 	return (0);
 }
