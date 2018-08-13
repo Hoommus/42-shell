@@ -10,7 +10,34 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/twenty_one_sh.h"
+#include "../../include/twenty_one_sh.h"
+
+t_builtin_func	g_builtin_func[] = {
+	&hs_alias,
+	&hs_cd,
+	&hs_echo,
+	&hs_env,
+	&hs_setenv,
+	&hs_unsetenv,
+	&hs_help,
+	&hs_exit,
+	&hs_exit,
+	&hs_where
+};
+
+char			*g_builtins[] = {
+	"alias",
+	"cd",
+	"echo",
+	"env",
+	"setenv",
+	"unsetenv",
+	"help",
+	"exit",
+	"quit",
+	"where",
+	NULL
+};
 
 int				hs_echo(char **args)
 {

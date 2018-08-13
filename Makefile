@@ -21,24 +21,31 @@ OBJ_DIR = ./obj/
 LIB_DIR = ./printf
 LIB_NAME = libftprintf.a
 
-SHELL_SRC = main.c environ_utils.c commands_execution.c builtins.c builtins2.c \
-            memory.c auxilia.c input_parsing.c cd.c signals.c where.c          \
-            input_processing.c keyhooks.c \
-            lexer/smart_split.c lexer/tokenizer.c lexer/tokens_mem.c
+SHELL_SRC = main.c environ_utils.c commands_execution.c memory.c auxilia.c     \
+            input_parsing.c signals.c input_processing.c keyhooks.c            \
 
-OBJ = $(addprefix $(OBJ_DIR), $(SHELL_SRC:.c=.o))
+LEXER_DIR = lexer/
+LEXER_SRC = smart_split.c tokenizer.c tokens_mem.c
+
+BUILTIN_DIR = builtins/
+BUILTIN_SRC = cd.c where.c builtins.c builtins2.c
+
+OBJ = $(addprefix $(OBJ_DIR), $(SHELL_SRC:.c=.o)) \
+      $(addprefix $(OBJ_DIR)$(LEXER_DIR), $(LEXER_SRC:.c=.o)) \
+      $(addprefix $(OBJ_DIR)$(BUILTIN_DIR), $(BUILTIN_SRC:.c=.o))
+
+all:
+	@mkdir -p $(OBJ_DIR)$(LEXER_DIR)
+	@mkdir -p $(OBJ_DIR)$(BUILTIN_DIR)
+	@make $(NAME)
 
 $(NAME): $(OBJ)
 	make -C $(LIB_DIR)
-	@mkdir -p $(OBJ_DIR)
 	cp $(LIB_DIR)/$(LIB_NAME) ./$(LIB_NAME)
-	gcc $(FLAGS) -o $(NAME) $(addprefix $(OBJ_DIR), $(notdir $(OBJ))) -I $(HEADER) $(LIB_NAME)
+	gcc $(FLAGS) -o $(NAME) $(OBJ) -I $(HEADER) $(LIB_NAME)
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
-	@mkdir -p $(OBJ_DIR)
-	gcc $(FLAGS) -I $(HEADER) -o $(addprefix $(OBJ_DIR), $(notdir $@)) -c $<
-
-all: $(NAME)
+	gcc $(FLAGS) -I $(HEADER) -o $@ -c $<
 
 clean:
 	make -C libft clean

@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/twenty_one_sh.h"
+#include "../../include/twenty_one_sh.h"
 
 int				try_access_and_cd(char *path)
 {
@@ -33,7 +33,7 @@ int				try_cd(char *path, char *oldpwd)
 	char	*home;
 
 	home = get_env("HOME");
-	if (path == NULL || ft_strlen(path) == 0)
+	if (ft_strcmp(path, "--") == 0 || path == NULL || ft_strlen(path) == 0)
 	{
 		if (home != NULL)
 			status = try_access_and_cd(home);

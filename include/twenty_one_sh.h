@@ -54,31 +54,9 @@ int						hs_help(char **args);
 int						hs_exit(char **args);
 int						hs_where(char **args);
 
-static char				*g_builtins[] = {
-	"alias",
-	"cd",
-	"echo",
-	"env",
-	"setenv",
-	"unsetenv",
-	"help",
-	"exit",
-	"quit",
-	"where"
-};
-
-static t_builtin_func	g_builtin_func[] = {
-	&hs_alias,
-	&hs_cd,
-	&hs_echo,
-	&hs_env,
-	&hs_setenv,
-	&hs_unsetenv,
-	&hs_help,
-	&hs_exit,
-	&hs_exit,
-	&hs_where
-};
+char					**g_binaries_table;
+extern char				*g_builtins[];
+extern t_builtin_func	g_builtin_func[];
 
 pid_t					g_running_process;
 char					**g_environ;

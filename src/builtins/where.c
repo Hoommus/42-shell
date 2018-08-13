@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/twenty_one_sh.h"
+#include "../../include/twenty_one_sh.h"
 
 char	*is_builtin(char *arg)
 {
