@@ -1,7 +1,6 @@
 #include "../../include/script_lang.h"
-#include "../../include/twenty_one_sh.h"
 
-t_token	*new_token(char *value, enum e_token type)
+t_token			*new_token(char *value, enum e_token type)
 {
 	t_token	*new;
 

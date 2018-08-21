@@ -15,12 +15,27 @@
 void	ignore(int sig)
 {
 	sig = 0;
-	shell_loop();
+	clear_buffer();
+	ft_printf("^C\n");
+	g_term->state = BREAK;
+}
+
+void	resize(int sig)
+{
+	struct winsize size;
+
+	if (sig == SIGWINCH)
+	{
+		ioctl(STDOUT_FILENO, TIOCGWINSZ, &size);
+		g_term->term_rows = size.ws_row;
+		g_term->term_cols = size.ws_col;
+	}
 }
 
 void	setup_signal_handlers(void)
 {
-	signal(SIGTERM, SIG_IGN);
-	signal(SIGINT, SIG_IGN);
-	signal(SIGTSTP, &ignore);
+//	signal(SIGTERM, SIG_IGN);
+	signal(SIGINT, &ignore);
+//	signal(SIGTSTP, &ignore);
+//	signal(SIGWINCH, &resize);
 }

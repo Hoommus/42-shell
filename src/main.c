@@ -12,25 +12,9 @@
 
 #include "../include/twenty_one_sh.h"
 
-ssize_t	ponies_teleported(void)
-{
-	ssize_t			ponies;
-	static int		fd;
+struct s_term	*g_term;
 
-	if (fd == 0)
-		fd = open("/dev/urandom", O_RDONLY);
-	if (fd < 0)
-		return (1);
-	else
-	{
-		read(fd, &ponies, sizeof(ssize_t));
-		if (ponies == 0)
-			ponies += 1348;
-		return (ABS(ponies));
-	}
-}
-
-void	display_prompt(void)
+void			display_prompt(void)
 {
 	char	hostname[1024];
 	char	*cwd;
@@ -54,7 +38,7 @@ void	display_prompt(void)
 	chfree(cwd);
 }
 
-int		shell_loop(void)
+int				shell_loop(void)
 {
 	int			status;
 	int			i;
@@ -64,6 +48,8 @@ int		shell_loop(void)
 	while (ponies_teleported())
 	{
 		display_prompt();
+		clear_buffer();
+		g_term->state = NORMAL;
 		commands = wait_for_input();
 		i = 0;
 		while (commands && commands[i])
@@ -82,26 +68,49 @@ int		shell_loop(void)
 	return (0);
 }
 
-int		_ma_in_(int argc, char **argv, char **env)
+void			init_term(void)
 {
 	struct winsize	window;
-	extern char		**environ;
-	int				tty_fd;
+	struct termios	oldterm;
 	struct termios	term;
+	int				tty_fd;
 
-	*argv = argv[argc - argc];
 	tty_fd = open("/dev/tty", O_RDWR);
-	tcgetattr(tty_fd, &term);
-	term.c_lflag &= ~(ICANON);
+	ft_printf("tty: %d\n", tty_fd);
+	tcgetattr(tty_fd, &oldterm);
+	term = oldterm;
+	term.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
+	//term.c_lflag &= ECHOCTL | ECHOE | ECHOK | ECHOKE;
 	tcsetattr(tty_fd, TCSANOW, &term);
-	ioctl(1, TIOCGWINSZ, &window);
-	ft_printf("\n%*s\n%*s\n\n",
-			window.ws_col / 2 + 17, "    Willkommen und bienvenue.    ",
-			window.ws_col / 2 + 17, "  Welcome to 42sh divided by 2.  ");
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &window);
+	g_term = (struct s_term *)malloc(sizeof(struct s_term));
+	g_term->term_cols = window.ws_col;
+	g_term->term_rows = window.ws_row;
+	g_term->iterator = 0;
+	ft_bzero(g_term->line_buffer, sizeof(char) * (MAX_INPUT + 1));
+	g_term->state = NORMAL;
+}
+
+int				main(int argc, char **argv, char **env)
+{
+	extern char		**environ;
+
+	init_term();
 	g_environ = copy_env(env, environ);
 	increment_shlvl();
+	ft_printf("\n%*s\n%*s\n\n",
+			g_term->term_cols / 2 + 17, "    Willkommen und bienvenue.    ",
+			g_term->term_cols / 2 + 17, "  Welcome to 42sh divided by 2.  ");
+	if (ft_atoi(get_env("SHLVL")) > 2)
+		ft_printf("\nRabbit hole (shell) level: %s\n", get_env("SHLVL"));
+	if (tgetent(NULL, getenv("TERM")) == ERR)
+		printf("\x001b[41;1m%-52s\x001b[0;0m\n\x001b[41;1m%52s\x001b[0;0m\n",
+			   "Warning: TERM enviroment variable is not set.",
+			   "Terminal capabilities are somewhat limited.");
 	setup_signal_handlers();
+	hook_listeners();
 	shell_loop();
+	*argv = argv[argc - argc];
 	return (0);
 }
 

@@ -12,7 +12,8 @@
 
 NAME = 21sh
 
-FLAGS = -std=c99 -Wall -Wextra -Werror
+##### Remove the -g flag #####
+FLAGS = -g -std=c99 -Wall -Wextra -Werror
 
 HEADER = include
 SRC_DIR = ./src/
@@ -22,27 +23,32 @@ LIB_DIR = ./printf
 LIB_NAME = libftprintf.a
 
 SHELL_SRC = main.c environ_utils.c commands_execution.c memory.c auxilia.c     \
-            input_parsing.c signals.c input_processing.c keyhooks.c            \
+            signals.c variables_replacement.c \
 
 LEXER_DIR = lexer/
-LEXER_SRC = smart_split.c tokenizer.c tokens_mem.c
+LEXER_SRC = quotes.c smart_split.c tokenizer.c tokens_mem.c
 
 BUILTIN_DIR = builtins/
 BUILTIN_SRC = cd.c where.c builtins.c builtins2.c
 
+INTERFACE_DIR = line_editing/
+INTERFACE_SRC = buffer_works.c cursor_control.c key_handlers.c listeners.c
+
 OBJ = $(addprefix $(OBJ_DIR), $(SHELL_SRC:.c=.o)) \
       $(addprefix $(OBJ_DIR)$(LEXER_DIR), $(LEXER_SRC:.c=.o)) \
-      $(addprefix $(OBJ_DIR)$(BUILTIN_DIR), $(BUILTIN_SRC:.c=.o))
+      $(addprefix $(OBJ_DIR)$(BUILTIN_DIR), $(BUILTIN_SRC:.c=.o)) \
+      $(addprefix $(OBJ_DIR)$(INTERFACE_DIR), $(INTERFACE_SRC:.c=.o))
 
 all:
 	@mkdir -p $(OBJ_DIR)$(LEXER_DIR)
 	@mkdir -p $(OBJ_DIR)$(BUILTIN_DIR)
+	@mkdir -p $(OBJ_DIR)$(INTERFACE_DIR)
 	@make $(NAME)
 
 $(NAME): $(OBJ)
 	make -C $(LIB_DIR)
 	cp $(LIB_DIR)/$(LIB_NAME) ./$(LIB_NAME)
-	gcc $(FLAGS) -o $(NAME) $(OBJ) -I $(HEADER) $(LIB_NAME)
+	gcc $(FLAGS) -o $(NAME) $(OBJ) -I $(HEADER) $(LIB_NAME) -ltermcap
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
 	gcc $(FLAGS) -I $(HEADER) -o $@ -c $<

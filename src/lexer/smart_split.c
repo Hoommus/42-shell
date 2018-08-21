@@ -1,5 +1,4 @@
 #include "../../include/script_lang.h"
-#include "../../include/twenty_one_sh.h"
 
 char		*g_singles[] = {
 	"|",
@@ -41,7 +40,7 @@ int			count_substrings(char *str)
 		c = str[i];
 		if (ft_strchr(LIBFT_WHTSP, str[i]) != NULL && ++i)
 			continue ;
-		else if (is_single_token(str[i]) && ++i)
+		else if (is_single_token(str[i++]))
 			subs++;
 		else if (ISQT(str[i]) && ++i)
 			while (str[i] != 0 && str[i] != c)
@@ -115,7 +114,6 @@ char		**smart_split(char *str, char *delimiters)
 		array[j++] = ft_strsub(str + i, 0, word_size + ISQT(str[i]));
 		if (str[i] != ';')
 			i += word_size - !ISQT(str[i]);
-		ft_printf("%s\n", array[j - 1]);
 	}
 	array[j] = NULL;
 	return (array);

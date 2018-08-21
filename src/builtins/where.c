@@ -64,10 +64,7 @@ int		hs_where(char **args)
 	char	**paths;
 
 	swap = get_env("PATH");
-	if (swap == NULL)
-		swap = ft_strnew(0);
 	paths = ft_strsplit(swap, ':');
-	free(swap);
 	while (*args)
 		hs_where_auxilia(paths, *args++);
 	free_array(paths);

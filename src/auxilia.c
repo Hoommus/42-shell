@@ -40,19 +40,37 @@ void		restore_variables(void)
 		set_env("PATH", "");
 }
 
+ssize_t		ponies_teleported(void)
+{
+	ssize_t			ponies;
+	static int		fd;
+
+	if (fd == 0)
+		fd = open("/dev/urandom", O_RDONLY);
+	if (fd < 0)
+		return (1);
+	else
+	{
+		read(fd, &ponies, sizeof(ssize_t));
+		if (ponies == 0)
+			ponies += 1348;
+		return (ABS(ponies));
+	}
+}
+
 void		increment_shlvl(void)
 {
 	char		*swap;
 	int			level;
 
 	swap = get_env("SHLVL");
-	if (swap == NULL)
+	if (swap == NULL || ft_strlen(swap) == 0)
 		set_env("SHLVL", "1");
 	else
 	{
 		level = ft_atoi(swap) + 1;
-		free(swap);
 		set_env("SHLVL", (swap = ft_itoa(level)));
 		chfree(swap);
 	}
 }
+

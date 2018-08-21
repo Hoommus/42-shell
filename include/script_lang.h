@@ -1,8 +1,9 @@
 #ifndef SCRIPT_LANG_H
 # define SCRIPT_LANG_H
 
-# define TOKEN_DELIMITERS "\n\t;'\" \r\a"
+# include "twenty_one_sh.h"
 
+# define TOKEN_DELIMITERS "\n\t;'\" \r\a"
 # define ISQT(x) (((x) == '\'' || (x) == '"' || (x) == '`') ? (1) : (0))
 
 
@@ -12,16 +13,17 @@ extern char		*g_operators[];
 
 enum			e_token
 {
-	KEYWORD,			// while, if, fi, do, done, etc;
-	LITERAL,			// "hello", 42, 10.5;
-	BRACE,				// (, ), [, ], {, }
-	REDIRECTION,		// 2>&-
-	PIPE,				// '|'
-	OPERATOR,			//
-	UNARY_OPERATOR,		// -, $
-	BINARY_OPERATOR,	// <, >, +, -, /, *, &&, ||
-	SEPARATOR,			// ; '\n'
-	COMMAND				// string representing a command name;
+	KEYWORD,		// while, if, fi, do, done, etc;
+	LITERAL,		// "hello", 42, 10.5;
+	BRACE,			// (, ), [, ], {, }
+	REDIRECTION,	// 2>&-
+	PIPE,			// '|'
+	OPERATOR,		// DON'T TEASE ME,
+					// OPERATOR, WHAT'S GOING ON?
+					// Got it?
+	SEPARATOR,		// ; '\n'
+	COMMAND,		// string representing a command name;
+	END_OF_SCRIPT	// DO AS HE SAYS
 };
 
 typedef struct	s_token
@@ -47,13 +49,17 @@ typedef struct	s_node
 	struct s_node	*right;
 }				t_node;
 
-char			**smart_split(char *str, char *delimiters);
-
 /*
 ** Lexer
 */
+struct s_token	*tokenize(char **array);
 struct s_token	*new_token(char *value, enum e_token type);
 void			add_token(t_token **head, t_token **tail, t_token *to_add);
 void			free_token(struct s_token *token);
+
+char			**smart_split(char *str, char *delimiters);
+
+char			*get_buffer(void);
+void			clear_buffer(void);
 
 #endif

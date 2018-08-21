@@ -67,10 +67,11 @@ struct s_token	*tokenize(char **array)
 	i = 0;
 	while (array && array[i])
 		add_token(&head, &tail, get_token(array[i++]));
+	add_token(&head, &tail, new_token(";", SEPARATOR));
 	return (head);
 }
 
-char	*getenumname(enum e_token e)
+char	*enum_to_str(enum e_token e)
 {
 	switch (e)
 	{
@@ -95,10 +96,10 @@ char	*getenumname(enum e_token e)
 	}
 }
 
-int main(int argc, char **argv)
+int main_(int argc, char **argv)
 {
 	t_token	*tokens;
-	char	*name;
+	//char	*name;
 	char	*line;
 
 	*argv = argv[argc - argc];
@@ -107,7 +108,7 @@ int main(int argc, char **argv)
 	tokens = tokenize(smart_split(line, LIBFT_WHTSP));
 	while (tokens)
 	{
-		ft_printf("(%s '%s') ", getenumname(tokens->type), tokens->value);
+		ft_printf("(%s, %s) ", enum_to_str(tokens->type), tokens->value);
 		tokens = tokens->next;
 	}
 	return (0);
