@@ -33,7 +33,7 @@ int				try_cd(char *path, char *oldpwd)
 	char	*home;
 
 	home = get_env("HOME");
-	if (ft_strcmp(path, "--") == 0 || path == NULL || ft_strlen(path) == 0)
+	if (path == NULL || ft_strcmp(path, "--") == 0 || ft_strlen(path) == 0)
 	{
 		if (home != NULL)
 			status = try_access_and_cd(home);

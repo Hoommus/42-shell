@@ -43,7 +43,14 @@ all:
 	@mkdir -p $(OBJ_DIR)$(LEXER_DIR)
 	@mkdir -p $(OBJ_DIR)$(BUILTIN_DIR)
 	@mkdir -p $(OBJ_DIR)$(INTERFACE_DIR)
-	@make $(NAME)
+#	@make $(NAME)
+	@if make $(NAME) | grep -v "is up to date" ; \
+	then \
+	BUILD_NBR=$$(expr $$(grep -E "# define BUILD [0-9]+"                \
+	           < ./include/twenty_one_sh.h | grep -o -E '[0-9]+') + 1); \
+	ex -c "%s/define BUILD [0-9]\+/define BUILD $$BUILD_NBR/g|w|q"      \
+	           include/twenty_one_sh.h ; \
+	fi ;
 
 $(NAME): $(OBJ)
 	make -C $(LIB_DIR)
@@ -51,7 +58,20 @@ $(NAME): $(OBJ)
 	gcc $(FLAGS) -o $(NAME) $(OBJ) -I $(HEADER) $(LIB_NAME) -ltermcap
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
-	gcc $(FLAGS) -I $(HEADER) -o $@ -c $<
+	gcc $(FLAGS) -I $(HEADER) -o $@ -c $< ;
+
+install: all
+	@if [ grep ~/.brew/bin $PATH 2>/dev/null ] ; \
+	then \
+	  mkdir -p ~/.brew/bin/ ;   \
+	  cp $(NAME) ~/.brew/bin/ ; \
+	  echo "\n export PATH=\$$PATH:\$$HOME/.brew/bin" >> ~/.zshrc ; \
+	  source ~/.zshrc ;         \
+	  echo "21sh installed" ;   \
+	else \
+	  cp $(NAME) ~/.brew/bin/ ; \
+	  echo "21sh updated" ;     \
+	fi ;
 
 clean:
 	make -C libft clean

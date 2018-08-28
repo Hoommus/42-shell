@@ -1,53 +1,37 @@
 #include "../../include/line_editing.h"
 
-struct s_listener_map	*g_key_listeners;
+struct s_listener_map	g_key_listeners[] =
+{
+	{K_LEFT, &handle_left},
+	{K_RIGHT, &handle_right},
+	{K_BSP, &handle_backspace},
+	{K_DEL, &handle_del},
+	{CEOT, &handle_eot},
+	{CKILL, &handle_line_kill},
+
+	{0, 0}
+};
 
 int						ft_putc(int c)
 {
-	return ((int) write(2, &c, 1));
+	return ((int)write(2, &c, 1));
 }
 
-void					register_key_listener(int key, void (*listener)(int))
+void	handle_eot(int key)
 {
-	struct s_listener_map	*new;
-	struct s_listener_map	*copy;
-
-	new = (struct s_listener_map *)malloc(sizeof(struct s_listener_map));
-	new->key = key;
-	new->handler = listener;
-	new->next = NULL;
-	copy = g_key_listeners;
-	if (copy == NULL)
-		g_key_listeners = new;
-	else
-		while (copy != NULL)
-		{
-			if (copy->next == NULL)
-			{
-				copy->next = new;
-				return ;
-			}
-			copy = copy->next;
-		}
+	if (key == CEOT && g_running_process == 0 && ft_strlen(g_term->buffer) == 0)
+	{
+		ft_printf("exit\n");
+		exit(0);
+	}
 }
 
 void					handle_key(int key)
 {
-	struct s_listener_map	*copy;
+	int		i;
 
-	copy = g_key_listeners;
-	while (copy != NULL)
-	{
-		if (copy->key == key)
-			return (copy->handler(key));
-		copy = copy->next;
-	}
+	i = -1;
+	while (g_key_listeners[++i].handler != 0)
+		if (g_key_listeners[i].key == key)
+			g_key_listeners[i].handler(key);
 }
-
-void		hook_listeners(void)
-{
-	register_key_listener(K_LEFT, &handle_left);
-	register_key_listener(K_RIGHT, &handle_right);
-	register_key_listener(K_BSP, &handle_backspace);
-}
-

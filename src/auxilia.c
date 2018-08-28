@@ -58,6 +58,22 @@ ssize_t		ponies_teleported(void)
 	}
 }
 
+int		display_prompt(enum e_state state)
+{
+	if (state == NORMAL)
+		return (display_normal_prompt());
+	else if (state == DQUOTE)
+		return (ft_printf("dquote>"));
+	else if (state == QUOTE)
+		return (ft_printf("quote>"));
+	else if (state == HEREDOC)
+		return (ft_printf("heredoc>"));
+	else if (state == ESCAPED_NL)
+		return (ft_printf(">"));
+	else
+		return (ft_printf("err>"));
+}
+
 void		increment_shlvl(void)
 {
 	char		*swap;

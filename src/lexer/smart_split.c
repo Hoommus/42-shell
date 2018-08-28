@@ -103,7 +103,8 @@ char		**smart_split(char *str, char *delimiters)
 	long long	word_size;
 	long long	subs;
 
-	array = (char **)ft_memalloc(sizeof(char *) * (subs = count_substrings(str) + 2));
+	array = (char **)ft_memalloc(sizeof(char *) *
+				(subs = count_substrings(str) + 2));
 	j = 0;
 	i = -1;
 	while (str[++i] && j < subs - 1)

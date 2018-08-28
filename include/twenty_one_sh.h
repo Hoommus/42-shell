@@ -23,11 +23,13 @@
 # include "../libft/libft.h"
 # include "../libft/get_next_line.h"
 # include "script_lang.h"
-#include "line_editing.h"
+# include "line_editing.h"
 
 # define SNWH (copy[i + 1] == '/' || copy[i + 1] == 0 || ft_iswhsp(copy[i + 1]))
 # define ABS(a) ((a) < 0 ? -(a) : (a))
 # define PROMPT "\x001b[0m\x001b[38;5;2m[%s@%s] \x001b[37;1m%s $> \x001b[0m"
+
+# define BUILD 14
 
 /*
 ** ◦ pipe
@@ -72,13 +74,18 @@ enum				e_state
 struct					s_term
 {
 	// TODO: Possible memory allocation bottleneck
-	char			line_buffer[MAX_INPUT + 1];
-	uint64_t		iterator;
+	char			buffer[MAX_INPUT + 1];
+	int				iterator;
 	enum e_state	state;
 	short			term_rows;
 	short			term_cols;
 	short			cursor_row;
 	short			cursor_col;
+	short			tty_fd;
+	struct termios	*original_term;
+	struct termios	*current_term;
+
+	short			logfile;
 };
 
 typedef int				(*t_builtin_func) (char **);
@@ -124,7 +131,8 @@ char					**copy_env(char **argenv, char **environ);
 char					**wait_for_input(void);
 int						shell_loop(void);
 void					setup_signal_handlers(void);
-
+int						display_prompt(enum e_state state);
+int						display_normal_prompt(void);
 /*
 ** Auxilia
 */

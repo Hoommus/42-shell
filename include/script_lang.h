@@ -15,6 +15,7 @@ enum			e_token
 {
 	KEYWORD,		// while, if, fi, do, done, etc;
 	LITERAL,		// "hello", 42, 10.5;
+	LITERAL_ARRAY,	// ["hello", "42", "10.5"]
 	BRACE,			// (, ), [, ], {, }
 	REDIRECTION,	// 2>&-
 	PIPE,			// '|'

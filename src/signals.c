@@ -15,9 +15,12 @@
 void	ignore(int sig)
 {
 	sig = 0;
-	clear_buffer();
-	ft_printf("^C\n");
-	g_term->state = BREAK;
+	if (g_running_process == 0)
+	{
+		clear_buffer();
+		ft_printf("\n");
+		display_normal_prompt();
+	}
 }
 
 void	resize(int sig)
@@ -36,6 +39,6 @@ void	setup_signal_handlers(void)
 {
 //	signal(SIGTERM, SIG_IGN);
 	signal(SIGINT, &ignore);
-//	signal(SIGTSTP, &ignore);
-//	signal(SIGWINCH, &resize);
+	signal(SIGTSTP, &ignore);
+	signal(SIGWINCH, &resize);
 }

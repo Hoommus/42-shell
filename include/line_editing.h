@@ -10,15 +10,13 @@
 # define K_BSP    127
 # define K_DEL    2117294875
 
-# define ISCTRLSIG(x) (x == CEOF || x == CINTR || x == CKILL || x == CSTOP || x == CQUIT)
-
-typedef void		(*t_listener) (int);
+typedef void					(*t_listener) (int);
 
 
 /*
 ** Cursor movement direction
 */
-enum				e_direction
+enum							e_direction
 {
 	D_UP,
 	D_DOWN,
@@ -27,24 +25,28 @@ enum				e_direction
 	D_NOWHERE
 };
 
-struct				s_listener_map
+struct							s_listener_map
 {
 	int						key;
 	t_listener				handler;
-	struct s_listener_map	*next;
 };
 
-extern struct s_listener_map	*g_key_listeners;
+extern struct s_listener_map	g_key_listeners[];
 
 void							handle_key(int key);
 int								ft_putc(int c);
-int								cursor_move(int distance, enum e_direction direction);
-void							register_key_listener(int key, void (*listener)(int));
+int								cursor_move(int distance,
+											enum e_direction direction);
+void							update_cursor_position(void);
 
+void							handle_del(int key);
+void							handle_eot(int key);
 void							handle_left(int key);
 void							handle_right(int key);
+void							handle_line_kill(int key);
 void							handle_backspace(int key);
 
-void							hook_listeners(void);
+int								delete_char_at(char *str, int64_t index);
+
 
 #endif
