@@ -30,6 +30,7 @@ int		forknrun(char *bin, char **args)
 {
 	int		status;
 
+	tcsetattr(g_term->tty_fd, TCSANOW, g_term->original_term);
 	g_running_process = fork();
 	if (g_running_process == 0)
 	{
@@ -40,6 +41,7 @@ int		forknrun(char *bin, char **args)
 	{
 		wait(&status);
 		g_running_process = 0;
+		tcsetattr(g_term->tty_fd, TCSANOW, g_term->current_term);
 		return (0);
 	}
 }

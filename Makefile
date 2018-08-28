@@ -12,7 +12,8 @@
 
 NAME = 21sh
 
-FLAGS = -std=c99 -Wall -Wextra -Werror
+##### Remove the -g flag #####
+FLAGS = -g -std=c99 -Wall -Wextra -Werror
 
 HEADER = include
 SRC_DIR = ./src/
@@ -21,24 +22,56 @@ OBJ_DIR = ./obj/
 LIB_DIR = ./printf
 LIB_NAME = libftprintf.a
 
-SHELL_SRC = main.c environ_utils.c commands_execution.c builtins.c builtins2.c \
-            memory.c auxilia.c input_parsing.c cd.c signals.c where.c          \
-            input_processing.c keyhooks.c \
-            lexer/smart_split.c lexer/tokenizer.c lexer/tokens_mem.c
+SHELL_SRC = main.c environ_utils.c commands_execution.c memory.c auxilia.c     \
+            signals.c variables_replacement.c \
 
-OBJ = $(addprefix $(OBJ_DIR), $(SHELL_SRC:.c=.o))
+LEXER_DIR = lexer/
+LEXER_SRC = quotes.c smart_split.c tokenizer.c tokens_mem.c
+
+BUILTIN_DIR = builtins/
+BUILTIN_SRC = cd.c where.c builtins.c builtins2.c
+
+INTERFACE_DIR = line_editing/
+INTERFACE_SRC = buffer_works.c cursor_control.c key_handlers.c listeners.c
+
+OBJ = $(addprefix $(OBJ_DIR), $(SHELL_SRC:.c=.o)) \
+      $(addprefix $(OBJ_DIR)$(LEXER_DIR), $(LEXER_SRC:.c=.o)) \
+      $(addprefix $(OBJ_DIR)$(BUILTIN_DIR), $(BUILTIN_SRC:.c=.o)) \
+      $(addprefix $(OBJ_DIR)$(INTERFACE_DIR), $(INTERFACE_SRC:.c=.o))
+
+all:
+	@mkdir -p $(OBJ_DIR)$(LEXER_DIR)
+	@mkdir -p $(OBJ_DIR)$(BUILTIN_DIR)
+	@mkdir -p $(OBJ_DIR)$(INTERFACE_DIR)
+#	@make $(NAME)
+	@if make $(NAME) | grep -v "is up to date" ; \
+	then \
+	BUILD_NBR=$$(expr $$(grep -E "# define BUILD [0-9]+"                \
+	           < ./include/twenty_one_sh.h | grep -o -E '[0-9]+') + 1); \
+	ex -c "%s/define BUILD [0-9]\+/define BUILD $$BUILD_NBR/g|w|q"      \
+	           include/twenty_one_sh.h ; \
+	fi ;
 
 $(NAME): $(OBJ)
 	make -C $(LIB_DIR)
-	@mkdir -p $(OBJ_DIR)
 	cp $(LIB_DIR)/$(LIB_NAME) ./$(LIB_NAME)
-	gcc $(FLAGS) -o $(NAME) $(addprefix $(OBJ_DIR), $(notdir $(OBJ))) -I $(HEADER) $(LIB_NAME)
+	gcc $(FLAGS) -o $(NAME) $(OBJ) -I $(HEADER) $(LIB_NAME) -ltermcap
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
-	@mkdir -p $(OBJ_DIR)
-	gcc $(FLAGS) -I $(HEADER) -o $(addprefix $(OBJ_DIR), $(notdir $@)) -c $<
+	gcc $(FLAGS) -I $(HEADER) -o $@ -c $< ;
 
-all: $(NAME)
+install: all
+	@if [ grep ~/.brew/bin $PATH 2>/dev/null ] ; \
+	then \
+	  mkdir -p ~/.brew/bin/ ;   \
+	  cp $(NAME) ~/.brew/bin/ ; \
+	  echo "\n export PATH=\$$PATH:\$$HOME/.brew/bin" >> ~/.zshrc ; \
+	  source ~/.zshrc ;         \
+	  echo "21sh installed" ;   \
+	else \
+	  cp $(NAME) ~/.brew/bin/ ; \
+	  echo "21sh updated" ;     \
+	fi ;
 
 clean:
 	make -C libft clean

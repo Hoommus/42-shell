@@ -1,26 +1,52 @@
 #include "../../include/script_lang.h"
-#include "../../include/twenty_one_sh.h"
+
+char		*g_singles[] = {
+	"|",
+	";",
+	"\n",
+	"(",
+	")",
+	"[",
+	"]",
+	"{",
+	"}",
+	NULL
+};
+
+int			is_single_token(char c)
+{
+	int		i;
+	char	tmp[2];
+
+	tmp[0] = c;
+	tmp[1] = 0;
+	i = 0;
+	while (g_singles[i])
+		if (ft_strcmp(g_singles[i++], tmp) == 0)
+			return (1);
+	return (0);
+}
 
 int			count_substrings(char *str)
 {
-	size_t	i;
+	ssize_t	i;
 	int		subs;
 	char	c;
 
 	subs = 0;
-	i = 0;
-	while (str && str[i])
+	i = -1;
+	while (str && str[++i])
 	{
 		c = str[i];
 		if (ft_strchr(LIBFT_WHTSP, str[i]) != NULL && ++i)
 			continue ;
-		else if (str[i++] == ';')
+		else if (is_single_token(str[i++]))
 			subs++;
 		else if (ISQT(str[i]) && ++i)
 			while (str[i] != 0 && str[i] != c)
 				i++;
 		else
-			while (str[i] != 0 && ft_strchr(LIBFT_WHTSP, str[i]) == NULL)
+			while (str[i] != 0 && ft_strchr(TOKEN_DELIMITERS, str[i]) == NULL)
 				i++;
 		subs++;
 	}
@@ -51,7 +77,7 @@ long long	get_word_size(char *str)
 
 	c = *str;
 	i = 0;
-	if (*str == ';')
+	if (is_single_token(*str))
 		return (1);
 	else if (ISQT(*str) && ++i)
 		while (str[i] && str[i] != c)
@@ -64,17 +90,21 @@ long long	get_word_size(char *str)
 }
 
 /*
-** Split that takes into account quotes ("", '')
+** Split that takes into account quotes ("", '', ``), separators - ';', '\n'
+** and literally everything else like brackets
+** TODO: Try to fix that too high memory allocation thing
+ * TODO: Try to fix not enough memory allocation
 */
 char		**smart_split(char *str, char *delimiters)
 {
 	char		**array;
-	int			j;
+	long long	j;
 	long long	i;
 	long long	word_size;
 	long long	subs;
 
-	array = (char **)ft_memalloc(sizeof(char *) * (subs = count_substrings(str) + 1));
+	array = (char **)ft_memalloc(sizeof(char *) *
+				(subs = count_substrings(str) + 2));
 	j = 0;
 	i = -1;
 	while (str[++i] && j < subs - 1)
@@ -88,18 +118,4 @@ char		**smart_split(char *str, char *delimiters)
 	}
 	array[j] = NULL;
 	return (array);
-}
-
-int main(int argc, char **argv)
-{
-	char	**array;
-	char	*line;
-
-	*argv = argv[argc - argc];
-	while (get_next_line(STDIN_FILENO, &line) != 1)
-		;
-	array = smart_split(line, LIBFT_WHTSP);
-	while (*array)
-		ft_printf("%s\n", *array++);
-	return (0);
 }

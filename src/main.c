@@ -12,30 +12,16 @@
 
 #include "../include/twenty_one_sh.h"
 
-ssize_t	ponies_teleported(void)
-{
-	ssize_t			ponies;
-	static int		fd;
+#include <time.h>
+struct s_term	*g_term;
 
-	if (fd == 0)
-		fd = open("/dev/urandom", O_RDONLY);
-	if (fd < 0)
-		return (1);
-	else
-	{
-		read(fd, &ponies, sizeof(ssize_t));
-		if (ponies == 0)
-			ponies += 1348;
-		return (ABS(ponies));
-	}
-}
-
-void	display_prompt(void)
+int			display_normal_prompt(void)
 {
 	char	hostname[1024];
 	char	*cwd;
 	char	*swap;
 	char	*home;
+	int		size;
 
 	home = get_env("HOME");
 	cwd = ft_strnew(1024);
@@ -50,11 +36,12 @@ void	display_prompt(void)
 	}
 	gethostname(hostname, 1024);
 	hostname[6] = 0;
-	ft_printf(PROMPT, get_env("USER"), hostname, cwd);
+	size = ft_printf(PROMPT, get_env("USER"), hostname, cwd);
 	chfree(cwd);
+	return (size);
 }
 
-int		shell_loop(void)
+int				shell_loop(void)
 {
 	int			status;
 	int			i;
@@ -63,7 +50,9 @@ int		shell_loop(void)
 
 	while (ponies_teleported())
 	{
-		display_prompt();
+		g_term->state = NORMAL;
+		display_prompt(g_term->state);
+		clear_buffer();
 		commands = wait_for_input();
 		i = 0;
 		while (commands && commands[i])
@@ -82,27 +71,65 @@ int		shell_loop(void)
 	return (0);
 }
 
-int		_ma_in_(int argc, char **argv, char **env)
+void			init_term(void)
 {
 	struct winsize	window;
-	extern char		**environ;
-	int				tty_fd;
-	struct termios	term;
+	struct termios	*oldterm;
+	struct termios	*term;
 
-	*argv = argv[argc - argc];
-	tty_fd = open("/dev/tty", O_RDWR);
-	tcgetattr(tty_fd, &term);
-	term.c_lflag &= ~(ICANON);
-	tcsetattr(tty_fd, TCSANOW, &term);
-	ioctl(1, TIOCGWINSZ, &window);
-	ft_printf("\n%*s\n%*s\n\n",
-			window.ws_col / 2 + 17, "    Willkommen und bienvenue.    ",
-			window.ws_col / 2 + 17, "  Welcome to 42sh divided by 2.  ");
-	g_environ = copy_env(env, environ);
-	increment_shlvl();
-	setup_signal_handlers();
-	shell_loop();
-	return (0);
+	g_term = (struct s_term *)malloc(sizeof(struct s_term));
+	g_term->tty_fd = open("/dev/tty", O_RDWR);
+	oldterm = (struct termios *)malloc(sizeof(struct termios));
+	term = (struct termios *)malloc(sizeof(struct termios));
+	g_term->original_term = oldterm;
+	g_term->current_term = term;
+	tcgetattr(g_term->tty_fd, oldterm);
+	*term = *oldterm;
+	term->c_lflag &= ~(ECHO | ICANON | IEXTEN) | ECHOE | ECHOCTL | ECHONL;
+	term->c_iflag &= ~(IXOFF);
+	tcsetattr(g_term->tty_fd, TCSANOW, term);
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &window);
+	ft_bzero(g_term->buffer, sizeof(char) * (MAX_INPUT + 1));
+	g_term->term_cols = window.ws_col;
+	g_term->term_rows = window.ws_row;
+	g_term->iterator = 0;
+	update_cursor_position();
+	g_term->state = NORMAL;
 }
 
+void			init_log(void)
+{
+	time_t		rawtime;
+	struct tm	*timeinfo;
 
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
+	g_term->logfile = open("21sh.log", O_RDWR | O_CREAT | O_TRUNC);
+	chmod("log", 0666);
+	ft_dprintf(g_term->logfile, "21sh log [%d]\nDate: %s\n",
+				getpid(), asctime(timeinfo));
+}
+
+int				main(int argc, char **argv, char **env)
+{
+	extern char		**environ;
+
+	init_term();
+	init_log();
+	g_environ = copy_env(env, environ);
+	increment_shlvl();
+	ft_printf("\n%*s\n%*s\n%*s%d\n\n",
+			g_term->term_cols / 2 + 17, "    Willkommen und bienvenue.    ",
+			g_term->term_cols / 2 + 17, "  Welcome to 42sh divided by 2.  ",
+			g_term->term_cols / 2 - 7, "Build #", BUILD);
+	if (ft_atoi(get_env("SHLVL")) > 2)
+		ft_printf("\nRabbit hole depth: %s\n", get_env("SHLVL"));
+	if (tgetent(NULL, getenv("TERM")) == ERR)
+		ft_printf("\x001b[41;1m%-52s\x001b[0;0m\n\x001b[41;1m%52s\x001b[0;0m\n",
+				"Warning: TERM enviroment variable is not set.",
+				"Terminal capabilities are somewhat limited.");
+	setup_signal_handlers();
+	shell_loop();
+	*argv = argv[argc - argc];
+	return (0);
+}
