@@ -26,7 +26,7 @@ size_t	ft_utf_strlen(char *str)
 	size = 0;
 	while (str[i])
 	{
-		while (str[i] & 0x80)
+		while ((uint8_t)str[i] > 0x7F && (str[i] & 0x80) == (str[i] & 0xC0))
 			i++;
 		if (str[i] == 0)
 			break ;

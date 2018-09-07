@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "../include/twenty_one_sh.h"
+#include "../include/line_editing.h"
 
 int			is_valid_var(char *var)
 {
@@ -58,20 +59,21 @@ ssize_t		ponies_teleported(void)
 	}
 }
 
-int		display_prompt(enum e_state state)
+void	display_prompt(enum e_state state)
 {
 	if (state == NORMAL)
-		return (display_normal_prompt());
+		display_normal_prompt();
 	else if (state == DQUOTE)
-		return (ft_printf("dquote>"));
+		ft_printf("dquote> ");
 	else if (state == QUOTE)
-		return (ft_printf("quote>"));
-	else if (state == HEREDOC)
-		return (ft_printf("heredoc>"));
+		ft_printf("quote> ");
 	else if (state == ESCAPED_NL)
-		return (ft_printf(">"));
+		ft_printf("> ");
+	else if (state == HEREDOC)
+		ft_printf("heredoc> ");
 	else
-		return (ft_printf("err>"));
+		ft_printf("err> ");
+	update_caret_position(POS_PROMPT);
 }
 
 void		increment_shlvl(void)

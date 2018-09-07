@@ -21,8 +21,8 @@ char	*is_builtin(char *arg)
 	i = 0;
 	while (i < 10)
 	{
-		if (ft_strcmp(arg, g_builtins[i]) == 0)
-			return (g_builtins[i]);
+		if (ft_strcmp(arg, g_builtins[i].name) == 0)
+			return (g_builtins[i].name);
 		i++;
 	}
 	return (NULL);

@@ -12,31 +12,18 @@
 
 #include "../../include/twenty_one_sh.h"
 
-t_builtin_func	g_builtin_func[] = {
-	&hs_alias,
-	&hs_cd,
-	&hs_echo,
-	&hs_env,
-	&hs_setenv,
-	&hs_unsetenv,
-	&hs_help,
-	&hs_exit,
-	&hs_exit,
-	&hs_where
-};
-
-char			*g_builtins[] = {
-	"alias",
-	"cd",
-	"echo",
-	"env",
-	"setenv",
-	"unsetenv",
-	"help",
-	"exit",
-	"quit",
-	"where",
-	NULL
+struct s_builtin	g_builtins[] = {
+	{"alias", &hs_alias,},
+	{"cd", &hs_cd,},
+	{"echo", &hs_echo,},
+	{"env", &hs_env,},
+	{"setenv", &hs_setenv,},
+	{"unsetenv", &hs_unsetenv,},
+	{"help", &hs_help,},
+	{"exit", &hs_exit,},
+	{"quit", &hs_exit,},
+	{"where", &hs_where,},
+	{NULL, NULL}
 };
 
 int				hs_echo(char **args)
@@ -72,9 +59,9 @@ int				hs_help(char **args)
 	*args = args[0];
 	ft_printf("Existing builtins:\n");
 	i = 0;
-	while (i < 9)
-		ft_printf("%s, ", g_builtins[i++]);
-	ft_printf("%s\n", g_builtins[9]);
+	while (g_builtins[i].name != NULL)
+		ft_printf("%s, ", g_builtins[i++].name);
+	ft_printf("\n");
 	return (0);
 }
 

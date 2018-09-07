@@ -1,6 +1,6 @@
 #include "../../include/line_editing.h"
 
-struct s_listener_map	g_key_listeners[] =
+struct s_listener	g_key_listeners[] =
 {
 	{K_LEFT, &handle_left},
 	{K_RIGHT, &handle_right},
@@ -8,6 +8,7 @@ struct s_listener_map	g_key_listeners[] =
 	{K_DEL, &handle_del},
 	{CEOT, &handle_eot},
 	{CKILL, &handle_line_kill},
+	{'\t', &handle_ignore},
 
 	{0, 0}
 };
@@ -15,6 +16,11 @@ struct s_listener_map	g_key_listeners[] =
 int						ft_putc(int c)
 {
 	return ((int)write(2, &c, 1));
+}
+
+void	handle_ignore(int key)
+{
+	key = 1337;
 }
 
 void	handle_eot(int key)

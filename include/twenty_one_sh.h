@@ -18,32 +18,27 @@
 # include <curses.h>
 # include <sys/termios.h>
 
-
 # include "../printf/include/ft_printf.h"
 # include "../libft/libft.h"
 # include "../libft/get_next_line.h"
-# include "script_lang.h"
-# include "line_editing.h"
 
 # define SNWH (copy[i + 1] == '/' || copy[i + 1] == 0 || ft_iswhsp(copy[i + 1]))
 # define ABS(a) ((a) < 0 ? -(a) : (a))
-# define PROMPT "\x001b[0m\x001b[38;5;2m[%s@%s] \x001b[37;1m%s $> \x001b[0m"
+# define SHELL_PROMPT "\x1b[0m\x1b[38;5;2m[%s@%s] \x1b[37;1m%s $> \x1b[0m"
 
-# define BUILD 14
+# define BUILD 60
+# define BUILD_DATE "07.09.18 16:41:21 EEST"
+
+# undef MAX_INPUT
+# define MAX_INPUT 2048
 
 /*
 ** ◦ pipe
 ** ◦ dup, dup2
 ** ◦ isatty, ttyname, ttyslot
-** ◦ ioctl
-** ◦ getenv
-** ◦ tcsetattr, tcgetattr
 ** ◦ tgetent
 ** ◦ tgetflag
 ** ◦ tgetnum
-** ◦ tgetstr
-** ◦ tgoto
-** ◦ tputs
 */
 
 // TODO: Remove after AST implemented
@@ -54,7 +49,7 @@ struct			command {
 
 /*
 ** Real... e_state
-** I mean, used for controlling of input state
+** I mean, used for controlling input state
 */
 
 enum				e_state
@@ -62,11 +57,38 @@ enum				e_state
 	NORMAL,
 	QUOTE,
 	DQUOTE,
+	BQUOTE,
 	HEREDOC,
 	ESCAPED_NL,
 	NEXT_ESCAPED,
+	COMMIT,
 	BREAK
 };
+
+/*
+** Used to store specific caret positions. Heavy usage in cursor_positions.c
+** Also, see line_editing.h
+*/
+enum				e_position
+{
+	POS_CURRENT,
+	POS_PROMPT,
+	POS_LAST,
+	POS_CUSTOM1,
+	POS_CUSTOM2
+};
+
+struct						s_position
+{
+	short				col;
+	short				row;
+};
+
+/*
+** CArPOS. Got it? Like Carbon-Argentum-Phosphorus-Oxygen-Sulfur
+** Alright, it's __carpos__ for __caret position__
+*/
+typedef struct s_position	t_carpos;
 
 /*
 ** s_term stores terminal parameters as well as cursor position and input buffer
@@ -76,32 +98,33 @@ struct					s_term
 	// TODO: Possible memory allocation bottleneck
 	char			buffer[MAX_INPUT + 1];
 	int				iterator;
-	enum e_state	state;
-	short			term_rows;
-	short			term_cols;
-	short			cursor_row;
-	short			cursor_col;
+	enum e_state	input_state;
+	short			ws_row;
+	short			ws_col;
 	short			tty_fd;
+	t_carpos		carpos_db[5];
 	struct termios	*original_term;
 	struct termios	*current_term;
 
+	short			history_file;
 	short			logfile;
 };
 
-typedef int				(*t_builtin_func) (char **);
+struct					s_builtin
+{
+	char	*name;
+	int		(*function) (char **);
+};
 
-extern struct s_term	*g_term;
-extern char				*g_builtins[];
-extern t_builtin_func	g_builtin_func[];
-
-pid_t					g_running_process;
 char					**g_environ;
+extern struct s_term	*g_term;
+extern struct s_builtin	g_builtins[];
+pid_t					g_running_process;
 
 //struct command	extract_commands(t_token *tokens);
 
-
 /*
-** Builtins
+** Builtins (builtins/ *.c)
 */
 int						hs_alias(char **args);
 int						hs_cd(char **args);
@@ -126,21 +149,21 @@ int						unset_env(char *name);
 char					**copy_env(char **argenv, char **environ);
 
 /*
-** Main Loop
+** Main Loop (main.c, )
 */
 char					**wait_for_input(void);
 int						shell_loop(void);
 void					setup_signal_handlers(void);
-int						display_prompt(enum e_state state);
+void					display_prompt(enum e_state state);
 int						display_normal_prompt(void);
 /*
-** Auxilia
+** Auxilia (auxilia.c)
 */
 ssize_t					ponies_teleported(void);
 void					increment_shlvl(void);
 
 /*
-** Final input parsing
+** Final input parsing (variables_replacement.c)
 */
 char					*replace_variables(char *line);
 char					*replace_home(char *line);
@@ -149,7 +172,7 @@ void					expand_variables(char **line);
 int						is_valid_var(char *var);
 
 /*
-** Memory utils
+** Memory utils (memory.c)
 */
 void					chfree(void *obj);
 void					chfree_n(int n, ...);

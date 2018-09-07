@@ -13,6 +13,9 @@ char		*g_singles[] = {
 	NULL
 };
 
+/*
+** Returns true if char needs separate token
+*/
 int			is_single_token(char c)
 {
 	int		i;
@@ -53,6 +56,9 @@ int			count_substrings(char *str)
 	return (subs);
 }
 
+/*
+** Returns pointer to any found needle char in str.
+*/
 char		*ft_strchr_any(const char *str, const char *needles)
 {
 	size_t	i;
@@ -91,9 +97,9 @@ long long	get_word_size(char *str)
 
 /*
 ** Split that takes into account quotes ("", '', ``), separators - ';', '\n'
-** and literally everything else like brackets
+** and brackets
 ** TODO: Try to fix that too high memory allocation thing
- * TODO: Try to fix not enough memory allocation
+** TODO: Try to fix not enough memory allocation
 */
 char		**smart_split(char *str, char *delimiters)
 {

@@ -1,40 +1,70 @@
 #include "../../include/line_editing.h"
 
-enum e_direction	choose_direction(int key)
+int			ft_strchr_back(const char *str, char c, int i)
 {
-	if (key == K_UP)
-		return (D_UP);
-	else if (key == K_DOWN)
-		return (D_DOWN);
-	else if (key == K_LEFT)
-		return (D_LEFT);
-	else if (key == K_RIGHT)
-		return (D_RIGHT);
-	return (D_NOWHERE);
+	while (i >= 0)
+	{
+		if (str[i] == c)
+			break;
+		i--;
+	}
+	return (i);
 }
 
-int					cursor_move(int distance, enum e_direction direction)
+void		left_hard(int dist, int *new_col, int *new_row)
 {
-	if (distance > 1)
-	{
+	int		tmp;
 
+	while (dist)
+	{
+		if (*new_col == 1)
+		{
+			*(new_row) -= 1;
+			if (g_term->buffer[g_term->iterator - dist] == '\n')
+			{
+				tmp = ft_strchr_back(g_term->buffer, '\n',
+									g_term->iterator - dist);
+				*(new_col) = tmp - (tmp % g_term->ws_col) * g_term->ws_col;
+			}
+			else
+				*(new_col) = g_term->ws_col;
+		}
+		else
+			*(new_col) -= 1;
+		dist--;
 	}
+}
+
+void		right_hard(int distance, int *new_col, int *new_row)
+{
+	int		i;
+
+	i = 0;
+	while (i < distance)
+	{
+		if (*new_col == g_term->ws_col
+			|| g_term->buffer[g_term->iterator + i] == '\n')
+		{
+			*(new_row) += 1;
+			*(new_col) = 1;
+		}
+		else
+			*(new_col) += 1;
+		i++;
+	}
+}
+
+int			caret_move(int distance, enum e_direction direction)
+{
+	int		new_col;
+	int		new_row;
+
+	new_col = get_caretpos(POS_CURRENT)->col;
+	new_row = get_caretpos(POS_CURRENT)->row;
 	if (direction == D_LEFT)
-		return (tputs(tgetstr("le", NULL), distance, &ft_putc));
+		left_hard(distance, &new_col, &new_row);
 	else if (direction == D_RIGHT)
-		return (tputs(tgetstr("nd", NULL), distance, &ft_putc));
+		right_hard(distance, &new_col, &new_row);
+	tputs(tgoto(tgetstr("cm", NULL), new_col - 1, new_row - 1), 1, &ft_putc);
 	return (0);
-}
-
-void				update_cursor_position(void)
-{
-	char			response[16];
-
-	ft_printf("\033[6n");
-	read(STDIN_FILENO, response, 16);
-	if (ft_strchr(response, '[') && ft_strchr(response, ';'))
-	{
-		g_term->cursor_row = ft_atoi(ft_strchr(response, '[') + 1);
-		g_term->cursor_col = ft_atoi(ft_strchr(response, ';') + 1);
-	}
 }

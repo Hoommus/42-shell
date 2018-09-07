@@ -61,6 +61,5 @@ void			free_token(struct s_token *token);
 char			**smart_split(char *str, char *delimiters);
 
 char			*get_buffer(void);
-void			clear_buffer(void);
 
 #endif
