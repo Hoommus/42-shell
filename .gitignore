@@ -4,3 +4,8 @@ CMakeLists.txt
 .idea/*
 *.swp
 *.swo
+*.o
+*.a
+21sh
+42sh
+

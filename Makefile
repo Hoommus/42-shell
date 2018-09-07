@@ -32,30 +32,39 @@ BUILTIN_DIR = builtins/
 BUILTIN_SRC = cd.c where.c builtins.c builtins2.c
 
 INTERFACE_DIR = line_editing/
-INTERFACE_SRC = buffer_works.c cursor_control.c key_handlers.c listeners.c
+INTERFACE_SRC = buffer_drawing.c buffer_works.c     \
+                cursor_control.c cursor_positions.c \
+                state_machine.c \
+                handlers_arrows.c handlers_editing.c handlers_zbase.c \
 
 OBJ = $(addprefix $(OBJ_DIR), $(SHELL_SRC:.c=.o)) \
       $(addprefix $(OBJ_DIR)$(LEXER_DIR), $(LEXER_SRC:.c=.o)) \
       $(addprefix $(OBJ_DIR)$(BUILTIN_DIR), $(BUILTIN_SRC:.c=.o)) \
       $(addprefix $(OBJ_DIR)$(INTERFACE_DIR), $(INTERFACE_SRC:.c=.o))
 
-all:
-	@mkdir -p $(OBJ_DIR)$(LEXER_DIR)
-	@mkdir -p $(OBJ_DIR)$(BUILTIN_DIR)
-	@mkdir -p $(OBJ_DIR)$(INTERFACE_DIR)
-#	@make $(NAME)
-	@if make $(NAME) | grep -v "is up to date" ; \
-	then \
-	BUILD_NBR=$$(expr $$(grep -E "# define BUILD [0-9]+"                \
-	           < ./include/twenty_one_sh.h | grep -o -E '[0-9]+') + 1); \
-	ex -c "%s/define BUILD [0-9]\+/define BUILD $$BUILD_NBR/g|w|q"      \
-	           include/twenty_one_sh.h ; \
-	fi ;
+all: $(NAME)
 
-$(NAME): $(OBJ)
+#                     ** Do not EVER touch rule below **                       #
+#                     ** Do not EVER touch rule below **                       #
+#                     ** Do not EVER touch rule below **                       #
+$(NAME): prepare $(OBJ)
+	@BUILD_NBR=$$(expr $$(grep -E "# define BUILD [0-9]+" \
+			   < ./include/twenty_one_sh.h | \
+			   grep -o -E '[0-9]+') + 1) &&  \
+	BUILD_DATE=$$(date +"%d.%m.%y %T %Z") && \
+	ex -c "%s/define BUILD [0-9]\+/define BUILD $$BUILD_NBR/g|             \
+			%s!define BUILD_DATE .\+!define BUILD_DATE \"$$BUILD_DATE\"!g| \
+			|w|q" include/twenty_one_sh.h
+	rm -f obj/main.o
+	gcc $(FLAGS) -I $(HEADER) -o $(OBJ_DIR)main.o -c $(SRC_DIR)main.c
 	make -C $(LIB_DIR)
 	cp $(LIB_DIR)/$(LIB_NAME) ./$(LIB_NAME)
 	gcc $(FLAGS) -o $(NAME) $(OBJ) -I $(HEADER) $(LIB_NAME) -ltermcap
+
+prepare:
+	@mkdir -p $(OBJ_DIR)$(LEXER_DIR)
+	@mkdir -p $(OBJ_DIR)$(BUILTIN_DIR)
+	@mkdir -p $(OBJ_DIR)$(INTERFACE_DIR)
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
 	gcc $(FLAGS) -I $(HEADER) -o $@ -c $< ;
@@ -63,14 +72,14 @@ $(OBJ_DIR)%.o: $(SRC_DIR)%.c
 install: all
 	@if [ grep ~/.brew/bin $PATH 2>/dev/null ] ; \
 	then \
-	  mkdir -p ~/.brew/bin/ ;   \
-	  cp $(NAME) ~/.brew/bin/ ; \
-	  echo "\n export PATH=\$$PATH:\$$HOME/.brew/bin" >> ~/.zshrc ; \
-	  source ~/.zshrc ;         \
-	  echo "21sh installed" ;   \
+	    mkdir -p ~/.brew/bin/   ; \
+	    cp $(NAME) ~/.brew/bin/ ; \
+	    echo "\n export PATH=\$$PATH:\$$HOME/.brew/bin" >> ~/.zshrc ; \
+	    source ~/.zshrc         ; \
+	    echo "21sh installed"   ; \
 	else \
-	  cp $(NAME) ~/.brew/bin/ ; \
-	  echo "21sh updated" ;     \
+	    cp $(NAME) ~/.brew/bin/ ; \
+	    echo "21sh updated"     ; \
 	fi ;
 
 clean:
@@ -98,7 +107,7 @@ fclean: clean
 	/bin/rm -f $(NAME)
 	/bin/rm -f $(LIB_NAME)
 
-re: fclean all
+re: fclean $(NAME)
 
 love:
 	@echo "Not all."

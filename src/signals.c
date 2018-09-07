@@ -11,15 +11,17 @@
 /* ************************************************************************** */
 
 #include "../include/twenty_one_sh.h"
+#include "../include/line_editing.h"
 
 void	ignore(int sig)
 {
 	sig = 0;
 	if (g_running_process == 0)
 	{
-		clear_buffer();
+		clear_buffer(0);
 		ft_printf("\n");
 		display_normal_prompt();
+		g_term->input_state = NORMAL;
 	}
 }
 
@@ -30,8 +32,8 @@ void	resize(int sig)
 	if (sig == SIGWINCH)
 	{
 		ioctl(STDOUT_FILENO, TIOCGWINSZ, &size);
-		g_term->term_rows = size.ws_row;
-		g_term->term_cols = size.ws_col;
+		g_term->ws_row = size.ws_row;
+		g_term->ws_col = size.ws_col;
 	}
 }
 

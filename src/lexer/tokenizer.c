@@ -38,8 +38,8 @@ struct s_token	*get_token(char *string)
 		if (ft_strcmp(g_keywords[i++], string) == 0)
 			token = new_token(string, KEYWORD);
 	i = 0;
-	while (!token && g_builtins[i] != NULL)
-		if (ft_strcmp(g_builtins[i++], string) == 0)
+	while (!token && g_builtins[i].name != NULL)
+		if (ft_strcmp(g_builtins[i++].name, string) == 0)
 			token = new_token(string, COMMAND);
 	i = 3;
 	while (!token && g_singles[i] != NULL)

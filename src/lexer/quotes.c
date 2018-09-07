@@ -1,5 +1,8 @@
 #include "../../include/script_lang.h"
 
+/*
+** Function strips first and last quote from given string.
+*/
 char	*remove_quotes(char *string)
 {
 	char	q;

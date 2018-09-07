@@ -19,8 +19,8 @@ int		try_builtin(char *builtin, char **args)
 	i = 0;
 	while (i < 10 && builtin)
 	{
-		if (ft_strcmp(builtin, g_builtins[i]) == 0)
-			return (g_builtin_func[i](args));
+		if (ft_strcmp(builtin, g_builtins[i].name) == 0)
+			return (g_builtins[i].function(args));
 		i++;
 	}
 	return (1);
@@ -85,6 +85,9 @@ int		try_local_binary(char *bin, char **args)
 	return (status);
 }
 
+/*
+** TODO: Check if binary name is a path and decide what function to use to run it
+*/
 int		execute(char **args)
 {
 	int		status;
