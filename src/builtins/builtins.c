@@ -26,7 +26,7 @@ struct s_builtin	g_builtins[] = {
 	{NULL, NULL}
 };
 
-int				hs_echo(char **args)
+int					hs_echo(char **args)
 {
 	char	*str;
 	char	*swap;
@@ -46,13 +46,13 @@ int				hs_echo(char **args)
 	return (0);
 }
 
-int				hs_alias(char **args)
+int					hs_alias(char **args)
 {
 	*args = args[0];
 	return (0);
 }
 
-int				hs_help(char **args)
+int					hs_help(char **args)
 {
 	int		i;
 
@@ -65,7 +65,7 @@ int				hs_help(char **args)
 	return (0);
 }
 
-int				hs_exit(char **args)
+int					hs_exit(char **args)
 {
 	*args = args[0];
 	exit(0);

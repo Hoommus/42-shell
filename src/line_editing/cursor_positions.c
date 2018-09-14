@@ -21,8 +21,8 @@ t_carpos	*save_caret_position_as(enum e_position type)
 */
 t_carpos	*load_caret_position(enum e_position type)
 {
-	tputs(tgoto(tgetstr("cm", NULL), g_term->carpos_db[type].col - 1,
-				g_term->carpos_db[type].row - 1), 1, &ft_putc);
+	tputs(tgoto(tgetstr("cm", NULL), g_term->carpos_db[type].col,
+				g_term->carpos_db[type].row), 1, &ft_putc);
 	return (g_term->carpos_db + type);
 }
 
@@ -38,8 +38,8 @@ void		update_caret_position(enum e_position type)
 	if (ft_strchr(response, '[') && ft_strchr(response, ';'))
 	{
 		g_term->carpos_db[type].row =
-				(short)ft_atoi(ft_strchr(response, '[') + 1);
+				(short)(ft_atoi(ft_strchr(response, '[') + 1) - 1);
 		g_term->carpos_db[type].col =
-				(short)ft_atoi(ft_strchr(response, ';') + 1);
+				(short)(ft_atoi(ft_strchr(response, ';') + 1) - 1);
 	}
 }

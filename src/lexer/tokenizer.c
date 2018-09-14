@@ -29,8 +29,9 @@ char			*g_operators[] = {
 
 struct s_token	*get_token(char *string)
 {
-	struct s_token	*token;
-	unsigned long	i;
+	extern struct s_builtin	g_builtins[];
+	struct s_token			*token;
+	unsigned long			i;
 
 	token = NULL;
 	i = 0;

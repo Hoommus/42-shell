@@ -3,32 +3,32 @@
 
 void	toggle_quote(void)
 {
-	if (g_term->input_state == QUOTE)
-		g_term->input_state = NORMAL;
-	else if (g_term->input_state == NORMAL)
-		g_term->input_state = QUOTE;
+	if (g_term->input_state == STATE_QUOTE)
+		g_term->input_state = STATE_NORMAL;
+	else if (g_term->input_state == STATE_NORMAL)
+		g_term->input_state = STATE_QUOTE;
 }
 
 void	toggle_dquote(void)
 {
-	if (g_term->input_state == DQUOTE)
-		g_term->input_state = NORMAL;
-	else if (g_term->input_state == NORMAL)
-		g_term->input_state = DQUOTE;
+	if (g_term->input_state == STATE_DQUOTE)
+		g_term->input_state = STATE_NORMAL;
+	else if (g_term->input_state == STATE_NORMAL)
+		g_term->input_state = STATE_DQUOTE;
 }
 
 void	toggle_bquote(void)
 {
-	if (g_term->input_state == BQUOTE)
-		g_term->input_state = NORMAL;
-	else if (g_term->input_state == NORMAL)
-		g_term->input_state = BQUOTE;
+	if (g_term->input_state == STATE_BQUOTE)
+		g_term->input_state = STATE_NORMAL;
+	else if (g_term->input_state == STATE_NORMAL)
+		g_term->input_state = STATE_BQUOTE;
 }
 
 void	toggle_escaped(void)
 {
-	if (g_term->input_state == ESCAPED_NL)
-		g_term->input_state = NORMAL;
-	else if (g_term->input_state == NORMAL)
-		g_term->input_state = ESCAPED_NL;
+	if (g_term->input_state == STATE_ESCAPED_NL)
+		g_term->input_state = STATE_NORMAL;
+	else if (g_term->input_state == STATE_NORMAL)
+		g_term->input_state = STATE_ESCAPED_NL;
 }

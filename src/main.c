@@ -51,7 +51,7 @@ int				shell_loop(void)
 
 	while (ponies_teleported())
 	{
-		display_prompt(g_term->input_state = NORMAL);
+		display_prompt(g_term->input_state = STATE_NORMAL);
 		clear_buffer(0);
 		commands = wait_for_input();
 		i = 0;
@@ -80,10 +80,10 @@ void			init_term(void)
 	struct termios	*oldterm;
 	struct termios	*newterm;
 
-	g_term = (struct s_term *)malloc(sizeof(struct s_term));
-	g_term->tty_fd = (short)open("/dev/tty", O_RDWR);
 	oldterm = (struct termios *)malloc(sizeof(struct termios));
 	newterm = (struct termios *)malloc(sizeof(struct termios));
+	g_term = (struct s_term *)malloc(sizeof(struct s_term));
+	g_term->tty_fd = (short)open("/dev/tty", O_RDWR);
 	g_term->original_term = oldterm;
 	g_term->current_term = newterm;
 	tcgetattr(g_term->tty_fd, oldterm);
@@ -93,24 +93,27 @@ void			init_term(void)
 	tcsetattr(g_term->tty_fd, TCSANOW, newterm);
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &window);
 	ft_bzero(g_term->buffer, sizeof(char) * (MAX_INPUT + 1));
+	tputs(tgetstr("ei", NULL), 1, &ft_putc);
 	g_term->ws_col = window.ws_col;
 	g_term->ws_row = window.ws_row;
 	g_term->iterator = 0;
+	g_term->input_state = STATE_NORMAL;
 	update_caret_position(POS_CURRENT);
-	g_term->input_state = NORMAL;
 }
 
-void			init_log(void)
+void			init_files(void)
 {
 	time_t		rawtime;
 	struct tm	*timeinfo;
 
 	time(&rawtime);
 	timeinfo = localtime(&rawtime);
-	g_term->logfile = open("21sh.log", O_RDWR | O_CREAT | O_TRUNC);
-	chmod("21sh.log", 0666);
+	g_term->logfile = (short)open("21sh.log", O_RDWR | O_CREAT | O_TRUNC);
+	chmod("21sh.log", 0644);
 	ft_dprintf(g_term->logfile, "21sh log [%d]\nDate: %s\n",
 				getpid(), asctime(timeinfo));
+	g_term->history_file = (short)open(".21sh_history", O_RDWR | O_CREAT);
+	chmod("21sh_history", 0644);
 }
 
 int				main(int argc, char **argv, char **env)
@@ -118,7 +121,7 @@ int				main(int argc, char **argv, char **env)
 	extern char		**environ;
 
 	init_term();
-	init_log();
+	init_files();
 	g_environ = copy_env(env, environ);
 	increment_shlvl();
 	ft_printf("\n%*s\n%*s\n\n%*s%d (%s)\n",
@@ -131,6 +134,7 @@ int				main(int argc, char **argv, char **env)
 		ft_printf("\x1b[41;1m%-52s\x1b[0;0m\n\x1b[41;1m%52s\x1b[0;0m\n",
 				"Warning: TERM enviroment variable is not set.",
 				"Terminal capabilities are somewhat limited.");
+	ft_printf("\a");
 	setup_signal_handlers();
 	shell_loop();
 	*argv = argv[argc - argc + 0];
