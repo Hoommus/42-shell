@@ -14,10 +14,11 @@
 
 int		try_builtin(char *builtin, char **args)
 {
-	int		i;
+	extern struct s_builtin	g_builtins[];
+	int						i;
 
 	i = 0;
-	while (i < 10 && builtin)
+	while (builtin && g_builtins[i].name)
 	{
 		if (ft_strcmp(builtin, g_builtins[i].name) == 0)
 			return (g_builtins[i].function(args));

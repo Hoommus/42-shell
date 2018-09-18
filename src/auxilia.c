@@ -61,15 +61,15 @@ ssize_t		ponies_teleported(void)
 
 void	display_prompt(enum e_state state)
 {
-	if (state == NORMAL)
+	if (state == STATE_NORMAL)
 		display_normal_prompt();
-	else if (state == DQUOTE)
+	else if (state == STATE_DQUOTE)
 		ft_printf("dquote> ");
-	else if (state == QUOTE)
+	else if (state == STATE_QUOTE)
 		ft_printf("quote> ");
-	else if (state == ESCAPED_NL)
+	else if (state == STATE_ESCAPED_NL)
 		ft_printf("> ");
-	else if (state == HEREDOC)
+	else if (state == STATE_HEREDOC)
 		ft_printf("heredoc> ");
 	else
 		ft_printf("err> ");

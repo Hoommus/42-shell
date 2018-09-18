@@ -16,7 +16,8 @@ int				is_printable(const char c[8])
 
 void			clear_buffer(char symbol)
 {
-	if (symbol == 0)
+	if (symbol == 0 || ft_strrchr(g_term->buffer, symbol)
+						< g_term->buffer + g_term->iterator)
 	{
 		g_term->iterator = 0;
 		ft_bzero(g_term->buffer, (1 + MAX_INPUT) * sizeof(unsigned char));
@@ -27,7 +28,7 @@ void			clear_buffer(char symbol)
 						ft_strchr_back(g_term->buffer, '\n', g_term->iterator),
 				MAX_INPUT - g_term->iterator);
 	}
-	g_term->input_state = NORMAL;
+	g_term->input_state = STATE_NORMAL;
 }
 
 int				delete_char_at(char *str, int64_t index)
@@ -87,37 +88,45 @@ void			deal_with_printable(const char arr[8])
 		toggle_escaped();
 	else if (arr[0] == '`')
 		toggle_bquote();
-	else if (g_term->input_state == ESCAPED_NL)
-		g_term->input_state = NORMAL;
+	else if (g_term->input_state == STATE_ESCAPED_NL)
+		g_term->input_state = STATE_NORMAL;
 	insert_string_at(g_term->buffer, arr, g_term->iterator);
-	g_term->iterator += ft_strlen((char *)arr);
+	g_term->iterator += ft_strlen((char *) arr);
+	save_caret_position_as(POS_LAST);
 	tputs(tgetstr("im", NULL), 1, &ft_putc);
 	write(1, arr, 8);
 	tputs(tgetstr("ei", NULL), 1, &ft_putc);
-	redraw_buffer();
+	if (get_carpos(POS_LAST)->col == g_term->ws_col - 1)
+	{
+		tputs(tgetstr("sf", NULL), 1, &ft_putc);
+		caret_move(1, D_RIGHT);
+	}
+	update_caret_position(POS_CURRENT);
+	if (get_carpos(POS_LAST)->row <= get_carpos(POS_CURRENT)->row
+		&& get_carpos(POS_LAST)->col < get_carpos(POS_CURRENT)->col)
+		adjust_carpos_db();
+	if (get_carpos(POS_CURRENT)->col < g_term->ws_col)
+		redraw_buffer(-1);
 }
 
 void			deal_with_newline(const char arr[8])
 {
-	if (g_term->input_state == QUOTE
-		|| g_term->input_state == DQUOTE
-		|| g_term->input_state == ESCAPED_NL)
+	if (g_term->input_state == STATE_QUOTE
+		|| g_term->input_state == STATE_DQUOTE
+		|| g_term->input_state == STATE_ESCAPED_NL)
 	{
 		write(STDOUT_FILENO, "\n", 1);
-		display_prompt(g_term->input_state);
 		insert_string_at(g_term->buffer, (char *)arr, g_term->iterator++);
-		redraw_buffer();
-	}
-	else if (g_term->buffer[g_term->iterator] == '\0')
-	{
-		write(STDOUT_FILENO, "\n", 1);
-		g_term->input_state = COMMIT;
+		display_prompt(g_term->input_state);
+		toggle_escaped();
+		redraw_buffer(-1);
 	}
 	else
 	{
-		caret_move(ft_strlen(g_term->buffer + g_term->iterator), D_RIGHT);
+		if (g_term->buffer[g_term->iterator] != '\0')
+			caret_move(ft_strlen(g_term->buffer + g_term->iterator), D_RIGHT);
 		write(STDOUT_FILENO, "\n", 1);
-		g_term->input_state = COMMIT;
+		g_term->input_state = STATE_COMMIT;
 	}
 }
 
@@ -128,17 +137,17 @@ char			**wait_for_input(void)
 {
 	char		**commands;
 	long		chr;
-	uint64_t	status;
+//	uint64_t	status;
 	char		arr[8];
 
 	commands = NULL;
 	while (!commands)
 	{
 		ft_bzero(arr, 8 * sizeof(char));
-		read(0, arr, 1);
-		status = get_utf_body_size(arr[0]);
-		if (status != 0)
-			read(0, arr + 1, status);
+		read(0, arr, 8);
+//		status = get_utf_body_size(arr[0]);
+//		if (status != 0)
+//			read(0, arr + 1, status);
 		ft_memcpy(&chr, arr,  8);
 		if (arr[0] == '\n')
 			deal_with_newline(arr);
@@ -146,7 +155,7 @@ char			**wait_for_input(void)
 			deal_with_printable(arr);
 		else
 			handle_key(chr);
-		if (g_term->input_state == COMMIT)
+		if (g_term->input_state == STATE_COMMIT)
 			commands = smart_split(g_term->buffer, TOKEN_DELIMITERS);
 		update_caret_position(POS_CURRENT);
 	}

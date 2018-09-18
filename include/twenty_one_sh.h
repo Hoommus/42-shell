@@ -11,11 +11,11 @@
 # include <sys/wait.h>
 # include <sys/ioctl.h>
 
+# include <curses.h>
 # include <term.h>
 # include <termios.h>
 # include <termcap.h>
 # include <limits.h>
-# include <curses.h>
 # include <sys/termios.h>
 
 # include "../printf/include/ft_printf.h"
@@ -26,12 +26,13 @@
 # define ABS(a) ((a) < 0 ? -(a) : (a))
 # define SHELL_PROMPT "\x1b[0m\x1b[38;5;2m[%s@%s] \x1b[37;1m%s $> \x1b[0m"
 
-# define BUILD 60
-# define BUILD_DATE "07.09.18 16:41:21 EEST"
+# define BUILD 149
+# define BUILD_DATE "14.09.18 16:28:57 EEST"
 
-# undef MAX_INPUT
-# define MAX_INPUT 2048
-
+# ifndef MAX_INPUT
+#  undef MAX_INPUT
+#  define MAX_INPUT 2048
+# endif
 /*
 ** ◦ pipe
 ** ◦ dup, dup2
@@ -52,16 +53,17 @@ struct			command {
 ** I mean, used for controlling input state
 */
 
-enum				e_state
+enum						e_state
 {
-	NORMAL,
-	QUOTE,
-	DQUOTE,
-	BQUOTE,
-	HEREDOC,
-	ESCAPED_NL,
-	NEXT_ESCAPED,
-	COMMIT,
+	STATE_NORMAL,
+	STATE_QUOTE,
+	STATE_DQUOTE,
+	STATE_BQUOTE,
+	STATE_HEREDOC,
+	STATE_ESCAPED_NL,
+	STATE_NEXT_ESCAPED,
+	STATE_COMMIT,
+	STATE_NON_INTERACTIVE,
 	BREAK
 };
 
@@ -69,11 +71,12 @@ enum				e_state
 ** Used to store specific caret positions. Heavy usage in cursor_positions.c
 ** Also, see line_editing.h
 */
-enum				e_position
+enum						e_position
 {
 	POS_CURRENT,
 	POS_PROMPT,
 	POS_LAST,
+	POS_TAIL,
 	POS_CUSTOM1,
 	POS_CUSTOM2
 };
@@ -86,7 +89,7 @@ struct						s_position
 
 /*
 ** CArPOS. Got it? Like Carbon-Argentum-Phosphorus-Oxygen-Sulfur
-** Alright, it's __carpos__ for __caret position__
+** Alright, it's carpos for 'caret position'
 */
 typedef struct s_position	t_carpos;
 
@@ -96,18 +99,23 @@ typedef struct s_position	t_carpos;
 struct					s_term
 {
 	// TODO: Possible memory allocation bottleneck
-	char			buffer[MAX_INPUT + 1];
 	int				iterator;
 	enum e_state	input_state;
-	short			ws_row;
 	short			ws_col;
+	short			ws_row;
 	short			tty_fd;
-	t_carpos		carpos_db[5];
+	t_carpos		carpos_db[6];
 	struct termios	*original_term;
 	struct termios	*current_term;
 
 	short			history_file;
 	short			logfile;
+
+	short			flags;
+
+	short			last_cmd_status;
+
+	char			buffer[MAX_INPUT + 1];
 };
 
 struct					s_builtin
@@ -118,10 +126,7 @@ struct					s_builtin
 
 char					**g_environ;
 extern struct s_term	*g_term;
-extern struct s_builtin	g_builtins[];
 pid_t					g_running_process;
-
-//struct command	extract_commands(t_token *tokens);
 
 /*
 ** Builtins (builtins/ *.c)
@@ -177,6 +182,5 @@ int						is_valid_var(char *var);
 void					chfree(void *obj);
 void					chfree_n(int n, ...);
 void					free_array(char **array);
-
 
 #endif

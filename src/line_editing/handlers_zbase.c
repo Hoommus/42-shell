@@ -9,21 +9,21 @@ struct s_listener	g_key_listeners[] =
 	{CEOT, &handle_eot},
 	{CKILL, &handle_line_kill},
 	{'\t', &handle_ignore},
-
+	{9, &handle_delchar},
 	{0, 0}
 };
 
-int						ft_putc(int c)
+int					ft_putc(int c)
 {
 	return ((int)write(2, &c, 1));
 }
 
-void	handle_ignore(int key)
+void				handle_ignore(int key)
 {
 	key = 1337;
 }
 
-void	handle_eot(int key)
+void				handle_eot(int key)
 {
 	if (key == CEOT && g_running_process == 0 && ft_strlen(g_term->buffer) == 0)
 	{
@@ -32,7 +32,13 @@ void	handle_eot(int key)
 	}
 }
 
-void					handle_key(int key)
+void				handle_delchar(int key)
+{
+	key = 0;
+	tputs(tgetstr("dc", NULL), 1, &ft_putc);
+}
+
+void				handle_key(int key)
 {
 	int		i;
 

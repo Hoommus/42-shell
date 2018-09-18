@@ -14,6 +14,7 @@
 
 char	*is_builtin(char *arg)
 {
+	extern struct s_builtin	g_builtins[];
 	int		i;
 
 	if (arg == NULL)
