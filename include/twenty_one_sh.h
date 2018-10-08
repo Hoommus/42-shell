@@ -183,4 +183,7 @@ void					chfree(void *obj);
 void					chfree_n(int n, ...);
 void					free_array(char **array);
 
+void					load_history(int fd);
+
+
 #endif

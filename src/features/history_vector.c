@@ -1,5 +1,5 @@
-#include "../../include/twenty_one_sh.h"
-#include "../../include/line_editing.h"
+#include "twenty_one_sh.h"
+#include "line_editing.h"
 
 extern t_history		*g_history;
 

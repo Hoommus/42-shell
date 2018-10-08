@@ -1,5 +1,5 @@
-#include "../../include/line_editing.h"
-#include "../../include/script_lang.h"
+#include "line_editing.h"
+#include "script_lang.h"
 
 void	handle_backspace(int key)
 {

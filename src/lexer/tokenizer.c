@@ -1,4 +1,4 @@
-#include "../../include/script_lang.h"
+#include "script_lang.h"
 #include "../../include/twenty_one_sh.h"
 
 char			*g_keywords[] = {

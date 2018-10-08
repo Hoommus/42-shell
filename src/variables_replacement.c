@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/twenty_one_sh.h"
+#include "twenty_one_sh.h"
 
 char	*ft_strinsert_range(char *str, char *insert, size_t start, size_t end)
 {

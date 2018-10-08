@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/twenty_one_sh.h"
+#include "twenty_one_sh.h"
 #include "../include/line_editing.h"
 
 void	tstp(int sig)

@@ -1,4 +1,4 @@
-#include "../../include/script_lang.h"
+#include "script_lang.h"
 
 t_token			*new_token(char *value, enum e_token type)
 {

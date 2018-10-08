@@ -1,4 +1,4 @@
-#include "../../include/line_editing.h"
+#include "line_editing.h"
 
 int			ft_strchr_back(const char *str, char c, int i)
 {

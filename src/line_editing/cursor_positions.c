@@ -1,4 +1,4 @@
-#include "../../include/line_editing.h"
+#include "line_editing.h"
 
 t_carpos	*get_caretpos(enum e_position type)
 {

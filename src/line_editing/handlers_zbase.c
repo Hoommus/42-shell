@@ -1,4 +1,4 @@
-#include "../../include/line_editing.h"
+#include "line_editing.h"
 
 struct s_listener	g_key_listeners[] =
 {

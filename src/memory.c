@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/twenty_one_sh.h"
+#include "twenty_one_sh.h"
 
 void	free_array(char **array)
 {

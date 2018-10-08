@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/twenty_one_sh.h"
-#include "../include/line_editing.h"
+#include "twenty_one_sh.h"
+#include "line_editing.h"
 
 int			is_valid_var(char *var)
 {

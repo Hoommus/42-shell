@@ -1,4 +1,4 @@
-#include "../../include/line_editing.h"
+#include "line_editing.h"
 
 void	handle_up(int key)
 {

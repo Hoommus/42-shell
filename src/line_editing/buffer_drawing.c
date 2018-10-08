@@ -1,5 +1,5 @@
-#include "../../include/twenty_one_sh.h"
-#include "../../include/line_editing.h"
+#include "twenty_one_sh.h"
+#include "line_editing.h"
 
 void	redraw_buffer(int symbol_index)
 {

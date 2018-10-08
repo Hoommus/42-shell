@@ -1,6 +1,6 @@
-#include "../../include/twenty_one_sh.h"
-#include "../../include/line_editing.h"
-#include "../../include/script_lang.h"
+#include "twenty_one_sh.h"
+#include "line_editing.h"
+#include "script_lang.h"
 
 int				is_printable(const char c[8])
 {

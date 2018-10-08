@@ -6,11 +6,11 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:32 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/07/31 14:45:32 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/09/19 14:58:02 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/twenty_one_sh.h"
+#include "twenty_one_sh.h"
 #include "../include/line_editing.h"
 
 #include <time.h>
@@ -113,7 +113,7 @@ void			init_files(void)
 	ft_dprintf(g_term->logfile, "21sh log [%d]\nDate: %s\n",
 				getpid(), asctime(timeinfo));
 	g_term->history_file = (short)open(".21sh_history", O_RDWR | O_CREAT);
-	chmod("21sh_history", 0644);
+	chmod(".21sh_history", 0644);
 }
 
 int				main(int argc, char **argv, char **env)
