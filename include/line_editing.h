@@ -10,11 +10,10 @@
 # define K_BSP    127
 # define K_DEL    2117294875
 
-# define INITIAL_HISTORY_SIZE 256
-
 /*
 ** Cursor movement direction
 */
+
 enum						e_direction
 {
 	D_UP,
@@ -30,34 +29,20 @@ struct						s_listener
 	void		(*handler) (int);
 };
 
-struct						s_history_entry
-{
-	char		*command;
-	time_t		timestamp;
-};
-
-typedef struct				s_history_vector
-{
-	struct s_history_entry	**entries;
-	uint64_t				size;
-	uint64_t				capacity;
-}							t_history;
-
 extern struct s_listener	g_key_listeners[];
 
 int							ft_putc(int c);
-int							delete_char_at(char *str, int64_t index);
 int							ft_strchr_back(const char *str, char c, int i);
-
-void						clear_buffer(char symbol);
-void redraw_buffer(int symbol_index);
+int							buff_strchr_back(t_buffer *buffer, char *c, int i);
+void						buffer_clear(char symbol);
+void						buffer_redraw(int symbol_index);
 
 /*
 ** Key handlers (handlers_zbase.c, handlers_arrows.c, handlers_editing.c)
 */
 void						handle_key(int key);
 
-void				handle_delchar(int key);
+void					handle_delchar(int key);
 void						handle_del(int key);
 void						handle_eot(int key);
 void						handle_up(int key);
@@ -71,11 +56,11 @@ void						handle_backspace(int key);
 /*
 ** State machine (state_machine.c)
 */
-void						toggle_quote(void);
-void						toggle_bquote(void);
-void						toggle_dquote(void);
-void						toggle_escaped(void);
-
+int							toggle_state(const char *c);
+int							toggle_quote(void);
+int							toggle_bquote(void);
+int							toggle_dquote(void);
+int							toggle_escaped(void);
 /*
 ** Caret positions manipulation (cursor_positions.c)
 */
@@ -88,15 +73,5 @@ t_carpos					*load_caret_position(enum e_position type);
 t_carpos					*save_caret_position_as(enum e_position type);
 void						update_caret_position(enum e_position type);
 
-/*
-** History utilities (features/history.c, features/history_vector.c)
-*/
-
-void						init_vector(uint64_t capacity);
-void						push_history_entry(const char *cmd, time_t timestamp);
-void						save_history_entry(int fd);
-void						load_history(int fd);
-struct s_history_entry		*pop_entry(void);
-struct s_history_entry		*get_entry(uint64_t index);
 
 #endif

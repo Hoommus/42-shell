@@ -12,7 +12,7 @@
 
 NAME = libftprintf.a
 
-FLAGS = -std=c99 -Wall -Wextra -Werror -O3
+FLAGS = -std=c99 -Wall -Wextra -Werror
 
 HEADER = include
 SRC_DIR = ./src/

@@ -67,7 +67,7 @@ void	display_prompt(enum e_state state)
 		ft_printf("dquote> ");
 	else if (state == STATE_QUOTE)
 		ft_printf("quote> ");
-	else if (state == STATE_ESCAPED_NL)
+	else if (state == STATE_ESCAPED_EOL)
 		ft_printf("> ");
 	else if (state == STATE_HEREDOC)
 		ft_printf("heredoc> ");

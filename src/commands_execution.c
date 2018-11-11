@@ -40,6 +40,7 @@ int		forknrun(char *bin, char **args)
 	}
 	else
 	{
+		//TODO: Replace with waitpid() with WUNTRACED to make Ctrl+Z workma
 		wait(&status);
 		g_running_process = 0;
 		tcsetattr(g_term->tty_fd, TCSANOW, g_term->current_term);

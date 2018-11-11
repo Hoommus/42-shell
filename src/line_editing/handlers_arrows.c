@@ -4,7 +4,7 @@ void	handle_up(int key)
 {
 	if (key == K_UP)
 	{
-		clear_buffer(0);
+		reset_buffer(0);
 	}
 }
 
@@ -18,30 +18,20 @@ void	handle_down(int key)
 
 void	handle_left(int key)
 {
-	if (key == K_LEFT && g_term->iterator > 0
-		&& g_term->buffer[g_term->iterator - 1] != '\n')
+	if (key == K_LEFT && g_term->v_buffer->iterator > 0
+		&& ft_strcmp(buff_char_at(g_term->v_buffer->iterator - 1), "\n") != 0)
 	{
 		caret_move(1, D_LEFT);
-		while (g_term->iterator > 0 &&
-				((uint8_t)g_term->buffer[g_term->iterator]) > 0x7F &&
-				(g_term->buffer[g_term->iterator] & 0xC0) ==
-						(g_term->buffer[g_term->iterator] & 0x80))
-			g_term->iterator--;
-		g_term->iterator--;
+		g_term->v_buffer->iterator--;
 	}
 }
 
 void	handle_right(int key)
 {
-	if (key == K_RIGHT && g_term->iterator < (int)ft_strlen(g_term->buffer)
-		&& g_term->buffer[g_term->iterator] != 0)
+	if (key == K_RIGHT && g_term->v_buffer->iterator < g_term->v_buffer->size
+		&& ft_strcmp(buff_char_at(g_term->v_buffer->iterator), "\0") != 0)
 	{
 		caret_move(1, D_RIGHT);
-		while (g_term->iterator < (int)ft_strlen(g_term->buffer) &&
-				((uint8_t)g_term->buffer[g_term->iterator]) > 0x7F &&
-				(g_term->buffer[g_term->iterator] & 0xC0) ==
-						(g_term->buffer[g_term->iterator] & 0x80))
-			g_term->iterator++;
-		g_term->iterator++;
+		g_term->v_buffer->iterator++;
 	}
 }

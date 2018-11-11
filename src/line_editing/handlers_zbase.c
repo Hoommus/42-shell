@@ -25,7 +25,7 @@ void				handle_ignore(int key)
 
 void				handle_eot(int key)
 {
-	if (key == CEOT && g_running_process == 0 && ft_strlen(g_term->buffer) == 0)
+	if (key == CEOT && g_running_process == 0 && g_term->v_buffer->size == 0)
 	{
 		ft_printf("exit\n");
 		exit(0);

@@ -15,11 +15,13 @@
 
 void	tstp(int sig)
 {
-	sig = 0;
-	clear_buffer(0);
-	ft_printf("\n");
+	//sig = 0;
+	reset_buffer(0);
+	ft_printf("Received SIGTSTP (%d)\n", sig);
 	display_normal_prompt();
+	tcsetattr(g_term->tty_fd, TCSANOW, g_term->current_term);
 	g_term->input_state = STATE_NORMAL;
+	ft_dprintf(0, "\4");
 	ft_printf("\7");
 }
 
@@ -28,7 +30,7 @@ void	ignore(int sig)
 	sig = 0;
 	if (g_running_process == 0)
 	{
-		clear_buffer(0);
+		reset_buffer(0);
 		ft_printf("\n");
 		display_normal_prompt();
 		g_term->input_state = STATE_NORMAL;
@@ -46,8 +48,13 @@ void	resize(int sig)
 		g_term->ws_col = size.ws_col;
 		update_caret_position(POS_CURRENT);
 //		caret_move(ft_utf_strlen(g_term->buffer), D_LEFT);
-//		redraw_buffer(0);
+//		buffer_redraw(0);
 	}
+}
+
+void	fatal(int sig)
+{
+	tcsetattr(g_term->tty_fd, TCSANOW, g_term->original_term);
 }
 
 void	setup_signal_handlers(void)
@@ -55,11 +62,13 @@ void	setup_signal_handlers(void)
 	struct sigaction	action;
 
 	ft_bzero(&action, sizeof(struct sigaction));
-	action.sa_flags |= SA_RESTART;
+	action.sa_flags = SA_RESTART;
 	action.__sigaction_u.__sa_handler = &tstp;
 	sigaction(SIGTSTP, &action, NULL);
 //	signal(SIGTERM, SIG_IGN);
 	signal(SIGINT, &ignore);
-	signal(SIGTSTP, &ignore);
+	signal(SIGSEGV, &fatal);
+	signal(SIGQUIT, &fatal);
+	//signal(SIGTSTP, &tstp);
 	signal(SIGWINCH, &resize);
 }

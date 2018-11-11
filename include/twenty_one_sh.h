@@ -18,18 +18,19 @@
 # include <limits.h>
 # include <sys/termios.h>
 
-# include "../printf/include/ft_printf.h"
-# include "../libft/libft.h"
-# include "../libft/get_next_line.h"
+# include "ft_printf.h"
+# include "libft.h"
+# include "get_next_line.h"
+# include "buffer_works.h"
 
 # define SNWH (copy[i + 1] == '/' || copy[i + 1] == 0 || ft_iswhsp(copy[i + 1]))
 # define ABS(a) ((a) < 0 ? -(a) : (a))
-# define SHELL_PROMPT "\x1b[0m\x1b[38;5;2m[%s@%s] \x1b[37;1m%s $> \x1b[0m"
+# define SHELL_PROMPT "\x1b[0m\x1b[%lld;1m[%s@%s] \x1b[37;1m%s $> \x1b[0m"
 
-# define BUILD 149
-# define BUILD_DATE "14.09.18 16:28:57 EEST"
+# define BUILD 249
+# define BUILD_DATE "11.11.18 17:43:11 EET"
 
-# ifndef MAX_INPUT
+# ifdef MAX_INPUT
 #  undef MAX_INPUT
 #  define MAX_INPUT 2048
 # endif
@@ -49,8 +50,7 @@ struct			command {
 };
 
 /*
-** Real... e_state
-** I mean, used for controlling input state
+** Used for controlling input state
 */
 
 enum						e_state
@@ -60,7 +60,7 @@ enum						e_state
 	STATE_DQUOTE,
 	STATE_BQUOTE,
 	STATE_HEREDOC,
-	STATE_ESCAPED_NL,
+	STATE_ESCAPED_EOL,
 	STATE_NEXT_ESCAPED,
 	STATE_COMMIT,
 	STATE_NON_INTERACTIVE,
@@ -94,11 +94,10 @@ struct						s_position
 typedef struct s_position	t_carpos;
 
 /*
-** s_term stores terminal parameters as well as cursor position and input buffer
+** g_term stores terminal parameters as well as cursor position and input buffer
 */
 struct					s_term
 {
-	// TODO: Possible memory allocation bottleneck
 	int				iterator;
 	enum e_state	input_state;
 	short			ws_col;
@@ -115,7 +114,7 @@ struct					s_term
 
 	short			last_cmd_status;
 
-	char			buffer[MAX_INPUT + 1];
+	t_buffer		*v_buffer;
 };
 
 struct					s_builtin
@@ -140,9 +139,11 @@ int						hs_unsetenv(char **args);
 int						hs_help(char **args);
 int						hs_exit(char **args);
 int						hs_where(char **args);
+
 /*
 ** What is it? A design pattern? Really???
 */
+
 int						execute(char **args);
 
 /*
@@ -156,7 +157,7 @@ char					**copy_env(char **argenv, char **environ);
 /*
 ** Main Loop (main.c, )
 */
-char					**wait_for_input(void);
+char					**read_command(void);
 int						shell_loop(void);
 void					setup_signal_handlers(void);
 void					display_prompt(enum e_state state);
