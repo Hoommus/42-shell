@@ -1,4 +1,4 @@
-#include "../../include/line_editing.h"
+#include "line_editing.h"
 
 int			ft_strchr_back(const char *str, char c, int i)
 {
@@ -23,19 +23,25 @@ void		adjust_carpos_db(void)
 	}
 }
 
+/*
+** If distance is big, searches for first newline
+** and counts physical coordinates from that character
+*/
+
 void		left_hard(int dist, int *new_col, int *new_row)
 {
-	int		tmp;
+	int			tmp;
+	u_int64_t	target;
 
 	while (dist)
 	{
 		if (*new_col == 0)
 		{
+			target = g_term->v_buffer->iterator - dist;
 			*(new_row) -= 1;
-			if (g_term->buffer[g_term->iterator - dist] == '\n')
+			if (buff_char_at_equals(target, "\n"))
 			{
-				tmp = ft_strchr_back(g_term->buffer, '\n',
-									g_term->iterator - dist);
+				tmp = buff_strchr_back(g_term->v_buffer, "\n", target);
 				*(new_col) = tmp - (tmp % g_term->ws_col) * g_term->ws_col;
 			}
 			else
@@ -54,8 +60,8 @@ void		right_hard(int distance, int *new_col, int *new_row)
 	i = 0;
 	while (i < distance)
 	{
-		if (*new_col >= g_term->ws_col - 1
-			|| g_term->buffer[g_term->iterator + i] == '\n')
+		if (*new_col >= g_term->ws_col - 1 ||
+			buff_char_at(g_term->v_buffer->iterator + i)[0] == '\n')
 		{
 			*(new_row) += 1;
 			*(new_col) = 0;

@@ -10,19 +10,19 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/twenty_one_sh.h"
+#include "twenty_one_sh.h"
 
 struct s_builtin	g_builtins[] = {
-	{"alias", &hs_alias,},
-	{"cd", &hs_cd,},
-	{"echo", &hs_echo,},
-	{"env", &hs_env,},
-	{"setenv", &hs_setenv,},
-	{"unsetenv", &hs_unsetenv,},
-	{"help", &hs_help,},
-	{"exit", &hs_exit,},
-	{"quit", &hs_exit,},
-	{"where", &hs_where,},
+	{"alias", &hs_alias},
+	{"cd", &hs_cd},
+	{"echo", &hs_echo},
+	{"env", &hs_env},
+	{"setenv", &hs_setenv},
+	{"unsetenv", &hs_unsetenv},
+	{"help", &hs_help},
+	{"exit", &hs_exit},
+	{"quit", &hs_exit},
+	{"where", &hs_where},
 	{NULL, NULL}
 };
 

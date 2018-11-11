@@ -1,6 +1,8 @@
-#include "../../include/twenty_one_sh.h"
-#include "../../include/line_editing.h"
-#include "../../include/script_lang.h"
+#include <twenty_one_sh.h>
+#include "twenty_one_sh.h"
+#include "line_editing.h"
+#include "script_lang.h"
+#include "shell_history.h"
 
 int				is_printable(const char c[8])
 {
@@ -14,52 +16,10 @@ int				is_printable(const char c[8])
 		return (0);
 }
 
-void			clear_buffer(char symbol)
-{
-	if (symbol == 0 || ft_strrchr(g_term->buffer, symbol)
-						< g_term->buffer + g_term->iterator)
-	{
-		g_term->iterator = 0;
-		ft_bzero(g_term->buffer, (1 + MAX_INPUT) * sizeof(unsigned char));
-	}
-	else
-	{
-		ft_bzero(g_term->buffer + g_term->iterator -
-						ft_strchr_back(g_term->buffer, '\n', g_term->iterator),
-				MAX_INPUT - g_term->iterator);
-	}
-	g_term->input_state = STATE_NORMAL;
-}
-
-int				delete_char_at(char *str, int64_t index)
-{
-	int		size;
-
-	size = 1;
-	while (((uint8_t)str[index]) > 0x7F
-		   && (str[index] & 0xC0) == (str[index] & 0x80))
-	{
-		index--;
-		size++;
-	}
-	ft_memmove(str + index, str + index + size, ft_strlen(str + index));
-	return (size);
-}
-
-int				insert_string_at(char *str, const char *substr, int64_t index)
-{
-	size_t	len;
-
-	len = ft_strlen((char *)substr);
-	ft_memmove(str + index + len, str + index, ft_strlen(str + index));
-	ft_memcpy(str + index, substr, len);
-	return (OK);
-}
-
 /*
 ** Returns number of 0b10xxxxxx-based characters
 */
-uint64_t		get_utf_body_size(char first)
+u_int64_t		get_utf_body_size(char first)
 {
 	unsigned char	c;
 
@@ -80,18 +40,9 @@ uint64_t		get_utf_body_size(char first)
 
 void			deal_with_printable(const char arr[8])
 {
-	if (arr[0] == '\'')
-		toggle_quote();
-	else if (arr[0] == '"')
-		toggle_dquote();
-	else if (arr[0] == '\\')
-		toggle_escaped();
-	else if (arr[0] == '`')
-		toggle_bquote();
-	else if (g_term->input_state == STATE_ESCAPED_NL)
+	if (!toggle_state(arr) && g_term->input_state == STATE_ESCAPED_EOL)
 		g_term->input_state = STATE_NORMAL;
-	insert_string_at(g_term->buffer, arr, g_term->iterator);
-	g_term->iterator += ft_strlen((char *) arr);
+	insert_string_at(g_term->v_buffer->iterator, arr);
 	save_caret_position_as(POS_LAST);
 	tputs(tgetstr("im", NULL), 1, &ft_putc);
 	write(1, arr, 8);
@@ -106,57 +57,65 @@ void			deal_with_printable(const char arr[8])
 		&& get_carpos(POS_LAST)->col < get_carpos(POS_CURRENT)->col)
 		adjust_carpos_db();
 	if (get_carpos(POS_CURRENT)->col < g_term->ws_col)
-		redraw_buffer(-1);
+		buffer_redraw(-1);
 }
 
 void			deal_with_newline(const char arr[8])
 {
 	if (g_term->input_state == STATE_QUOTE
 		|| g_term->input_state == STATE_DQUOTE
-		|| g_term->input_state == STATE_ESCAPED_NL)
+		|| g_term->input_state == STATE_ESCAPED_EOL)
 	{
 		write(STDOUT_FILENO, "\n", 1);
-		insert_string_at(g_term->buffer, (char *)arr, g_term->iterator++);
+		insert_string_at(g_term->v_buffer->iterator, arr);
 		display_prompt(g_term->input_state);
 		toggle_escaped();
-		redraw_buffer(-1);
+		buffer_redraw(-1);
 	}
 	else
 	{
-		if (g_term->buffer[g_term->iterator] != '\0')
-			caret_move(ft_strlen(g_term->buffer + g_term->iterator), D_RIGHT);
+		if (ft_strcmp(buff_char_at(g_term->v_buffer->iterator), "\0") == 0)
+			caret_move(g_term->v_buffer->size - g_term->v_buffer->iterator, D_RIGHT);
 		write(STDOUT_FILENO, "\n", 1);
 		g_term->input_state = STATE_COMMIT;
 	}
 }
 
 /*
-** TODO: Make this one handle long input from Command + V
+** Using union just to use it anywhere
 */
-char			**wait_for_input(void)
+
+union			u_char
 {
-	char		**commands;
-	long		chr;
-//	uint64_t	status;
+	long		lng;
 	char		arr[8];
+};
+
+/*
+** TODO: Make this one handle long input from Command + V
+** TODO: Memory leak at buff_get_part call
+*/
+char			**read_command(void)
+{
+	char			**commands;
+	union u_char	input;
 
 	commands = NULL;
 	while (!commands)
 	{
-		ft_bzero(arr, 8 * sizeof(char));
-		read(0, arr, 8);
-//		status = get_utf_body_size(arr[0]);
-//		if (status != 0)
-//			read(0, arr + 1, status);
-		ft_memcpy(&chr, arr,  8);
-		if (arr[0] == '\n')
-			deal_with_newline(arr);
-		else if (is_printable(arr) && arr[0] != '\n')
-			deal_with_printable(arr);
+		read(0, ft_memset(input.arr, 0, 8), 8);
+		if (input.arr[0] == '\n')
+			deal_with_newline(input.arr);
+		else if (is_printable(input.arr) && input.arr[0] != '\n')
+			deal_with_printable(input.arr);
 		else
-			handle_key(chr);
+			handle_key(input.lng);
 		if (g_term->input_state == STATE_COMMIT)
-			commands = smart_split(g_term->buffer, TOKEN_DELIMITERS);
+		{
+			// TODO: Fix leak from buff_get_part
+			commands = smart_split(write_history(buff_get_part(0, UINT64_MAX),
+						g_term->history_file), TOKEN_DELIMITERS);
+		}
 		update_caret_position(POS_CURRENT);
 	}
 	return (commands);

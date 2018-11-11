@@ -1,34 +1,52 @@
 #include "../../include/twenty_one_sh.h"
-#include "../../include/line_editing.h"
+#include "line_editing.h"
 
-void	toggle_quote(void)
+int		toggle_quote(void)
 {
 	if (g_term->input_state == STATE_QUOTE)
-		g_term->input_state = STATE_NORMAL;
+		return (g_term->input_state = STATE_NORMAL);
 	else if (g_term->input_state == STATE_NORMAL)
-		g_term->input_state = STATE_QUOTE;
+		return (g_term->input_state = STATE_QUOTE);
+	return (0);
 }
 
-void	toggle_dquote(void)
+int		toggle_dquote(void)
 {
 	if (g_term->input_state == STATE_DQUOTE)
-		g_term->input_state = STATE_NORMAL;
+		return (g_term->input_state = STATE_NORMAL);
 	else if (g_term->input_state == STATE_NORMAL)
-		g_term->input_state = STATE_DQUOTE;
+		return (g_term->input_state = STATE_DQUOTE);
+	return (0);
 }
 
-void	toggle_bquote(void)
+int		toggle_bquote(void)
 {
 	if (g_term->input_state == STATE_BQUOTE)
-		g_term->input_state = STATE_NORMAL;
+		return (g_term->input_state = STATE_NORMAL);
 	else if (g_term->input_state == STATE_NORMAL)
-		g_term->input_state = STATE_BQUOTE;
+		return (g_term->input_state = STATE_BQUOTE);
+	return (0);
 }
 
-void	toggle_escaped(void)
+int		toggle_escaped(void)
 {
-	if (g_term->input_state == STATE_ESCAPED_NL)
-		g_term->input_state = STATE_NORMAL;
+	if (g_term->input_state == STATE_ESCAPED_EOL)
+		return (g_term->input_state = STATE_NORMAL);
 	else if (g_term->input_state == STATE_NORMAL)
-		g_term->input_state = STATE_ESCAPED_NL;
+		return (g_term->input_state = STATE_ESCAPED_EOL);
+	return (0);
+}
+
+int		toggle_state(const char *c)
+{
+	if (ft_strcmp(c, "\'") == 0)
+		return (toggle_quote());
+	else if (ft_strcmp(c, "\"") == 0)
+		return (toggle_dquote());
+	else if (ft_strcmp(c, "`") == 0)
+		return (toggle_bquote());
+	else if (ft_strcmp(c, "\\") == 0)
+		return (toggle_escaped());
+	else
+		return (0);
 }

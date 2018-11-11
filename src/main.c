@@ -6,19 +6,30 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:32 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/07/31 14:45:32 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/10/30 19:25:18 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/twenty_one_sh.h"
-#include "../include/line_editing.h"
+#include "twenty_one_sh.h"
+#include "line_editing.h"
 
 #include <time.h>
 struct s_term	*g_term;
 
+long long		ft_rand(int bond)
+{
+	ssize_t			ponies;
+	static int		fd;
+
+	if (fd == 0)
+		fd = open("/dev/urandom", O_RDONLY);
+	read(fd, &ponies, sizeof(ssize_t));
+	return (ponies % bond);
+}
+
 int				display_normal_prompt(void)
 {
-	char	hostname[1024];
+	char	hostname[1025];
 	char	*cwd;
 	char	*swap;
 	char	*home;
@@ -36,36 +47,45 @@ int				display_normal_prompt(void)
 		cwd[0] = '~';
 	}
 	gethostname(hostname, 1024);
-	hostname[6] = 0;
-	size = ft_printf(SHELL_PROMPT, get_env("USER"), hostname, cwd);
+	hostname[ft_strchr(hostname, '.') - hostname] = 0;
+	size = ft_printf(SHELL_PROMPT, 31 + ft_rand(7), get_env("USER"), hostname, cwd);
 	chfree(cwd);
 	return (size);
 }
 
-int				shell_loop(void)
+void			execute_command(char **command)
 {
 	int			status;
+
+	restore_variables();
+	expand_variables(command);
+	status = execute(command);
+	if (status != 0)
+		ft_dprintf(2, "21sh: command not found: %s\n", command[0]);
+}
+
+int				shell_loop(void)
+{
 	int			i;
+	int			offset;
 	char		**commands;
-	char		**args;
 
 	while (ponies_teleported())
 	{
 		display_prompt(g_term->input_state = STATE_NORMAL);
-		clear_buffer(0);
-		commands = wait_for_input();
-		i = 0;
-		while (commands && commands[i])
-		{
-			restore_variables();
-			expand_variables(commands + i);
-			args = ft_strsplit(commands[i], ' ');
-			status = execute(args);
-			if (status != 0)
-				ft_dprintf(2, "21sh: command not found: %s\n", args[0]);
-			free_array(args);
-			i++;
-		}
+		reset_buffer(0);
+		commands = read_command();
+		i = -1;
+		offset = 0;
+		while (commands && commands[++i])
+			if (ft_strcmp(commands[i], ";") == 0)
+			{
+				ft_strdel(commands + i);
+				execute_command(commands + offset);
+				offset = i;
+			}
+		if (commands && *commands && offset == 0)
+			execute_command(commands + offset);
 		free_array(commands);
 	}
 	return (0);
@@ -92,12 +112,11 @@ void			init_term(void)
 	newterm->c_iflag &= ~(IXOFF);
 	tcsetattr(g_term->tty_fd, TCSANOW, newterm);
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &window);
-	ft_bzero(g_term->buffer, sizeof(char) * (MAX_INPUT + 1));
 	tputs(tgetstr("ei", NULL), 1, &ft_putc);
 	g_term->ws_col = window.ws_col;
 	g_term->ws_row = window.ws_row;
-	g_term->iterator = 0;
 	g_term->input_state = STATE_NORMAL;
+	init_buffer_vector(MAX_INPUT);
 	update_caret_position(POS_CURRENT);
 }
 
@@ -108,20 +127,24 @@ void			init_files(void)
 
 	time(&rawtime);
 	timeinfo = localtime(&rawtime);
-	g_term->logfile = (short)open("21sh.log", O_RDWR | O_CREAT | O_TRUNC);
-	chmod("21sh.log", 0644);
-	ft_dprintf(g_term->logfile, "21sh log [%d]\nDate: %s\n",
-				getpid(), asctime(timeinfo));
-	g_term->history_file = (short)open(".21sh_history", O_RDWR | O_CREAT);
-	chmod("21sh_history", 0644);
+	if (fcntl(1, F_GETFD) == -1)
+		dup2(open("/dev/fd/1", O_WRONLY), 1);
+	if (fcntl(2, F_GETFD) == -1)
+		dup2(open("/dev/fd/2", O_WRONLY), 2);
+	g_term->logfile = (short)open("21sh.log", O_RDWR | O_CREAT | O_TRUNC, 0644);
+	ft_dprintf(g_term->logfile, "21sh log [pid %d]\nDate: %s\n", getpid(),
+			asctime(timeinfo));
+	g_term->history_file = (short)open(".21sh_history", O_RDWR | O_CREAT, 0644);
 }
 
+// TODO: Add isatty() check and if it is the case, run in non-interactive mode
 int				main(int argc, char **argv, char **env)
 {
 	extern char		**environ;
 
 	init_term();
 	init_files();
+	load_history(g_term->history_file);
 	g_environ = copy_env(env, environ);
 	increment_shlvl();
 	ft_printf("\n%*s\n%*s\n\n%*s%d (%s)\n",

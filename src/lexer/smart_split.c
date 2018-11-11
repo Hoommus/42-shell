@@ -1,4 +1,4 @@
-#include "../../include/script_lang.h"
+#include "script_lang.h"
 
 char		*g_singles[] = {
 	"|",
