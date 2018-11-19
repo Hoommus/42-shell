@@ -6,10 +6,11 @@
 # define TOKEN_DELIMITERS "\n\t;'\" \r\a"
 # define ISQT(x) (((x) == '\'' || (x) == '"' || (x) == '`') ? (1) : (0))
 
-
 extern char		*g_singles[];
 extern char		*g_keywords[];
 extern char		*g_operators[];
+
+extern struct s_parse_token	*g_map[];
 
 enum			e_token
 {
@@ -25,6 +26,13 @@ enum			e_token
 	SEPARATOR,		// ; '\n'
 	COMMAND,		// string representing a command name;
 	END_OF_SCRIPT	// DO AS HE SAYS
+};
+
+struct			s_parse_token
+{
+	char	*text;
+	char	*token_name;
+	bool	requires_single;
 };
 
 typedef struct	s_token
@@ -59,5 +67,13 @@ void			add_token(t_token **head, t_token **tail, t_token *to_add);
 void			free_token(struct s_token *token);
 
 char			**smart_split(char *str, char *delimiters);
+
+/*
+** File reading and executing
+*/
+
+/*
+** Hullo?
+*/
 
 #endif

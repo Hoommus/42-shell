@@ -1,5 +1,6 @@
-#include "script_lang.h"
+#include "shell_script.h"
 
+#include <assert.h>
 char		*g_singles[] = {
 	"|",
 	";",
@@ -16,6 +17,7 @@ char		*g_singles[] = {
 /*
 ** Returns true if char needs separate token
 */
+
 int			is_single_token(char c)
 {
 	int		i;
@@ -46,52 +48,40 @@ int			count_substrings(char *str)
 		else if (is_single_token(str[i++]))
 			subs++;
 		else if (ISQT(str[i]) && ++i)
-			while (str[i] != 0 && str[i] != c)
+			while (str[i] && str[i] != c)
+				i++;
+		else if (ft_isdigit(str[i]))
+			while (str[i] && ft_isdigit(str[i]) && !is_single_token(str[i]))
 				i++;
 		else
-			while (str[i] != 0 && ft_strchr(TOKEN_DELIMITERS, str[i]) == NULL)
+			while (str[i] && ft_strchr(TOKEN_DELIMITERS, str[i]) == NULL
+				&& !is_single_token(str[i]))
 				i++;
 		subs++;
 	}
 	return (subs);
 }
 
-/*
-** Returns pointer to any found needle char in str.
-*/
-char		*ft_strchr_any(const char *str, const char *needles)
-{
-	size_t	i;
-	size_t	j;
-
-	i = 0;
-	while (str[i])
-	{
-		j = 0;
-		while (needles[j])
-			if (str[i] == needles[j++])
-				return ((char *)str + i);
-		i++;
-	}
-	return (NULL);
-}
-
 long long	get_word_size(char *str)
 {
 	long long	i;
-	char		c;
+	char		quote;
 
-	c = *str;
+	quote = *str;
 	i = 0;
 	if (is_single_token(*str))
 		return (1);
 	else if (ISQT(*str) && ++i)
-		while (str[i] && str[i] != c)
+		while (str[i] && str[i] != quote)
+			i++;
+	else if (ft_isdigit(*str) && ++i)
+		while (str[i] && ft_isdigit(str[i]))
 			i++;
 	else
-		i = (long long)(ft_strchr_any(str, TOKEN_DELIMITERS) - str);
-	if (i < 0)
-		return ((long long)ft_strlen(str));
+		while (str[i] && !is_single_token(str[i]) && !ft_strchr(TOKEN_DELIMITERS, str[i]))
+			i++;
+	// TODO: Don't forget about this guy
+	assert(i > 0);
 	return (i);
 }
 

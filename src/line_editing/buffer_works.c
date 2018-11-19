@@ -1,7 +1,6 @@
-#include <twenty_one_sh.h>
 #include "twenty_one_sh.h"
 #include "line_editing.h"
-#include "script_lang.h"
+#include "shell_script.h"
 #include "shell_history.h"
 
 int				is_printable(const char c[8])
@@ -16,33 +15,11 @@ int				is_printable(const char c[8])
 		return (0);
 }
 
-/*
-** Returns number of 0b10xxxxxx-based characters
-*/
-u_int64_t		get_utf_body_size(char first)
-{
-	unsigned char	c;
-
-	c = (unsigned char)first;
-	if (c >= 32 && c < 127)
-		return (0);
-	if ((c & 0xC0) == 0xC0)
-		return (1);
-	else if ((c & 0xE0) == 0xE0)
-		return (2);
-	else if ((c & 0xF0) == 0xF0)
-		return (3);
-	else if (c == 27)
-		return (7);
-	else
-		return (0);
-}
-
 void			deal_with_printable(const char arr[8])
 {
 	if (!toggle_state(arr) && g_term->input_state == STATE_ESCAPED_EOL)
 		g_term->input_state = STATE_NORMAL;
-	insert_string_at(g_term->v_buffer->iterator, arr);
+	insert_single_at(g_term->buffer->iterator, arr);
 	save_caret_position_as(POS_LAST);
 	tputs(tgetstr("im", NULL), 1, &ft_putc);
 	write(1, arr, 8);
@@ -67,15 +44,15 @@ void			deal_with_newline(const char arr[8])
 		|| g_term->input_state == STATE_ESCAPED_EOL)
 	{
 		write(STDOUT_FILENO, "\n", 1);
-		insert_string_at(g_term->v_buffer->iterator, arr);
+		insert_single_at(g_term->buffer->iterator, arr);
 		display_prompt(g_term->input_state);
 		toggle_escaped();
 		buffer_redraw(-1);
 	}
 	else
 	{
-		if (ft_strcmp(buff_char_at(g_term->v_buffer->iterator), "\0") == 0)
-			caret_move(g_term->v_buffer->size - g_term->v_buffer->iterator, D_RIGHT);
+		if (ft_strcmp(buff_char_at(g_term->buffer->iterator), "\0") == 0)
+			caret_move(g_term->buffer->size - g_term->buffer->iterator, D_RIGHT);
 		write(STDOUT_FILENO, "\n", 1);
 		g_term->input_state = STATE_COMMIT;
 	}
@@ -87,7 +64,7 @@ void			deal_with_newline(const char arr[8])
 
 union			u_char
 {
-	long		lng;
+	u_int64_t	lng;
 	char		arr[8];
 };
 
@@ -113,8 +90,8 @@ char			**read_command(void)
 		if (g_term->input_state == STATE_COMMIT)
 		{
 			// TODO: Fix leak from buff_get_part
-			commands = smart_split(write_history(buff_get_part(0, UINT64_MAX),
-						g_term->history_file), TOKEN_DELIMITERS);
+			commands = smart_split(history_write(buff_get_part(0, UINT64_MAX),
+										get_history_fd()), TOKEN_DELIMITERS);
 		}
 		update_caret_position(POS_CURRENT);
 	}

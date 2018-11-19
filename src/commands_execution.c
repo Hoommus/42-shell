@@ -10,7 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <errno.h>
 #include "twenty_one_sh.h"
+#include "shell_builtins.h"
 
 int		try_builtin(char *builtin, char **args)
 {
@@ -32,8 +34,8 @@ int		forknrun(char *bin, char **args)
 	int		status;
 
 	tcsetattr(g_term->tty_fd, TCSANOW, g_term->original_term);
-	g_running_process = fork();
-	if (g_running_process == 0)
+	g_term->running_process = fork();
+	if (g_term->running_process == 0)
 	{
 		execve(bin, args, g_environ);
 		exit(0);
@@ -42,7 +44,8 @@ int		forknrun(char *bin, char **args)
 	{
 		//TODO: Replace with waitpid() with WUNTRACED to make Ctrl+Z workma
 		wait(&status);
-		g_running_process = 0;
+		g_term->last_cmd_status = WEXITSTATUS(status);
+		g_term->running_process = 0;
 		tcsetattr(g_term->tty_fd, TCSANOW, g_term->current_term);
 		return (0);
 	}
@@ -56,7 +59,7 @@ int		try_binary(char *binary, char **args)
 	char	**paths;
 
 	swap = get_env("PATH");
-	if (swap == NULL)
+	if (swap == NULL || (binary && ft_strchr(binary, '/') != NULL))
 		return (1);
 	paths = ft_strsplit(swap, ':');
 	i = 0;
@@ -87,23 +90,18 @@ int		try_local_binary(char *bin, char **args)
 	return (status);
 }
 
-/*
-** TODO: Check if binary name is a path and decide what function to use to run it
-*/
 int		execute(char **args)
 {
-	int		status;
-
-	status = 1;
+	g_term->last_cmd_status = 1;
 	if (args != NULL)
-		status = try_builtin(args[0], args + 1);
-	if (status == 0)
+		g_term->last_cmd_status = try_builtin(args[0], args + 1);
+	if (g_term->last_cmd_status == 0)
 		return (0);
-	status = try_binary(args[0], args);
-	if (status == 0)
+	g_term->last_cmd_status = try_binary(args[0], args);
+	if (g_term->last_cmd_status == 0)
 		return (0);
-	status = try_local_binary(args[0], args);
-	if (status == 0)
+	g_term->last_cmd_status = try_local_binary(args[0], args);
+	if (g_term->last_cmd_status == 0)
 		return (0);
 	return (1);
 }

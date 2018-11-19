@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   cursor_control.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2018/11/16 12:28:16 by vtarasiu          #+#    #+#             */
+/*   Updated: 2018/11/16 12:28:16 by vtarasiu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "line_editing.h"
 
 int			ft_strchr_back(const char *str, char c, int i)
@@ -37,11 +49,11 @@ void		left_hard(int dist, int *new_col, int *new_row)
 	{
 		if (*new_col == 0)
 		{
-			target = g_term->v_buffer->iterator - dist;
+			target = g_term->buffer->iterator - dist;
 			*(new_row) -= 1;
 			if (buff_char_at_equals(target, "\n"))
 			{
-				tmp = buff_strchr_back(g_term->v_buffer, "\n", target);
+				tmp = buff_strchr_back(g_term->buffer, "\n", target);
 				*(new_col) = tmp - (tmp % g_term->ws_col) * g_term->ws_col;
 			}
 			else
@@ -61,7 +73,7 @@ void		right_hard(int distance, int *new_col, int *new_row)
 	while (i < distance)
 	{
 		if (*new_col >= g_term->ws_col - 1 ||
-			buff_char_at(g_term->v_buffer->iterator + i)[0] == '\n')
+			buff_char_at(g_term->buffer->iterator + i)[0] == '\n')
 		{
 			*(new_row) += 1;
 			*(new_col) = 0;
@@ -77,6 +89,8 @@ int			caret_move(int distance, enum e_direction direction)
 	int		new_col;
 	int		new_row;
 
+	if (distance == 0 || direction == D_NOWHERE)
+		return (0);
 	new_col = get_caretpos(POS_CURRENT)->col;
 	new_row = get_caretpos(POS_CURRENT)->row;
 	if (direction == D_LEFT)

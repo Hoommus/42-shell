@@ -1,8 +1,20 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   history_vector.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2018/11/19 15:35:35 by vtarasiu          #+#    #+#             */
+/*   Updated: 2018/11/19 15:35:35 by vtarasiu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "shell_history.h"
 
 extern t_history		*g_history;
 
-void					init_history_vector(const u_int64_t capacity)
+void					history_init_vector(const u_int64_t capacity)
 {
 	g_history = (t_history *)ft_memalloc(sizeof(t_history));
 	g_history->capacity = capacity;
@@ -12,7 +24,7 @@ void					init_history_vector(const u_int64_t capacity)
 			ft_memalloc(capacity * sizeof(struct s_history_entry *));
 }
 
-static void				reallocate_history_vector(void)
+static void				history_reallocate_vector(void)
 {
 	struct s_history_entry	**tmp;
 	u_int64_t				sz;
@@ -26,12 +38,12 @@ static void				reallocate_history_vector(void)
 	g_history->entries = tmp;
 }
 
-void					push_history_entry(const char *cmd, time_t timestamp)
+void					history_push_entry(const char *cmd, time_t timestamp)
 {
 	struct s_history_entry	*entry;
 
 	if (g_history->size >= g_history->capacity - 1)
-		reallocate_history_vector();
+		history_reallocate_vector();
 	entry = (struct s_history_entry *)
 			ft_memalloc(sizeof(struct s_history_entry));
 	entry->command = ft_strdup(cmd);
@@ -39,14 +51,14 @@ void					push_history_entry(const char *cmd, time_t timestamp)
 	g_history->entries[(g_history->size)++] = entry;
 }
 
-struct s_history_entry	*get_history_entry(u_int64_t index)
+struct s_history_entry	*history_get_entry(u_int64_t index)
 {
 	if (index >= g_history->size)
 		return (NULL);
 	return (g_history->entries[index]);
 }
 
-struct s_history_entry	*pop_history_entry(void)
+struct s_history_entry	*history_pop_entry(void)
 {
 	return (g_history->entries[g_history->size - 1]);
 }

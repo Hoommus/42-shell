@@ -25,15 +25,20 @@
 
 # define SNWH (copy[i + 1] == '/' || copy[i + 1] == 0 || ft_iswhsp(copy[i + 1]))
 # define ABS(a) ((a) < 0 ? -(a) : (a))
-# define SHELL_PROMPT "\x1b[0m\x1b[%lld;1m[%s@%s] \x1b[37;1m%s $> \x1b[0m"
+# define SHELL_PROMPT "\x1b[0m\x1b[34;1m[%s@%s] \x1b[36;1m%s\x1b[0m \x1b[%d;1m$\x1b[0m "
 
-# define BUILD 249
-# define BUILD_DATE "11.11.18 17:43:11 EET"
+# define HISTORY_FILE ".21sh_history"
+# define CONFIG_FILE ".21shrc"
+# define LOG_FILE ".21sh.log"
+
+# define BUILD 340
+# define BUILD_DATE "19.11.18 17:31:14 EET"
 
 # ifdef MAX_INPUT
 #  undef MAX_INPUT
-#  define MAX_INPUT 2048
+#  define MAX_INPUT 256
 # endif
+
 /*
 ** ◦ pipe
 ** ◦ dup, dup2
@@ -63,6 +68,7 @@ enum						e_state
 	STATE_ESCAPED_EOL,
 	STATE_NEXT_ESCAPED,
 	STATE_COMMIT,
+	STATE_SEARCH,
 	STATE_NON_INTERACTIVE,
 	BREAK
 };
@@ -98,7 +104,6 @@ typedef struct s_position	t_carpos;
 */
 struct					s_term
 {
-	int				iterator;
 	enum e_state	input_state;
 	short			ws_col;
 	short			ws_row;
@@ -112,33 +117,14 @@ struct					s_term
 
 	short			flags;
 
-	short			last_cmd_status;
+	int				last_cmd_status;
+	pid_t			running_process;
 
-	t_buffer		*v_buffer;
-};
-
-struct					s_builtin
-{
-	char	*name;
-	int		(*function) (char **);
+	t_buffer		*buffer;
 };
 
 char					**g_environ;
 extern struct s_term	*g_term;
-pid_t					g_running_process;
-
-/*
-** Builtins (builtins/ *.c)
-*/
-int						hs_alias(char **args);
-int						hs_cd(char **args);
-int						hs_echo(char **args);
-int						hs_env(char **args);
-int						hs_setenv(char **args);
-int						hs_unsetenv(char **args);
-int						hs_help(char **args);
-int						hs_exit(char **args);
-int						hs_where(char **args);
 
 /*
 ** What is it? A design pattern? Really???
@@ -147,8 +133,16 @@ int						hs_where(char **args);
 int						execute(char **args);
 
 /*
+** Init (init.c)
+*/
+void					init_term(void);
+void					init_files(void);
+short					init_fd_at_home(char *filename);
+
+/*
 ** Environment (environ_utils.c)
 */
+
 char					*get_env(char *name);
 int						set_env(char *key, char *value);
 int						unset_env(char *name);
@@ -157,20 +151,24 @@ char					**copy_env(char **argenv, char **environ);
 /*
 ** Main Loop (main.c, )
 */
+
 char					**read_command(void);
 int						shell_loop(void);
 void					setup_signal_handlers(void);
 void					display_prompt(enum e_state state);
 int						display_normal_prompt(void);
+
 /*
 ** Auxilia (auxilia.c)
 */
+
 ssize_t					ponies_teleported(void);
 void					increment_shlvl(void);
 
 /*
 ** Final input parsing (variables_replacement.c)
 */
+
 char					*replace_variables(char *line);
 char					*replace_home(char *line);
 void					restore_variables(void);
@@ -180,11 +178,38 @@ int						is_valid_var(char *var);
 /*
 ** Memory utils (memory.c)
 */
+
 void					chfree(void *obj);
 void					chfree_n(int n, ...);
 void					free_array(char **array);
 
-void					load_history(int fd);
+void					history_load(int fd);
 
+/*
+** errors.c
+*/
+
+void					throw_fatal(char *cause);
+
+/*
+** service_routines.c
+*/
+
+int						get_history_fd(void);
+
+/*
+** Arguments parsing
+*/
+
+bool					has_long_flag(const char **args, const char *flag);
+bool					has_flag(const char **args, const char flag);
+char					validate_short_flags(const char **args,
+												const char *possible_flags);
+/*
+** Compatibility
+*/
+# ifdef __linux__
+int						gethostname(char *arr, size_t size)
+# endif
 
 #endif

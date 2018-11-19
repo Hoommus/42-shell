@@ -1,5 +1,5 @@
-#include "script_lang.h"
-#include "../../include/twenty_one_sh.h"
+#include "shell_script.h"
+#include "shell_builtins.h"
 
 char			*g_keywords[] = {
 	"while",
@@ -18,12 +18,9 @@ char			*g_keywords[] = {
 	NULL
 };
 
-/*
-**
-*/
 char			*g_operators[] = {
-	"|", "<", ">", "+", "-", "/", "*",
 	"&&", "||", ">>", "<<",
+	"|", "<", ">", "+", "-", "/", "*",
 	NULL
 };
 
@@ -49,7 +46,7 @@ struct s_token	*get_token(char *string)
 	i = 0;
 	while (!token && g_operators[i] != NULL)
 		if (ft_strcmp(g_operators[i++], string) == 0)
-			token = new_token(string, string[0] == '|' ? PIPE : OPERATOR);
+			token = new_token(string, OPERATOR);
 	if (token == NULL && ft_strcmp(string, ";") == 0)
 		token = new_token(string, SEPARATOR);
 	if (token == NULL)

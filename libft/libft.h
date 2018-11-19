@@ -56,6 +56,7 @@ char			*ft_strrchr(const char *s, int c);
 char			*ft_strstr(const char *haystack, const char *needle);
 char			*ft_strnstr(const char *haystack, const char *needle,
 				size_t len);
+char			*ft_strchr_any(const char *str, const char *needles);
 
 int				ft_strcmp(const char *s1, const char *s2);
 int				ft_strncmp(const char *s1, const char *s2, size_t n);
@@ -112,5 +113,7 @@ t_list			*ft_lstmap(t_list *lst, t_list *(*f)(t_list *elem));
 
 char			*to_unicode(wchar_t codepoint);
 char			*to_unicode_string(wchar_t *string);
+
+u_int64_t		ft_rand(u_int64_t limit);
 
 #endif

@@ -1,0 +1,78 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   init.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2018/11/16 12:28:13 by vtarasiu          #+#    #+#             */
+/*   Updated: 2018/11/19 12:58:09 by vtarasiu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "twenty_one_sh.h"
+#include "line_editing.h"
+
+#include <time.h>
+/*
+** TODO: Don't forget to add isatty() and ttyname() usages;
+*/
+
+void	init_term(void)
+{
+	struct winsize	window;
+	struct termios	*oldterm;
+	struct termios	*newterm;
+
+	oldterm = (struct termios *)malloc(sizeof(struct termios));
+	newterm = (struct termios *)malloc(sizeof(struct termios));
+	g_term = (struct s_term *)malloc(sizeof(struct s_term));
+	g_term->tty_fd = (short)open("/dev/tty", O_RDWR);
+	g_term->original_term = oldterm;
+	g_term->current_term = newterm;
+	tcgetattr(g_term->tty_fd, oldterm);
+	ft_memcpy(newterm, oldterm, sizeof(struct termios));
+	newterm->c_lflag &= ~(ECHO | ICANON | IEXTEN) | ECHOE | ECHOCTL | ECHONL;
+	newterm->c_iflag &= ~(IXOFF);
+	tcsetattr(g_term->tty_fd, TCSANOW, newterm);
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &window);
+	tputs(tgetstr("ei", NULL), 1, &ft_putc);
+	g_term->ws_col = window.ws_col;
+	g_term->ws_row = window.ws_row;
+	g_term->input_state = STATE_NORMAL;
+	init_buffer_vector(MAX_INPUT);
+	update_caret_position(POS_CURRENT);
+}
+
+short	init_fd_at_home(char *filename)
+{
+	short	fd;
+	char	*home;
+	char	*full_path;
+
+	home = get_env("HOME");
+	full_path = ft_strings_join(2, "/", home, filename);
+	if (access(full_path, F_OK) != -1 && access(full_path, 0644) == -1)
+		chmod(full_path, 0644);
+	fd = (short)open(full_path, O_RDWR | O_CREAT, 0644);
+	free(full_path);
+	return (fd);
+}
+
+// TODO: Create files at $HOME. If env var does not exist, create in current dir
+void	init_files(void)
+{
+	time_t		rawtime;
+	struct tm	*timeinfo;
+
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
+	if (fcntl(1, F_GETFD) == -1)
+		dup2(open("/dev/fd/1", O_WRONLY), 1);
+	if (fcntl(2, F_GETFD) == -1)
+		dup2(open("/dev/fd/2", O_WRONLY), 2);
+	g_term->logfile = init_fd_at_home(LOG_FILE);
+	g_term->history_file = init_fd_at_home(HISTORY_FILE);
+	ft_dprintf(g_term->logfile, "21sh log [pid %d]\nDate: %s\n", getpid(),
+				asctime(timeinfo));
+}

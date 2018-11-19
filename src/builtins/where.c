@@ -6,21 +6,22 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/01 12:51:55 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/08/01 13:02:49 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/11/19 14:02:25 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "twenty_one_sh.h"
+#include "shell_builtins.h"
 
 char	*is_builtin(char *arg)
 {
 	extern struct s_builtin	g_builtins[];
-	int		i;
+	int						i;
 
 	if (arg == NULL)
 		return (NULL);
 	i = 0;
-	while (i < 10)
+	while (g_builtins[i].name != NULL)
 	{
 		if (ft_strcmp(arg, g_builtins[i].name) == 0)
 			return (g_builtins[i].name);

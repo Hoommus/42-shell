@@ -16,7 +16,7 @@ t_conv	*create_empty(void)
 {
 	t_conv	*conv;
 
-	conv = (t_conv *)malloc(sizeof(t_conv));
+	conv = (t_conv *)ft_memalloc(sizeof(t_conv));
 	if (conv == NULL)
 		return (NULL);
 	conv->format_offset = 0;

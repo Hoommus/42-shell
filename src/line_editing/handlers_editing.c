@@ -1,34 +1,34 @@
 #include "line_editing.h"
-#include "script_lang.h"
+#include "shell_script.h"
 
-void	handle_backspace(int key)
+void	handle_backspace(u_int64_t key)
 {
-	if (key == K_BSP && g_term->v_buffer->iterator > 0)
+	if (key == K_BSP && g_term->buffer->iterator > 0)
 	{
 		handle_left(K_LEFT);
-		toggle_state(buff_char_at(g_term->v_buffer->iterator));
-		buff_del_symbol(g_term->v_buffer->iterator);
+		toggle_state(buff_char_at(g_term->buffer->iterator));
+		buff_del_symbol(g_term->buffer->iterator);
 		tputs(tgetstr("dc", NULL), 1, &ft_putc);
 		buffer_redraw(-1);
 	}
 }
 
-void	handle_del(int key)
+void	handle_del(u_int64_t key)
 {
-	if (key == K_DEL && g_term->v_buffer->iterator < g_term->v_buffer->size)
+	if (key == K_DEL && g_term->buffer->iterator < g_term->buffer->size)
 	{
 		tputs(tgetstr("dc", NULL), 1, &ft_putc);
 		buffer_redraw(0);
-		buff_del_symbol(g_term->v_buffer->iterator);
+		buff_del_symbol(g_term->buffer->iterator);
 	}
 }
 
-void	handle_line_kill(int key)
+void	handle_line_kill(u_int64_t key)
 {
-	if (key == CKILL && g_term->v_buffer->size > 0)
+	if (key == CKILL && g_term->buffer->size > 0)
 	{
-		load_caret_position(POS_PROMPT);
+		caret_move(g_term->buffer->size, D_LEFT);
 		tputs(tgetstr("cd", NULL), 1, &ft_putc);
-		reset_buffer(0);
+		clear_buffer(0);
 	}
 }
