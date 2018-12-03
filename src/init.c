@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/16 12:28:13 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/11/19 12:58:09 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/11/19 18:51:19 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,22 +44,24 @@ void	init_term(void)
 	update_caret_position(POS_CURRENT);
 }
 
-short	init_fd_at_home(char *filename)
+short	init_fd_at_home(char *filename, int flags)
 {
 	short	fd;
 	char	*home;
 	char	*full_path;
 
 	home = get_env("HOME");
-	full_path = ft_strings_join(2, "/", home, filename);
+	if (home[0] != '\0')
+		full_path = ft_strings_join(2, "/", home, filename);
+	else
+		full_path = ft_strdup(filename);
 	if (access(full_path, F_OK) != -1 && access(full_path, 0644) == -1)
 		chmod(full_path, 0644);
-	fd = (short)open(full_path, O_RDWR | O_CREAT, 0644);
+	fd = (short)open(full_path, O_RDWR | O_CREAT | flags, 0644);
 	free(full_path);
 	return (fd);
 }
 
-// TODO: Create files at $HOME. If env var does not exist, create in current dir
 void	init_files(void)
 {
 	time_t		rawtime;
@@ -71,8 +73,8 @@ void	init_files(void)
 		dup2(open("/dev/fd/1", O_WRONLY), 1);
 	if (fcntl(2, F_GETFD) == -1)
 		dup2(open("/dev/fd/2", O_WRONLY), 2);
-	g_term->logfile = init_fd_at_home(LOG_FILE);
-	g_term->history_file = init_fd_at_home(HISTORY_FILE);
+	g_term->logfile = init_fd_at_home(LOG_FILE, 0);
+	g_term->history_file = init_fd_at_home(HISTORY_FILE, 0);
 	ft_dprintf(g_term->logfile, "21sh log [pid %d]\nDate: %s\n", getpid(),
 				asctime(timeinfo));
 }

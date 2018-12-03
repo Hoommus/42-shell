@@ -31,12 +31,16 @@
 # define CONFIG_FILE ".21shrc"
 # define LOG_FILE ".21sh.log"
 
-# define BUILD 340
-# define BUILD_DATE "19.11.18 17:31:14 EET"
+# define BUILD 346
+# define BUILD_DATE "03.12.18 12:59:08 EET"
+
+/*
+** Initial input of 260 is chosen because (260 * 10) % 8 == 0
+*/
 
 # ifdef MAX_INPUT
 #  undef MAX_INPUT
-#  define MAX_INPUT 256
+#  define MAX_INPUT 260
 # endif
 
 /*
@@ -47,12 +51,6 @@
 ** ◦ tgetflag
 ** ◦ tgetnum
 */
-
-// TODO: Remove after AST implemented
-struct			command {
-	char	*command;
-	char	**args;
-};
 
 /*
 ** Used for controlling input state
@@ -69,6 +67,7 @@ enum						e_state
 	STATE_NEXT_ESCAPED,
 	STATE_COMMIT,
 	STATE_SEARCH,
+	STATE_PARTIAL_EXPAND,
 	STATE_NON_INTERACTIVE,
 	BREAK
 };
@@ -102,7 +101,7 @@ typedef struct s_position	t_carpos;
 /*
 ** g_term stores terminal parameters as well as cursor position and input buffer
 */
-struct					s_term
+struct						s_term
 {
 	enum e_state	input_state;
 	short			ws_col;
@@ -123,93 +122,93 @@ struct					s_term
 	t_buffer		*buffer;
 };
 
-char					**g_environ;
-extern struct s_term	*g_term;
+char						**g_environ;
+extern struct s_term		*g_term;
 
 /*
 ** What is it? A design pattern? Really???
 */
 
-int						execute(char **args);
+int							execute(char **args);
 
 /*
 ** Init (init.c)
 */
-void					init_term(void);
-void					init_files(void);
-short					init_fd_at_home(char *filename);
+void						init_term(void);
+void						init_files(void);
+short						init_fd_at_home(char *filename, int flags);
 
 /*
 ** Environment (environ_utils.c)
 */
 
-char					*get_env(char *name);
-int						set_env(char *key, char *value);
-int						unset_env(char *name);
-char					**copy_env(char **argenv, char **environ);
+char						*get_env(char *name);
+int							set_env(char *key, char *value);
+int							unset_env(char *name);
+char						**copy_env(char **argenv, char **environ);
 
 /*
 ** Main Loop (main.c, )
 */
 
-char					**read_command(void);
-int						shell_loop(void);
-void					setup_signal_handlers(void);
-void					display_prompt(enum e_state state);
-int						display_normal_prompt(void);
+char						**read_command(void);
+int							shell_loop(void);
+void						setup_signal_handlers(void);
+void						display_prompt(enum e_state state);
+int							display_normal_prompt(void);
 
 /*
 ** Auxilia (auxilia.c)
 */
 
-ssize_t					ponies_teleported(void);
-void					increment_shlvl(void);
+ssize_t						ponies_teleported(void);
+void						increment_shlvl(void);
 
 /*
 ** Final input parsing (variables_replacement.c)
 */
 
-char					*replace_variables(char *line);
-char					*replace_home(char *line);
-void					restore_variables(void);
-void					expand_variables(char **line);
-int						is_valid_var(char *var);
+char						*replace_variables(char *line);
+char						*replace_home(char *line);
+void						restore_variables(void);
+void						expand_variables(char **line);
+int							is_valid_var(char *var);
 
 /*
 ** Memory utils (memory.c)
 */
 
-void					chfree(void *obj);
-void					chfree_n(int n, ...);
-void					free_array(char **array);
+void						chfree(void *obj);
+void						chfree_n(int n, ...);
+void						free_array(char **array);
 
-void					history_load(int fd);
+void						history_load(int fd);
 
 /*
 ** errors.c
 */
 
-void					throw_fatal(char *cause);
+void						throw_fatal(char *cause);
 
 /*
 ** service_routines.c
 */
 
-int						get_history_fd(void);
+int							get_history_fd(void);
 
 /*
 ** Arguments parsing
 */
 
-bool					has_long_flag(const char **args, const char *flag);
-bool					has_flag(const char **args, const char flag);
-char					validate_short_flags(const char **args,
+bool						has_long_flag(const char **args, const char *flag);
+bool						has_flag(const char **args, const char flag);
+char						validate_short_flags(const char **args,
 												const char *possible_flags);
 /*
 ** Compatibility
 */
 # ifdef __linux__
-int						gethostname(char *arr, size_t size)
+int							gethostname(char *arr, size_t size)
 # endif
 
 #endif

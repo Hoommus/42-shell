@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/16 12:28:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/11/19 14:14:55 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/11/19 14:33:51 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ void	clear_history_hard(void)
 	free(g_history);
 	history_init_vector(capacity);
 	close(g_term->history_file);
-	g_term->history_file = init_fd_at_home(HISTORY_FILE);
+	g_term->history_file = init_fd_at_home(HISTORY_FILE, O_TRUNC);
 }
 
 /*

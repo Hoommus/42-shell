@@ -34,7 +34,7 @@ struct s_token	*get_token(char *string)
 	i = 0;
 	while (!token && g_keywords[i] != NULL)
 		if (ft_strcmp(g_keywords[i++], string) == 0)
-			token = new_token(string, KEYWORD);
+			token = new_token(string, TOKEN_KEYWORD);
 	i = 0;
 	while (!token && g_builtins[i].name != NULL)
 		if (ft_strcmp(g_builtins[i++].name, string) == 0)
@@ -73,7 +73,7 @@ char	*enum_to_str(enum e_token e)
 {
 	switch (e)
 	{
-		case KEYWORD:
+		case TOKEN_KEYWORD:
 			return ("KEYWORD");
 		case LITERAL:
 			return ("LITERAL");
@@ -81,7 +81,7 @@ char	*enum_to_str(enum e_token e)
 			return ("BRACE");
 		case REDIRECTION:
 			return ("REDIRECTION");
-		case PIPE:
+		case TOKEN_PIPE:
 			return ("PIPE");
 		case OPERATOR:
 			return ("OPERATOR");
