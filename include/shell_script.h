@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 14:44:44 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/03 19:31:53 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/12/05 16:45:32 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,19 +16,15 @@
 # include "libft.h"
 # include <stdbool.h>
 
-# define TOKEN_DELIMITERS "\n\t;'\" \r\a"
+# define TOKEN_DELIMITERS "\n\t; \r\a"
 # define ISQT(x) (((x) == '\'' || (x) == '"' || (x) == '`') ? (1) : (0))
 
-extern char					*g_singles[];
-extern char					*g_keywords[];
-extern char					*g_operators[];
-
 /*
-** Do not change order in which these entries appear. They provide access to a
-** specific token entry in g_tokens[] table.
+** Do not change order in which these entries appear. They provide easy random
+** access to a specific token entry in g_tokens[] table.
 */
 
-enum						e_token
+enum						e_token_type
 {
 	TOKEN_IF,
 	TOKEN_THEN,
@@ -37,8 +33,6 @@ enum						e_token
 	TOKEN_FI,
 	TOKEN_DO,
 	TOKEN_DONE,
-	TOKEN_CASE,
-	TOKEN_ESAC,
 	TOKEN_WHILE,
 	TOKEN_UNTIL,
 	TOKEN_FOR,
@@ -68,17 +62,18 @@ enum						e_token
 
 	TOKEN_LESS,
 	TOKEN_GREAT,
-	TOKEN_NEWLINE,
+	TOKEN_TILDE,
 	TOKEN_AMPERSAND,
-/*
-** Add token classes below and after "newline" token in g_tokens[] table
-*/
 
 	TOKEN_WORD,
 	TOKEN_NAME,
 	TOKEN_IO_NUMBER,
 	TOKEN_ASSIGNMENT_WORD,
+
+	TOKEN_NEWLINE,
 	TOKEN_EMPTY,
+
+	TOKEN,
 
 	TOKEN_KEYWORD,
 
@@ -92,7 +87,6 @@ enum						e_token
 	SEPARATOR,
 	COMMAND,
 	VARIABLE,
-	TOKEN_TILDE,
 	END_OF_SCRIPT,
 };
 
@@ -106,11 +100,11 @@ struct						s_parse_token
 {
 	char			*text;
 	char			*token_name;
-	enum e_token	type;
+	enum e_token_type	type;
 	bool			requires_single;
 };
 
-extern struct s_parse_token	g_tokens[];
+extern const struct s_parse_token	g_tokens[];
 
 /*
 ** Syntax rule is an entity that contains an array of possible expansions
@@ -120,7 +114,7 @@ extern struct s_parse_token	g_tokens[];
 ** The expands_to field is a two dimensional NULL-terminated array of pointers
 ** to s_syntax_rule variables declared in syntax_rules.h.
 ** Basically, it can hold up to 9 cases of given rule each of which
-*А* can hold up to 9 rules or tokens to which this rule expands.
+** can hold up to 9 rules and tokens to which this rule expands.
 ** For example, this syntax rule from BNF will be translated to this
 ** structure as follows:
 **
@@ -150,14 +144,14 @@ extern struct s_parse_token	g_tokens[];
 
 struct						s_syntax_rule
 {
-	enum e_token				representation[2];
+	enum e_token_type				representation[3];
 	const struct s_syntax_rule	*expands_to[10][10];
 };
 
 typedef struct				s_token
 {
 	const char		*value;
-	enum e_token	type;
+	enum e_token_type	type;
 	struct s_token	*next;
 }							t_token;
 
@@ -172,7 +166,7 @@ typedef enum				e_type
 typedef struct				s_node
 {
 	void			*value;
-	enum e_token	token_type;
+	enum e_token_type	token_type;
 	enum e_type		data_type;
 	struct s_node	*left;
 	struct s_node	*right;
@@ -181,8 +175,8 @@ typedef struct				s_node
 /*
 ** Lexer
 */
-struct s_token				*tokenize(char **array);
-struct s_token				*new_token(char *value, enum e_token type);
+struct s_token				*tokenizer(const char *str, const char *delimiters);
+struct s_token				*new_token(char *value, enum e_token_type type);
 void						add_token(t_token **head, t_token **tail,
 														t_token *to_add);
 void						free_token(struct s_token *token);

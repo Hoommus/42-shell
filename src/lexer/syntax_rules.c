@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/03 16:28:37 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/03 19:39:39 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/12/04 13:09:22 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,9 @@
 
 const t_rule g_program = { {0},
 	.expands_to = {
-		{&g_linebreak, &g_complete_commands, &g_linebreak, NULL},
-		{&g_linebreak, NULL},
-		{NULL}
+		{&g_linebreak, &g_complete_commands, &g_linebreak, 0},
+		{&g_linebreak, 0},
+		{0}
 	}
 };
 
@@ -36,7 +36,7 @@ const t_rule g_complete_commands = {{0},
 	.expands_to = {
 		{&g_complete_commands, &g_newline_list, &g_complete_command, 0},
 		{&g_complete_command, 0},
-		{NULL}
+		{0}
 	}
 };
 
@@ -50,8 +50,8 @@ const t_rule g_complete_command = { {0},
 
 const t_rule g_list = { {0},
 	.expands_to = {
-		{&g_list, &g_separator_op, &g_and_or},
-		{&g_and_or},
+		{&g_list, &g_separator_op, &g_and_or, 0},
+		{&g_and_or, 0},
 		{0},
 	}
 };
@@ -59,8 +59,9 @@ const t_rule g_list = { {0},
 const t_rule g_and_or = { {0},
 	.expands_to = {
 		{&g_pipeline, 0},
-		{&g_and_or, &g_and_if_token, &g_linebreak, &g_pipeline},
-		{&g_and_or, &g_or_if_token, &g_linebreak, &g_pipeline},
+		{&g_and_or, &g_and_if_token, &g_linebreak, &g_pipeline, 0},
+		{&g_and_or, &g_or_if_token, &g_linebreak, &g_pipeline, 0},
+		{0}
 	}
 };
 
@@ -74,17 +75,20 @@ const t_rule g_pipeline = { {0},
 
 const t_rule g_pipe_sequence = { {0},
 	.expands_to = {
-		{&g_command},
+		{&g_command, 0},
 		{&g_pipe_sequence, &g_pipe_token, &g_linebreak, &g_command, 0},
 	}
 };
+
+/*
+** The following rule has function_definition removed
+*/
 
 const t_rule g_command = { {0},
 	.expands_to = {
 		{&g_simple_command, 0},
 		{&g_compound_command, 0},
 		{&g_compound_command, &g_redirect_list, 0},
-		{&g_function_definition, 0},
 		{NULL}
 	}
 };
@@ -179,13 +183,14 @@ const t_rule g_if_clause = { {0},
 			&g_then_token,
 			&g_compound_list,
 			&g_else_part,
-			&g_fi_token},
+			&g_fi_token, 0
+		},
 		{
 			&g_if_token,
 			&g_compound_list,
 			&g_then_token,
 			&g_compound_list,
-			&g_fi_token
+			&g_fi_token, 0
 		},
 		{0}
 	}
@@ -257,6 +262,7 @@ const t_rule g_until_clause = {{0},
 **     }
 ** };
 */
+
 const t_rule g_brace_group = { {0},
 	.expands_to = {
 		{&g_lbrace_token, &g_compound_list, &g_rbrace_token, 0},
@@ -308,22 +314,22 @@ const t_rule g_redirect_list = { {0},
 };
 const t_rule g_io_redirect = { {0},
 	.expands_to = {
-		{&g_io_file},
-		{&g_io_number_token, &g_io_file},
-		{&g_io_here},
-		{&g_io_number_token, &g_io_here},
+		{&g_io_file, 0},
+		{&g_io_number_token, &g_io_file, 0},
+		{&g_io_here, 0},
+		{&g_io_number_token, &g_io_here, 0},
 		{0}
 	}
 };
 const t_rule g_io_file = { {0},
 	.expands_to = {
-		{&g_less_token, &g_filename},
-		{&g_lessand_token, &g_filename},
-		{&g_great_token, &g_filename},
-		{&g_greatand_token, &g_filename},
-		{&g_dgreat_token, &g_filename},
-		{&g_lessgreat_token, &g_filename},
-		{&g_clobber_token, &g_filename},
+		{&g_less_token, &g_filename, 0},
+		{&g_lessand_token, &g_filename, 0},
+		{&g_great_token, &g_filename, 0},
+		{&g_greatand_token, &g_filename, 0},
+		{&g_dgreat_token, &g_filename, 0},
+		{&g_lessgreat_token, &g_filename, 0},
+		{&g_clobber_token, &g_filename, 0},
 		{0}
 	}
 };
@@ -337,18 +343,18 @@ const t_rule g_io_here = { {0},
 };
 const t_rule g_here_end = { {TOKEN_WORD}, {{0}} }; /* Apply rule 3 */
 
-const t_rule g_newline_list = {
-	.representation = {0},
+const t_rule g_newline_list = { {0},
 	.expands_to = {
-		{&g_newline_token},
-		{&g_newline_list, &g_newline_token}
+		{&g_newline_token, 0},
+		{&g_newline_list, &g_newline_token, 0},
+		{0}
 	}
 };
 const t_rule g_linebreak = { {0},
 	{
 		{&g_newline_list, 0},
-		{&g_empty_token},
-		{NULL}
+		{&g_empty_token, 0},
+		{0}
 	}
 };
 const t_rule g_separator_op = { {TOKEN_SEMICOLON, TOKEN_AMPERSAND}, {{NULL}} };
@@ -356,18 +362,18 @@ const t_rule g_separator = { {0},
 	{
 		{&g_separator_op, &g_linebreak, 0},
 		{&g_newline_list, 0},
-		{NULL}
+		{0}
 	}
 };
 const t_rule g_sequential_sep = { {0},
 	{
-		{&g_semicolon_token, &g_linebreak},
-		{&g_newline_list}
+		{&g_semicolon_token, &g_linebreak, 0},
+		{&g_newline_list, 0},
+		{0}
 	}
 };
 
 const t_rule g_semicolon_token = { {TOKEN_SEMICOLON}, {{NULL}} };
-
 const t_rule g_newline_token = { {TOKEN_NEWLINE}, {{NULL}} };
 const t_rule g_and_if_token = { {TOKEN_AND_IF}, {{0}} };
 const t_rule g_or_if_token = { {TOKEN_OR_IF}, {{0}} };
@@ -384,6 +390,7 @@ const t_rule g_then_token = { {TOKEN_THEN}, {{0}} };
 const t_rule g_fi_token = { {TOKEN_FI}, {{0}} };
 const t_rule g_elif_token = { {TOKEN_ELIF}, {{0}} };
 const t_rule g_else_token = { {TOKEN_ELSE}, {{0}} };
+const t_rule g_for_token = { {TOKEN_FOR}, {{0}} };
 const t_rule g_while_token = { {TOKEN_WHILE}, {{0}} };
 const t_rule g_until_token = { {TOKEN_UNTIL}, {{0}} };
 const t_rule g_do_token = { {TOKEN_DO}, {{0}} };

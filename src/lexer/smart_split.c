@@ -6,14 +6,14 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 14:44:48 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/03 18:40:26 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/12/05 13:18:32 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell_script.h"
-#include "syntax_rules.h"
 
 #include <assert.h>
+
 char		*g_singles[] = {
 	"|",
 	";",
@@ -27,7 +27,14 @@ char		*g_singles[] = {
 	NULL
 };
 
-struct s_parse_token	g_tokens[] = {
+/*
+** case and esac tokens are avoided.
+** But here they are, just in case (no pun intended)
+** {"case",          "case",        TOKEN_CASE,            false},
+** {"esac",          "esac",        TOKEN_ESAC,            false},
+*/
+
+const struct s_parse_token	g_tokens[] = {
 	{"if",            "if",          TOKEN_IF,              false},
 	{"then",          "then",        TOKEN_THEN,            false},
 	{"else",          "else",        TOKEN_ELSE,            false},
@@ -35,8 +42,6 @@ struct s_parse_token	g_tokens[] = {
 	{"fi",            "fi",          TOKEN_FI,              false},
 	{"do",            "do",          TOKEN_DO,              false},
 	{"done",          "done",        TOKEN_DONE,            false},
-	{"case",          "case",        TOKEN_CASE,            false},
-	{"esac",          "esac",        TOKEN_ESAC,            false},
 	{"while",         "while",       TOKEN_WHILE,           false},
 	{"until",         "until",       TOKEN_UNTIL,           false},
 	{"for",           "for",         TOKEN_FOR,             false},
@@ -49,6 +54,7 @@ struct s_parse_token	g_tokens[] = {
 	{")",             "rbracket",    TOKEN_RBRACKET,        true },
 	{"[",             "lsqbracket",  TOKEN_LSQBRACKET,      true },
 	{"]",             "rsqbracket",  TOKEN_RSQBRACKET,      true },
+
 	{";",             "semicolon",   TOKEN_SEMICOLON,       true },
 	{"|",             "pipe",        TOKEN_PIPE,            true },
 	{"!",             "bang",        TOKEN_BANG,            true },
@@ -66,6 +72,7 @@ struct s_parse_token	g_tokens[] = {
 	{"<",             "LESS",        TOKEN_LESS,            true },
 	{">",             "GREAT",       TOKEN_GREAT,           true },
 	{"~",             "TILDE",       TOKEN_TILDE,           false},
+	{"&",             "AMPERSAND",   TOKEN_AMPERSAND,       true },
 
 	{"^~/?[\\/\\w]*", "WORD",        TOKEN_WORD,            false},
 	{"^\\D\\w+",      "NAME",        TOKEN_NAME,            false},
@@ -73,7 +80,8 @@ struct s_parse_token	g_tokens[] = {
 	{"^\\w+\\=",      "ASSIGNMENT",  TOKEN_ASSIGNMENT_WORD, false},
 
 	{"\n",            "NEWLINE",     TOKEN_NEWLINE,         true },
-	{"&",             "AMPERSAND",   TOKEN_AMPERSAND,       true },
+	{"",              "EMPTY_LOL",   TOKEN_EMPTY,           false},
+	{"",              "literal",     TOKEN,                 false},
 
 	{NULL,            NULL,          TOKEN_KEYWORD,         false},
 };

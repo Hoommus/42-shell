@@ -31,8 +31,8 @@
 # define CONFIG_FILE ".21shrc"
 # define LOG_FILE ".21sh.log"
 
-# define BUILD 346
-# define BUILD_DATE "03.12.18 12:59:08 EET"
+# define BUILD 365
+# define BUILD_DATE "07.12.18 12:52:49 EET"
 
 /*
 ** Initial input of 260 is chosen because (260 * 10) % 8 == 0
