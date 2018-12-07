@@ -30,3 +30,25 @@ int				buff_char_at_equals(const u_int64_t index, const char *c)
 	return (ft_strcmp(g_buffer->array[index].s, c));
 }
 
+
+/*
+** Returns number of 0b10xxxxxx-based characters
+*/
+u_int64_t		utf_body_size(char first)
+{
+	unsigned char	c;
+
+	c = (unsigned char)first;
+	if (c >= 32 && c < 127)
+		return (0);
+	if ((c & 0xC0) == 0xC0)
+		return (1);
+	else if ((c & 0xE0) == 0xE0)
+		return (2);
+	else if ((c & 0xF0) == 0xF0)
+		return (3);
+	else if (c == 27)
+		return (7);
+	else
+		return (0);
+}

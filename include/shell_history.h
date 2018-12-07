@@ -1,8 +1,22 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   shell_history.h                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2018/11/16 12:28:10 by vtarasiu          #+#    #+#             */
+/*   Updated: 2018/11/16 12:28:35 by vtarasiu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef SHELL_HISTORY_H
 # define SHELL_HISTORY_H
 
 # include <stdlib.h>
+# include <stdbool.h>
 # include <time.h>
+# include <fcntl.h>
 # include "libft.h"
 # include "get_next_line.h"
 # include "ft_printf.h"
@@ -27,13 +41,14 @@ typedef struct				s_history_vector
 ** History utilities (features/history.c, features/history_vector.c)
 */
 
-void						init_history_vector(const u_int64_t capacity);
-void						push_history_entry(const char *cmd, time_t stamp);
-void						save_history_entry(int fd);
-void						load_history(int fd);
-struct s_history_entry		*pop_history_entry(void);
-struct s_history_entry		*get_history_entry(u_int64_t index);
-char						*write_history(char *command, int history_file);
+void						history_init_vector(const u_int64_t capacity);
+void						history_push_entry(const char *cmd, time_t stamp);
+void						history_save_entry(int fd);
+void						history_load(int fd);
+u_int64_t					history_get_size(void);
+struct s_history_entry		*history_pop_entry(void);
+struct s_history_entry		*history_get_entry(u_int64_t index);
+char						*history_write(char *command, int history_file);
 
 void						chfree_n(int n, ...);
 

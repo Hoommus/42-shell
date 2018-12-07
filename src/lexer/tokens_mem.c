@@ -1,11 +1,14 @@
-#include "script_lang.h"
+#include "shell_script.h"
 
-t_token			*new_token(char *value, enum e_token type)
+/*
+** new_token expects value to be already malloced
+*/
+
+t_token			*new_token(char *value, enum e_token_type type)
 {
 	t_token	*new;
 
-	new = (t_token  *)malloc(sizeof(t_token));
-	ft_bzero(new, sizeof(t_token));
+	new = (t_token *)ft_memalloc(sizeof(t_token));
 	new->value = value;
 	new->type = type;
 	return (new);
@@ -15,8 +18,8 @@ void			free_token(t_token *token)
 {
 	if (token == NULL)
 		return ;
-	chfree(token->value);
-	chfree(token);
+	free((void *)token->value);
+	free(token);
 }
 
 void			push_token(t_token **head, t_token *token)

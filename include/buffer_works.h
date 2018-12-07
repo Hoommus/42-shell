@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/16 17:42:29 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/10/18 14:22:40 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/11/18 13:11:17 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,14 +31,16 @@ typedef struct		s_buffer
 }					t_buffer;
 
 void				init_buffer_vector(u_int64_t capacity);
-void				reset_buffer(u_int64_t from_index);
+void				clear_buffer(u_int64_t from_index);
 int					buff_del_symbol(u_int64_t index);
 char				*buff_get_part(u_int64_t start, u_int64_t end);
 t_symbol			*buff_symbol_at(u_int64_t index);
 char				*buff_char_at(u_int64_t index);
 int					buff_char_at_equals(const u_int64_t index, const char *c);
 
-int					insert_string_at(u_int64_t index, const char *str);
+int					insert_single_at(u_int64_t index, const char *str);
 int					insert_symbol_at(u_int64_t index, t_symbol *symbol);
+int					insert_string_at(u_int64_t index, const char *string);
+u_int64_t			utf_body_size(char first);
 
 #endif

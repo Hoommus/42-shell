@@ -1,22 +1,46 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   history.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2018/11/16 14:53:24 by vtarasiu          #+#    #+#             */
+/*   Updated: 2018/11/19 15:23:01 by vtarasiu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "shell_history.h"
+
+/*
+** This file shares 'history' name with same builtin and builtin __is not here__
+** This is done because feature itself is yet another CrUD for history entries.
+**
+** History builtin is used to read this data and provides user interface.
+**
+** History is a ArrayList-like collection with expandable array of entries that
+** contain the exact user-provided command without any expansions and variable
+** resolution.
+**
+** This collection is saved to a file at HOME in a special format with
+** filename defined in HISTORY_FILE define in twenty_one_sh.h
+** File format goes like this (without any leading tabulations):
+**     : <unix epoch time>:0;<exact command text>
+**     : <unix epoch time>:0;<exact command text
+**     with newlines
+**     "and any characters;;;">
+**     : <unix epoch time>:0;<exact command text>
+*/
 
 t_history	*g_history;
 
-/*
-** Entry format:
-** : <unix epoch time>:0;<exact command text>
-** : <unix epoch time>:0;<exact command text
-** with newlines
-** "and any characters;;;">
-** : <unix epoch time>:0;<exact command text>
-*/
-void		load_history(int fd)
+void		history_load(int fd)
 {
 	char		*tmp;
 	char		*swap;
 	char		*partial;
 
-	init_history_vector(INITIAL_HISTORY_SIZE);
+	history_init_vector(INITIAL_HISTORY_SIZE);
 	if (get_next_line(fd, &partial) <= 0)
 		return ;
 	while (ft_strlen(partial) > 0 && ft_strstr(partial, ":0;") != NULL)
@@ -27,25 +51,34 @@ void		load_history(int fd)
 			chfree_n(2, partial, tmp);
 			partial = swap;
 		}
-		push_history_entry(partial + 14, ft_atoi(partial + 3));
+		history_push_entry(partial + 15, ft_atoi(partial + 3));
 		chfree_n(1, partial);
 		partial = tmp;
 		tmp = NULL;
 	}
+	g_history->iterator = g_history->size;
 }
 
-void		save_history_entry(int fd)
+void		history_save_entry(int fd)
 {
-	ft_dprintf(fd, ": %10.0ld:0;%s\n", pop_history_entry()->timestamp,
-										pop_history_entry()->command);
+	g_history->iterator = g_history->size;
+	ft_dprintf(fd, ": %10.0ld:0;%s\n", history_pop_entry()->timestamp,
+			   history_pop_entry()->command);
 }
 
-char		*write_history(char *command, int history_file)
+char		*history_write(char *command, int history_file)
 {
 	time_t		timestamp;
 
+	if (!command || ft_strlen(command) == 0)
+		return (command);
 	time(&timestamp);
-	push_history_entry(command, timestamp);
-	save_history_entry(history_file);
+	history_push_entry(command, timestamp);
+	history_save_entry(history_file);
 	return (command);
+}
+
+u_int64_t	history_get_size(void)
+{
+	return (g_history->size);
 }

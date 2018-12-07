@@ -25,8 +25,8 @@ enum						e_direction
 
 struct						s_listener
 {
-	int			key;
-	void		(*handler) (int);
+	u_int64_t	key;
+	void		(*handler) (u_int64_t);
 };
 
 extern struct s_listener	g_key_listeners[];
@@ -40,18 +40,18 @@ void						buffer_redraw(int symbol_index);
 /*
 ** Key handlers (handlers_zbase.c, handlers_arrows.c, handlers_editing.c)
 */
-void						handle_key(int key);
+void						handle_key(u_int64_t key);
 
-void					handle_delchar(int key);
-void						handle_del(int key);
-void						handle_eot(int key);
-void						handle_up(int key);
-void						handle_down(int key);
-void						handle_left(int key);
-void						handle_right(int key);
-void						handle_ignore(int key);
-void						handle_line_kill(int key);
-void						handle_backspace(int key);
+void					handle_delchar(u_int64_t key);
+void						handle_del(u_int64_t key);
+void						handle_eot(u_int64_t key);
+void						handle_up(u_int64_t key);
+void						handle_down(u_int64_t key);
+void						handle_left(u_int64_t key);
+void						handle_right(u_int64_t key);
+void						handle_ignore(u_int64_t key);
+void						handle_line_kill(u_int64_t key);
+void						handle_backspace(u_int64_t key);
 
 /*
 ** State machine (state_machine.c)

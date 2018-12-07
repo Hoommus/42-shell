@@ -6,11 +6,12 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:42 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/07/31 14:45:42 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/11/19 14:30:52 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "twenty_one_sh.h"
+#include "shell_builtins.h"
 
 struct s_builtin	g_builtins[] = {
 	{"alias", &hs_alias},
@@ -23,6 +24,7 @@ struct s_builtin	g_builtins[] = {
 	{"exit", &hs_exit},
 	{"quit", &hs_exit},
 	{"where", &hs_where},
+	{"history", &hs_history},
 	{NULL, NULL}
 };
 
@@ -57,16 +59,17 @@ int					hs_help(char **args)
 	int		i;
 
 	*args = args[0];
-	ft_printf("Existing builtins:\n");
+	ft_printf("42sh/2 builtins:\n");
 	i = 0;
-	while (g_builtins[i].name != NULL)
+	while (g_builtins[i + 1].name != NULL)
 		ft_printf("%s, ", g_builtins[i++].name);
-	ft_printf("\n");
+	ft_printf("%s\n", g_builtins[i].name);
 	return (0);
 }
 
 int					hs_exit(char **args)
 {
 	*args = args[0];
+	tcsetattr(g_term->tty_fd, TCSANOW, g_term->original_term);
 	exit(0);
 }

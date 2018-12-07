@@ -1,4 +1,18 @@
-#include "script_lang.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   smart_split.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2018/11/29 14:44:48 by vtarasiu          #+#    #+#             */
+/*   Updated: 2018/12/05 13:18:32 by vtarasiu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "shell_script.h"
+
+#include <assert.h>
 
 char		*g_singles[] = {
 	"|",
@@ -14,9 +28,74 @@ char		*g_singles[] = {
 };
 
 /*
+** case and esac tokens are avoided.
+** But here they are, just in case (no pun intended)
+** {"case",          "case",        TOKEN_CASE,            false},
+** {"esac",          "esac",        TOKEN_ESAC,            false},
+*/
+
+const struct s_parse_token	g_tokens[] = {
+	{"if",            "if",          TOKEN_IF,              false},
+	{"then",          "then",        TOKEN_THEN,            false},
+	{"else",          "else",        TOKEN_ELSE,            false},
+	{"elif",          "elif",        TOKEN_ELIF,            false},
+	{"fi",            "fi",          TOKEN_FI,              false},
+	{"do",            "do",          TOKEN_DO,              false},
+	{"done",          "done",        TOKEN_DONE,            false},
+	{"while",         "while",       TOKEN_WHILE,           false},
+	{"until",         "until",       TOKEN_UNTIL,           false},
+	{"for",           "for",         TOKEN_FOR,             false},
+
+	{"in",            "in",          TOKEN_IN,              false},
+
+	{"{",             "lbrace",      TOKEN_LBRACE,          true },
+	{"}",             "rbrace",      TOKEN_RBRACE,          true },
+	{"(",             "lbracket",    TOKEN_LBRACKET,        true },
+	{")",             "rbracket",    TOKEN_RBRACKET,        true },
+	{"[",             "lsqbracket",  TOKEN_LSQBRACKET,      true },
+	{"]",             "rsqbracket",  TOKEN_RSQBRACKET,      true },
+
+	{";",             "semicolon",   TOKEN_SEMICOLON,       true },
+	{"|",             "pipe",        TOKEN_PIPE,            true },
+	{"!",             "bang",        TOKEN_BANG,            true },
+	{"&&",            "AND_IF",      TOKEN_AND_IF,          true },
+	{"||",            "OR_IF",       TOKEN_OR_IF,           true },
+	{";;",            "DSEMI",       TOKEN_DSEMI,           true },
+	{"<<",            "DLESS",       TOKEN_DLESS,           true },
+	{">>",            "DGREAT",      TOKEN_DGREAT,          true },
+	{"<&",            "LESSAND",     TOKEN_LESSAND,         true },
+	{"&>",            "GREATAND",    TOKEN_GREATAND,        true },
+	{"<>",            "LESSGREAT",   TOKEN_LESSGREAT,       true },
+	{"<<-",           "DLESSDASH",   TOKEN_DLESSDASH,       true },
+	{">|",            "CLOBBER",     TOKEN_CLOBBER,         true },
+
+	{"<",             "LESS",        TOKEN_LESS,            true },
+	{">",             "GREAT",       TOKEN_GREAT,           true },
+	{"~",             "TILDE",       TOKEN_TILDE,           false},
+	{"&",             "AMPERSAND",   TOKEN_AMPERSAND,       true },
+
+	{"^~/?[\\/\\w]*", "WORD",        TOKEN_WORD,            false},
+	{"^\\D\\w+",      "NAME",        TOKEN_NAME,            false},
+	{"\\d*[><]\\d*",  "IO_NUMBER",   TOKEN_IO_NUMBER,       false},
+	{"^\\w+\\=",      "ASSIGNMENT",  TOKEN_ASSIGNMENT_WORD, false},
+
+	{"\n",            "NEWLINE",     TOKEN_NEWLINE,         true },
+	{"",              "EMPTY_LOL",   TOKEN_EMPTY,           false},
+	{"",              "literal",     TOKEN,                 false},
+
+	{NULL,            NULL,          TOKEN_KEYWORD,         false},
+};
+
+/*
+** WORD, NAME and ASSIGNMENT_WORD regexes contain caret because these tokens
+** must be a single string extracted from input and free from leading characters
+*/
+
+/*
 ** Returns true if char needs separate token
 */
-int			is_single_token(char c)
+
+int						is_single_token(char c)
 {
 	int		i;
 	char	tmp[2];
@@ -30,7 +109,11 @@ int			is_single_token(char c)
 	return (0);
 }
 
-int			count_substrings(char *str)
+/*
+** There is some cringy stuff going on today
+*/
+
+int						count_substrings(char *str)
 {
 	ssize_t	i;
 	int		subs;
@@ -46,52 +129,40 @@ int			count_substrings(char *str)
 		else if (is_single_token(str[i++]))
 			subs++;
 		else if (ISQT(str[i]) && ++i)
-			while (str[i] != 0 && str[i] != c)
+			while (str[i] && str[i] != c)
+				i++;
+		else if (ft_isdigit(str[i]))
+			while (str[i] && ft_isdigit(str[i]) && !is_single_token(str[i]))
 				i++;
 		else
-			while (str[i] != 0 && ft_strchr(TOKEN_DELIMITERS, str[i]) == NULL)
+			while (str[i] && ft_strchr(TOKEN_DELIMITERS, str[i]) == NULL
+				&& !is_single_token(str[i]))
 				i++;
 		subs++;
 	}
 	return (subs);
 }
 
-/*
-** Returns pointer to any found needle char in str.
-*/
-char		*ft_strchr_any(const char *str, const char *needles)
-{
-	size_t	i;
-	size_t	j;
-
-	i = 0;
-	while (str[i])
-	{
-		j = 0;
-		while (needles[j])
-			if (str[i] == needles[j++])
-				return ((char *)str + i);
-		i++;
-	}
-	return (NULL);
-}
-
-long long	get_word_size(char *str)
+long long				get_word_size(char *str)
 {
 	long long	i;
-	char		c;
+	char		quote;
 
-	c = *str;
+	quote = *str;
 	i = 0;
 	if (is_single_token(*str))
 		return (1);
 	else if (ISQT(*str) && ++i)
-		while (str[i] && str[i] != c)
+		while (str[i] && str[i] != quote)
+			i++;
+	else if (ft_isdigit(*str) && ++i)
+		while (str[i] && ft_isdigit(str[i]))
 			i++;
 	else
-		i = (long long)(ft_strchr_any(str, TOKEN_DELIMITERS) - str);
-	if (i < 0)
-		return ((long long)ft_strlen(str));
+		while (str[i] && !is_single_token(str[i]) && !ft_strchr(TOKEN_DELIMITERS, str[i]))
+			i++;
+	// TODO: Don't forget about this guy
+	assert(i > 0);
 	return (i);
 }
 
@@ -99,9 +170,8 @@ long long	get_word_size(char *str)
 ** Split that takes into account quotes ("", '', ``), separators - ';', '\n'
 ** and brackets
 ** TODO: Try to fix that too high memory allocation thing
-** TODO: Try to fix not enough memory allocation
 */
-char		**smart_split(char *str, char *delimiters)
+char					**smart_split(char *str, char *delimiters)
 {
 	char		**array;
 	long long	j;

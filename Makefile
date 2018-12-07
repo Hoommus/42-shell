@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2018/10/30 19:27:48 by vtarasiu         ###   ########.fr        #
+#    Updated: 2018/11/18 14:48:06 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,20 +23,21 @@ LIB_DIR = ./printf
 LIB_NAME = libftprintf.a
 
 SHELL_SRC = main.c environ_utils.c commands_execution.c memory.c auxilia.c     \
-            signals.c variables_replacement.c \
+            signals.c variables_replacement.c errors.c init.c \
+            service_routines.c args_parsing.c\
 
 LEXER_DIR = lexer/
 LEXER_SRC = quotes.c smart_split.c tokenizer.c tokens_mem.c
 
 BUILTIN_DIR = builtins/
-BUILTIN_SRC = cd.c where.c builtins.c builtins2.c
+BUILTIN_SRC = cd.c where.c builtins.c builtins2.c hs_history.c
 
 INTERFACE_DIR = line_editing/
 INTERFACE_SRC = buffer_drawing.c buffer_works.c     \
                 cursor_control.c cursor_positions.c \
                 buffer_vector.c buffer_vector_tools1.c buffer_vector_tools2.c  \
                 state_machine.c \
-                handlers_arrows.c handlers_editing.c handlers_zbase.c \
+                handlers_arrows.c handlers_editing.c handlers_engine.c \
 
 HISTORY_DIR = features/history/
 HISTORY_SRC = history.c history_vector.c

@@ -1,116 +1,86 @@
-#include "script_lang.h"
-#include "../../include/twenty_one_sh.h"
+#include "shell_script.h"
+#include "shell_builtins.h"
 
-char			*g_keywords[] = {
-	"while",
-	"do",
-	"done",
-	"if",
-	"then",
-	"fi",
-	"elif",
-	"else",
-	"for",
-	"in",
-	"until",
-	"case",
-	"esac",
-	NULL
-};
-
-/*
-**
-*/
-char			*g_operators[] = {
-	"|", "<", ">", "+", "-", "/", "*",
-	"&&", "||", ">>", "<<",
-	NULL
-};
-
-struct s_token	*get_token(char *string)
+char	*next_token(const char *str, const char *delims)
 {
-	extern struct s_builtin	g_builtins[];
-	struct s_token			*token;
-	unsigned long			i;
+	u_int64_t	i;
+	char		c;
+	char		*token;
 
-	token = NULL;
 	i = 0;
-	while (!token && g_keywords[i] != NULL)
-		if (ft_strcmp(g_keywords[i++], string) == 0)
-			token = new_token(string, KEYWORD);
-	i = 0;
-	while (!token && g_builtins[i].name != NULL)
-		if (ft_strcmp(g_builtins[i++].name, string) == 0)
-			token = new_token(string, COMMAND);
-	i = 3;
-	while (!token && g_singles[i] != NULL)
-		if (ft_strcmp(g_singles[i++], string) == 0)
-			token = new_token(string, BRACE);
-	i = 0;
-	while (!token && g_operators[i] != NULL)
-		if (ft_strcmp(g_operators[i++], string) == 0)
-			token = new_token(string, string[0] == '|' ? PIPE : OPERATOR);
-	if (token == NULL && ft_strcmp(string, ";") == 0)
-		token = new_token(string, SEPARATOR);
-	if (token == NULL)
-		token = new_token(string, LITERAL);
+	c = str[i];
+	if (ISQT(c) && ++i)
+		while (str[i] && str[i++] != c)
+			;
+	else
+		while (str[i] && ft_strchr(delims, str[i]) == NULL)
+			i++;
+	if (i == 0)
+		ft_printf("error with {%s}\n", str);
+	token = ft_strsub(str, 0, i);
 	return (token);
 }
 
-struct s_token	*tokenize(char **array)
+struct s_token	*create_token(const char *str)
+{
+	enum e_token_type	type;
+	int					i;
+
+	i = TOKEN_IF; // should be 0
+	type = TOKEN;
+	while (g_tokens[i].token_name != NULL)
+	{
+		if (ft_strcmp(g_tokens[i].text, str) == 0)
+		{
+			type = g_tokens[i].type;
+			return (new_token(ft_strnew(0), type));
+		}
+		i++;
+	}
+	return (new_token((char *)str, type));
+}
+
+struct s_token	*tokenizer(const char *string, const char *delimiters)
 {
 	struct s_token	*head;
 	struct s_token	*tail;
-	unsigned long	i;
+	char			*token_value;
+	u_int64_t		i;
 
 	head = NULL;
 	tail = NULL;
-	i = 0;
-	while (array && array[i])
-		add_token(&head, &tail, get_token(array[i++]));
-	add_token(&head, &tail, new_token(";", SEPARATOR));
-	return (head);
-}
-
-char	*enum_to_str(enum e_token e)
-{
-	switch (e)
+	i = -1;
+	while (string && string[++i])
 	{
-		case KEYWORD:
-			return ("KEYWORD");
-		case LITERAL:
-			return ("LITERAL");
-		case BRACE:
-			return ("BRACE");
-		case REDIRECTION:
-			return ("REDIRECTION");
-		case PIPE:
-			return ("PIPE");
-		case OPERATOR:
-			return ("OPERATOR");
-		case COMMAND:
-			return ("COMMAND");
-		case SEPARATOR:
-			return ("SEPARATOR");
-		default:
-			return ("null");
+		if (ft_strchr(delimiters, string[i]) != NULL)
+			continue ;
+		token_value = next_token(string + i, delimiters);
+		add_token(&head, &tail, create_token(token_value));
+		i += ft_strlen(token_value);
+		free(token_value);
 	}
+	return (head);
 }
 
 int main_(int argc, char **argv)
 {
 	t_token	*tokens;
-	//char	*name;
+	t_token	*head;
 	char	*line;
 
 	*argv = argv[argc - argc];
 	while (get_next_line(STDIN_FILENO, &line) != 1)
 		;
-	tokens = tokenize(smart_split(line, LIBFT_WHTSP));
+	head = tokenizer(line, TOKEN_DELIMITERS);
+	tokens = head;
 	while (tokens)
 	{
-		ft_printf("(%s, %s) ", enum_to_str(tokens->type), tokens->value);
+		if (tokens->type != TOKEN)
+			ft_printf("(%s) ", g_tokens[tokens->type].token_name);
+		else
+			ft_printf("(%s %s) ", g_tokens[tokens->type].token_name, tokens->value);
 		tokens = tokens->next;
 	}
+	system("leaks 21sh");
 	return (0);
 }
