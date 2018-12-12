@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   syntax_rules.h                                     :+:      :+:    :+:   */
+/*   shell_script_syntax.h                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/02 13:37:37 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/05 12:30:13 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/12/10 13:22:30 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,48 @@
 
 # include <shell_script.h>
 
-typedef struct s_syntax_rule	t_rule;
+/*
+** Syntax rule is an entity that contains an array of possible expansions
+** which define language grammar.
+**
+** Rules which given rule expands to are stored in 'expands_to' field.
+** The expands_to field is a two dimensional NULL-terminated array of pointers
+** to s_syntax_rule variables declared in syntax_rules.h.
+** Basically, it can hold up to 9 cases of given rule each of which
+** can hold up to 9 rules and tokens to which this rule expands.
+** For example, this syntax rule from BNF will be translated to this
+** structure as follows:
+**
+** Original:
+**  command : simple_command
+**          | compound_command
+**          | compound_command redirect_list
+**          | function_definition
+**          ;
+**
+** This shell struct:
+**  t_rule command = {
+**      {0}, // because it cannot be any token
+**
+**      // Token stream must correspond to either of these .expands_to rules
+**      // to be valid 'command'
+**      .expands_to = {
+**          { &simple_command, 0 },      // command can be solely simple_command
+**          { &compound_command, 0 },    // OR compound_command
+**          // OR compound_command which is followed by redirect_list
+**          { &compound_command, &redirect_list, 0 },
+**          { &function_definition, 0 }, // OR be a function definition
+**          { NULL } // just an array terminator
+**      }
+**  };
+*/
+
+// TODO: shrink down expands_to size
+typedef struct		s_syntax_rule
+{
+	enum e_token_type			representation[3];
+	const struct s_syntax_rule	*expands_to[10][10];
+}					t_rule;
 
 extern const t_rule	g_program;
 extern const t_rule	g_complete_commands;

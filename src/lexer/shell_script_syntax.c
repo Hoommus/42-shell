@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   syntax_rules.c                                     :+:      :+:    :+:   */
+/*   shell_script_syntax.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/03 16:28:37 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/04 13:09:22 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/12/10 13:22:30 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "syntax_rules.h"
+#include "shell_script_syntax.h"
 
 /*
 ** *****************************************************************************
@@ -26,57 +26,51 @@
 
 const t_rule g_program = { {0},
 	.expands_to = {
-		{&g_linebreak, &g_complete_commands, &g_linebreak, 0},
-		{&g_linebreak, 0},
-		{0}
+		{&g_linebreak, &g_complete_commands, &g_linebreak},
+		{&g_linebreak}
 	}
 };
 
 const t_rule g_complete_commands = {{0},
 	.expands_to = {
-		{&g_complete_commands, &g_newline_list, &g_complete_command, 0},
-		{&g_complete_command, 0},
-		{0}
+		{&g_complete_commands, &g_newline_list, &g_complete_command},
+		{&g_complete_command}
 	}
 };
 
 const t_rule g_complete_command = { {0},
 	.expands_to = {
-		{&g_list, &g_separator_op, 0},
-		{&g_list, 0},
-		{0}
+		{&g_list, &g_separator_op},
+		{&g_list}
 	}
 };
 
 const t_rule g_list = { {0},
 	.expands_to = {
-		{&g_list, &g_separator_op, &g_and_or, 0},
-		{&g_and_or, 0},
-		{0},
+		{&g_list, &g_separator_op, &g_and_or},
+		{&g_and_or},
 	}
 };
 
 const t_rule g_and_or = { {0},
 	.expands_to = {
-		{&g_pipeline, 0},
-		{&g_and_or, &g_and_if_token, &g_linebreak, &g_pipeline, 0},
-		{&g_and_or, &g_or_if_token, &g_linebreak, &g_pipeline, 0},
-		{0}
+		{&g_pipeline},
+		{&g_and_or, &g_and_if_token, &g_linebreak, &g_pipeline},
+		{&g_and_or, &g_or_if_token, &g_linebreak, &g_pipeline}
 	}
 };
 
 const t_rule g_pipeline = { {0},
 	.expands_to = {
-		{&g_pipe_sequence, 0},
-		{&g_bang_token, &g_pipe_sequence, 0},
-		{0}
+		{&g_pipe_sequence},
+		{&g_bang_token, &g_pipe_sequence}
 	}
 };
 
 const t_rule g_pipe_sequence = { {0},
 	.expands_to = {
-		{&g_command, 0},
-		{&g_pipe_sequence, &g_pipe_token, &g_linebreak, &g_command, 0},
+		{&g_command},
+		{&g_pipe_sequence, &g_pipe_token, &g_linebreak, &g_command},
 	}
 };
 
@@ -86,9 +80,9 @@ const t_rule g_pipe_sequence = { {0},
 
 const t_rule g_command = { {0},
 	.expands_to = {
-		{&g_simple_command, 0},
-		{&g_compound_command, 0},
-		{&g_compound_command, &g_redirect_list, 0},
+		{&g_simple_command},
+		{&g_compound_command},
+		{&g_compound_command, &g_redirect_list},
 		{NULL}
 	}
 };
@@ -100,34 +94,31 @@ const t_rule g_command = { {0},
 
 const t_rule g_compound_command = { {0},
 	.expands_to = {
-		{&g_brace_group, 0},
-		{&g_subshell, 0},
-		{&g_for_clause, 0},
-		{&g_if_clause, 0},
-		{&g_while_clause, 0},
-		{&g_until_clause, 0},
+		{&g_brace_group},
+		{&g_subshell},
+		{&g_for_clause},
+		{&g_if_clause},
+		{&g_while_clause},
+		{&g_until_clause},
 	}
 };
 const t_rule g_subshell = { {0},
 	.expands_to = {
-		{&g_lbracket_token, &g_compound_list, &g_rbracket_token, 0},
-		{0}
+		{&g_lbracket_token, &g_compound_list, &g_rbracket_token}
 	}
 };
 
 const t_rule g_compound_list = { {0},
 	.expands_to = {
-		{&g_linebreak, &g_term_rule, 0},
-		{&g_linebreak, &g_term_rule, &g_separator, 0},
-		{0}
+		{&g_linebreak, &g_term_rule},
+		{&g_linebreak, &g_term_rule, &g_separator}
 	}
 };
 
 const t_rule g_term_rule = { {0},
 	.expands_to = {
-		{&g_term_rule, &g_separator, &g_and_or, 0},
-		{&g_and_or, 0},
-		{0}
+		{&g_term_rule, &g_separator, &g_and_or},
+		{&g_and_or}
 	}
 };
 
@@ -136,13 +127,13 @@ const t_rule g_for_clause = { {0},
 		{
 			&g_for_token,
 			&g_name,
-			&g_do_group, 0
+			&g_do_group
 		},
 		{
 			&g_for_token,
 			&g_name,
 			&g_sequential_sep,
-			&g_do_group, 0
+			&g_do_group
 		},
 		{
 			&g_for_token,
@@ -150,7 +141,7 @@ const t_rule g_for_clause = { {0},
 			&g_linebreak,
 			&g_in,
 			&g_sequential_sep,
-			&g_do_group, 0
+			&g_do_group
 		},
 		{
 			&g_for_token,
@@ -159,10 +150,8 @@ const t_rule g_for_clause = { {0},
 			&g_in,
 			&g_wordlist,
 			&g_sequential_sep,
-			&g_do_group,
-			0
-		},
-		{0}
+			&g_do_group
+		}
 	}
 };
 
@@ -170,9 +159,8 @@ const t_rule g_name = { {TOKEN_NAME}, {{0}} };
 const t_rule g_in = { {TOKEN_IN}, {{0}} };
 const t_rule g_wordlist = { {0},
 	.expands_to = {
-		{&g_wordlist, &g_word_token, 0},
-		{&g_word_token, 0},
-		{0}
+		{&g_wordlist, &g_word_token},
+		{&g_word_token}
 	}
 };
 const t_rule g_if_clause = { {0},
@@ -183,16 +171,15 @@ const t_rule g_if_clause = { {0},
 			&g_then_token,
 			&g_compound_list,
 			&g_else_part,
-			&g_fi_token, 0
+			&g_fi_token
 		},
 		{
 			&g_if_token,
 			&g_compound_list,
 			&g_then_token,
 			&g_compound_list,
-			&g_fi_token, 0
-		},
-		{0}
+			&g_fi_token
+		}
 	}
 };
 const t_rule g_else_part = { {0},
@@ -201,32 +188,29 @@ const t_rule g_else_part = { {0},
 			&g_elif_token,
 			&g_compound_list,
 			&g_then_token,
-			&g_compound_list, 0
+			&g_compound_list
 		},
 		{
 			&g_elif_token,
 			&g_compound_list,
 			&g_then_token,
 			&g_compound_list,
-			&g_else_part, 0
+			&g_else_part
 		},
 		{
 			&g_else_token,
-			&g_compound_list, 0
-		},
-		{0}
+			&g_compound_list
+		}
 	}
 };
 const t_rule g_while_clause = { {0},
 	.expands_to = {
-		{&g_while_token, &g_compound_list, &g_do_group, 0},
-		{0}
+		{&g_while_token, &g_compound_list, &g_do_group}
 	}
 };
 const t_rule g_until_clause = {{0},
 	.expands_to = {
-		{&g_until_token, &g_compound_list, &g_do_group, 0},
-		{0}
+		{&g_until_token, &g_compound_list, &g_do_group}
 	}
 };
 
@@ -242,134 +226,117 @@ const t_rule g_until_clause = {{0},
 **             &g_lbracket_token,
 **             &g_rbracket_token,
 **             &g_linebreak,
-**             &g_function_body,
-**             0
-**         },
-**         {0}
+**             &g_function_body
+**         }
 **     }
 ** };
 ** const t_rule g_function_body = { {0},
 **     .expands_to = {
-**         {&g_complete_command, 0},
-**         {&g_complete_command, &g_redirect_list, 0},
-**         {0}
+**         {&g_complete_command},
+**         {&g_complete_command, &g_redirect_list}
 **     }
 ** };
 ** const t_rule g_fname = { {0},
 **     .expands_to = {
-**         {&g_name, 0},
-**         {0}
+**         {&g_name}
 **     }
 ** };
 */
 
 const t_rule g_brace_group = { {0},
 	.expands_to = {
-		{&g_lbrace_token, &g_compound_list, &g_rbrace_token, 0},
-		{0}
+		{&g_lbrace_token, &g_compound_list, &g_rbrace_token}
 	}
 };
 const t_rule g_do_group = { {0},
 	.expands_to = {
-		{&g_do_token, &g_compound_list, &g_done_token, 0},
-		{0}
+		{&g_do_token, &g_compound_list, &g_done_token}
 	}
 };
 const t_rule g_simple_command = { {0},
 	.expands_to = {
-		{&g_cmd_prefix, &g_cmd_word, &g_cmd_suffix, 0},
-		{&g_cmd_prefix, &g_cmd_word, 0},
-		{&g_cmd_prefix, 0},
-		{&g_cmd_name, &g_cmd_suffix, 0},
-		{&g_cmd_name, 0},
-		{0}
+		{&g_cmd_prefix, &g_cmd_word, &g_cmd_suffix},
+		{&g_cmd_prefix, &g_cmd_word},
+		{&g_cmd_prefix},
+		{&g_cmd_name, &g_cmd_suffix},
+		{&g_cmd_name}
 	}
 };
 const t_rule g_cmd_name = { {TOKEN_WORD}, {{0}} }; /* Apply rule 7a */
 const t_rule g_cmd_word = { {TOKEN_WORD}, {{0}} }; /* Apply rule 7b */
 const t_rule g_cmd_prefix = { {0},
 	.expands_to = {
-		{&g_io_redirect, 0},
-		{&g_cmd_prefix, &g_io_redirect, 0},
-		{&g_assignment_word_token, 0},
-		{&g_cmd_prefix, &g_assignment_word_token, 0},
-		{0}
+		{&g_io_redirect},
+		{&g_cmd_prefix, &g_io_redirect},
+		{&g_assignment_word_token},
+		{&g_cmd_prefix, &g_assignment_word_token}
 	}
 };
 const t_rule g_cmd_suffix = { {0},
 	.expands_to = {
-		{&g_io_redirect, 0},
-		{&g_cmd_suffix, &g_io_redirect, 0},
-		{&g_word_token, 0},
-		{&g_cmd_suffix, &g_word_token, 0},
-		{0}
+		{&g_io_redirect},
+		{&g_cmd_suffix, &g_io_redirect},
+		{&g_word_token},
+		{&g_cmd_suffix, &g_word_token}
 	}
 };
 const t_rule g_redirect_list = { {0},
 	.expands_to = {
-		{&g_io_redirect, 0},
-		{&g_redirect_list, &g_io_redirect, 0},
-		{0}
+		{&g_io_redirect},
+		{&g_redirect_list, &g_io_redirect}
 	}
 };
 const t_rule g_io_redirect = { {0},
 	.expands_to = {
-		{&g_io_file, 0},
-		{&g_io_number_token, &g_io_file, 0},
-		{&g_io_here, 0},
-		{&g_io_number_token, &g_io_here, 0},
-		{0}
+		{&g_io_file},
+		{&g_io_number_token, &g_io_file},
+		{&g_io_here},
+		{&g_io_number_token, &g_io_here}
 	}
 };
 const t_rule g_io_file = { {0},
 	.expands_to = {
-		{&g_less_token, &g_filename, 0},
-		{&g_lessand_token, &g_filename, 0},
-		{&g_great_token, &g_filename, 0},
-		{&g_greatand_token, &g_filename, 0},
-		{&g_dgreat_token, &g_filename, 0},
-		{&g_lessgreat_token, &g_filename, 0},
-		{&g_clobber_token, &g_filename, 0},
-		{0}
+		{&g_less_token, &g_filename},
+		{&g_lessand_token, &g_filename},
+		{&g_great_token, &g_filename},
+		{&g_greatand_token, &g_filename},
+		{&g_dgreat_token, &g_filename},
+		{&g_lessgreat_token, &g_filename},
+		{&g_clobber_token, &g_filename}
 	}
 };
 const t_rule g_filename = { {TOKEN_WORD}, {{0}} }; /* Apply rule 2 */
 const t_rule g_io_here = { {0},
 	.expands_to = {
-		{&g_dless_token, &g_here_end, 0},
-		{&g_dlessdash_token, &g_here_end, 0},
-		{0}
+		{&g_dless_token, &g_here_end},
+		{&g_dlessdash_token, &g_here_end}
 	}
 };
 const t_rule g_here_end = { {TOKEN_WORD}, {{0}} }; /* Apply rule 3 */
 
 const t_rule g_newline_list = { {0},
 	.expands_to = {
-		{&g_newline_token, 0},
-		{&g_newline_list, &g_newline_token, 0},
-		{0}
+		{&g_newline_token},
+		{&g_newline_list, &g_newline_token}
 	}
 };
 const t_rule g_linebreak = { {0},
 	{
-		{&g_newline_list, 0},
-		{&g_empty_token, 0},
-		{0}
+		{&g_newline_list},
+		{&g_empty_token}
 	}
 };
 const t_rule g_separator_op = { {TOKEN_SEMICOLON, TOKEN_AMPERSAND}, {{NULL}} };
 const t_rule g_separator = { {0},
 	{
-		{&g_separator_op, &g_linebreak, 0},
-		{&g_newline_list, 0},
-		{0}
+		{&g_separator_op, &g_linebreak},
+		{&g_newline_list}
 	}
 };
 const t_rule g_sequential_sep = { {0},
 	{
-		{&g_semicolon_token, &g_linebreak, 0},
-		{&g_newline_list, 0},
-		{0}
+		{&g_semicolon_token, &g_linebreak},
+		{&g_newline_list}
 	}
 };
 

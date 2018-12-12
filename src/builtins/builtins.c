@@ -25,6 +25,7 @@ struct s_builtin	g_builtins[] = {
 	{"quit", &hs_exit},
 	{"where", &hs_where},
 	{"history", &hs_history},
+	{"tokenizer", &hs_tokenizer},
 	{NULL, NULL}
 };
 
@@ -70,6 +71,6 @@ int					hs_help(char **args)
 int					hs_exit(char **args)
 {
 	*args = args[0];
-	tcsetattr(g_term->tty_fd, TCSANOW, g_term->original_term);
+	TERM_RESTORE;
 	exit(0);
 }

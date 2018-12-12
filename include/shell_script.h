@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 14:44:44 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/05 16:45:32 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/12/11 15:15:43 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,11 @@
 # define SHELL_SCRIPT_LANG_H
 
 # include "libft.h"
+# include "get_next_line.h"
+# include "ft_printf.h"
 # include <stdbool.h>
 
-# define TOKEN_DELIMITERS "\n\t; \r\a"
+# define TOKEN_DELIMITERS "\t \r\a"
 # define ISQT(x) (((x) == '\'' || (x) == '"' || (x) == '`') ? (1) : (0))
 
 /*
@@ -47,17 +49,16 @@ enum						e_token_type
 	TOKEN_RSQBRACKET,
 
 	TOKEN_SEMICOLON,
-	TOKEN_PIPE,
 	TOKEN_BANG,
 	TOKEN_AND_IF,
 	TOKEN_OR_IF,
-	TOKEN_DSEMI,
+	TOKEN_PIPE,
+	TOKEN_DLESSDASH,
 	TOKEN_DLESS,
 	TOKEN_DGREAT,
 	TOKEN_LESSAND,
 	TOKEN_GREATAND,
 	TOKEN_LESSGREAT,
-	TOKEN_DLESSDASH,
 	TOKEN_CLOBBER,
 
 	TOKEN_LESS,
@@ -76,6 +77,7 @@ enum						e_token_type
 	TOKEN,
 
 	TOKEN_KEYWORD,
+	TOKEN_WORD_COMMAND,
 
 	LITERAL,
 	LITERAL_ARRAY,
@@ -98,61 +100,20 @@ enum						e_token_type
 
 struct						s_parse_token
 {
-	char			*text;
-	char			*token_name;
+	char				*text;
+	char				*token_name;
 	enum e_token_type	type;
-	bool			requires_single;
+	bool				requires_single;
 };
 
 extern const struct s_parse_token	g_tokens[];
 
-/*
-** Syntax rule is an entity that contains an array of possible expansions
-** which define language grammar.
-**
-** Rules which given rule expands to are stored in 'expands_to' field.
-** The expands_to field is a two dimensional NULL-terminated array of pointers
-** to s_syntax_rule variables declared in syntax_rules.h.
-** Basically, it can hold up to 9 cases of given rule each of which
-** can hold up to 9 rules and tokens to which this rule expands.
-** For example, this syntax rule from BNF will be translated to this
-** structure as follows:
-**
-** Original:
-**  command : simple_command
-**          | compound_command
-**          | compound_command redirect_list
-**          | function_definition
-**          ;
-**
-** This shell struct:
-**  t_rule command = {
-**      {0}, // because it cannot be any token
-**
-**      // Token stream must correspond to either of these .expands_to rules
-**      // to be valid 'command'
-**      .expands_to = {
-**          { &simple_command, 0 },      // command can be solely simple_command
-**          { &compound_command, 0 },    // OR compound_command
-**          // OR compound_command which is followed by redirect_list
-**          { &compound_command, &redirect_list, 0 },
-**          { &function_definition, 0 }, // OR be a function definition
-**          { NULL } // just an array terminator
-**      }
-**  };
-*/
-
-struct						s_syntax_rule
-{
-	enum e_token_type				representation[3];
-	const struct s_syntax_rule	*expands_to[10][10];
-};
-
 typedef struct				s_token
 {
-	const char		*value;
+	const char			*value;
 	enum e_token_type	type;
-	struct s_token	*next;
+	struct s_token		*prev;
+	struct s_token		*next;
 }							t_token;
 
 typedef enum				e_type
@@ -165,23 +126,27 @@ typedef enum				e_type
 
 typedef struct				s_node
 {
-	void			*value;
+	void				*value;
 	enum e_token_type	token_type;
-	enum e_type		data_type;
-	struct s_node	*left;
-	struct s_node	*right;
+	enum e_type			data_type;
+	struct s_node		*left;
+	struct s_node		*right;
 }							t_node;
 
 /*
 ** Lexer
 */
-struct s_token				*tokenizer(const char *str, const char *delimiters);
+struct s_token				*tokenize(const char *str, const char *delimiters);
 struct s_token				*new_token(char *value, enum e_token_type type);
 void						add_token(t_token **head, t_token **tail,
 														t_token *to_add);
 void						free_token(struct s_token *token);
 
+enum e_token_type			get_token_type_contextual(const char *str);
+
 char						**smart_split(char *str, char *delimiters);
+
+extern void					free_array(char **array);
 
 /*
 ** File reading and executing

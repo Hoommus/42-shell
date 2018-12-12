@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:46:06 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/11/19 15:35:13 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/12/11 12:27:45 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void	tstp(int sig)
 	clear_buffer(0);
 	ft_printf("Received SIGTSTP (%d)\n", sig);
 	display_normal_prompt();
-	tcsetattr(g_term->tty_fd, TCSANOW, g_term->current_term);
+	TERM_ENFORCE;
 	g_term->input_state = STATE_NORMAL;
 	ft_dprintf(0, "\4");
 	ft_printf("\7");
@@ -28,13 +28,11 @@ void	tstp(int sig)
 void	ignore(int sig)
 {
 	sig = 0;
+	clear_buffer(0);
+	ft_printf("\n");
+	g_term->input_state = STATE_NORMAL;
 	if (g_term->running_process == 0)
-	{
-		clear_buffer(0);
-		ft_printf("\n");
 		display_normal_prompt();
-		g_term->input_state = STATE_NORMAL;
-	}
 }
 
 void	resize(int sig)
@@ -55,7 +53,7 @@ void	resize(int sig)
 void	fatal(int sig)
 {
 	sig = 0;
-	tcsetattr(g_term->tty_fd, TCSANOW, g_term->original_term);
+	TERM_RESTORE;
 }
 
 void	setup_signal_handlers(void)

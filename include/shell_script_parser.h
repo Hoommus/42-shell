@@ -1,25 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_memalloc.c                                      :+:      :+:    :+:   */
+/*   shell_script_parser.h                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/03/29 13:55:19 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/03/29 14:02:23 by vtarasiu         ###   ########.fr       */
+/*   Created: 2018/12/10 13:17:59 by vtarasiu          #+#    #+#             */
+/*   Updated: 2018/12/11 13:24:00 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#ifndef SHELL_SCRIPT_PARSER_H
+# define SHELL_SCRIPT_PARSER_H
 
-void	*ft_memalloc(size_t size)
+# include "shell_script.h"
+# include "shell_script_syntax.h"
+
+enum							e_parser_state
 {
-	unsigned char	*ptr;
-	size_t			i;
+	NONE
+};
 
-	ptr = (unsigned char *)malloc(sizeof(unsigned char) * size);
-	if (ptr == NULL)
-		return (NULL);
-	ft_bzero(ptr, size);
-	return ((void *)ptr);
-}
+struct							s_parser_state
+{
+	t_token				*list_head;
+	t_token				*list_tail;
+	enum e_token_type	*next_valid_tokens;
+};
+
+extern struct s_parser_state	g_parser_state;
+
+#endif

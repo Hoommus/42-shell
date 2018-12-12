@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   twenty_one_sh.h                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
+/*   Updated: 2018/12/12 17:21:52 by vtarasiu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef TWENTY_ONE_SH_H
 # define TWENTY_ONE_SH_H
 
@@ -27,12 +39,15 @@
 # define ABS(a) ((a) < 0 ? -(a) : (a))
 # define SHELL_PROMPT "\x1b[0m\x1b[34;1m[%s@%s] \x1b[36;1m%s\x1b[0m \x1b[%d;1m$\x1b[0m "
 
+# define TERM_RESTORE tcsetattr(g_term->tty_fd, TCSANOW, g_term->original_term)
+# define TERM_ENFORCE tcsetattr(g_term->tty_fd, TCSANOW, g_term->current_term)
+
 # define HISTORY_FILE ".21sh_history"
 # define CONFIG_FILE ".21shrc"
 # define LOG_FILE ".21sh.log"
 
-# define BUILD 365
-# define BUILD_DATE "07.12.18 12:52:49 EET"
+# define BUILD 408
+# define BUILD_DATE "12.12.18 17:21:52 EET"
 
 /*
 ** Initial input of 260 is chosen because (260 * 10) % 8 == 0
@@ -56,7 +71,7 @@
 ** Used for controlling input state
 */
 
-enum						e_state
+enum						e_input_state
 {
 	STATE_NORMAL,
 	STATE_QUOTE,
@@ -103,23 +118,23 @@ typedef struct s_position	t_carpos;
 */
 struct						s_term
 {
-	enum e_state	input_state;
-	short			ws_col;
-	short			ws_row;
-	short			tty_fd;
-	t_carpos		carpos_db[6];
-	struct termios	*original_term;
-	struct termios	*current_term;
+	enum e_input_state	input_state;
+	short				ws_col;
+	short				ws_row;
+	short				tty_fd;
+	t_carpos			carpos_db[6];
+	struct termios		*original_term;
+	struct termios		*current_term;
 
-	short			history_file;
-	short			logfile;
+	short				history_file;
+	short				logfile;
 
-	short			flags;
+	short				flags;
 
-	int				last_cmd_status;
-	pid_t			running_process;
+	int					last_cmd_status;
+	pid_t				running_process;
 
-	t_buffer		*buffer;
+	t_buffer			*buffer;
 };
 
 char						**g_environ;
@@ -154,7 +169,7 @@ char						**copy_env(char **argenv, char **environ);
 char						**read_command(void);
 int							shell_loop(void);
 void						setup_signal_handlers(void);
-void						display_prompt(enum e_state state);
+void						display_prompt(enum e_input_state state);
 int							display_normal_prompt(void);
 
 /*

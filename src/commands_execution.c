@@ -33,7 +33,7 @@ int		forknrun(char *bin, char **args)
 {
 	int		status;
 
-	tcsetattr(g_term->tty_fd, TCSANOW, g_term->original_term);
+	TERM_RESTORE;
 	g_term->running_process = fork();
 	if (g_term->running_process == 0)
 	{
@@ -46,7 +46,7 @@ int		forknrun(char *bin, char **args)
 		wait(&status);
 		g_term->last_cmd_status = WEXITSTATUS(status);
 		g_term->running_process = 0;
-		tcsetattr(g_term->tty_fd, TCSANOW, g_term->current_term);
+		TERM_ENFORCE;
 		return (0);
 	}
 }
