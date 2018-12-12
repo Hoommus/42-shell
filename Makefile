@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2018/11/18 14:48:06 by vtarasiu         ###   ########.fr        #
+#    Updated: 2018/12/10 15:38:31 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,10 +27,10 @@ SHELL_SRC = main.c environ_utils.c commands_execution.c memory.c auxilia.c     \
             service_routines.c args_parsing.c\
 
 LEXER_DIR = lexer/
-LEXER_SRC = quotes.c smart_split.c tokenizer.c tokens_mem.c
+LEXER_SRC = quotes.c smart_split.c tokenizer.c tokens_mem.c token_word_types.c
 
 BUILTIN_DIR = builtins/
-BUILTIN_SRC = cd.c where.c builtins.c builtins2.c hs_history.c
+BUILTIN_SRC = cd.c where.c builtins.c builtins2.c hs_history.c tokenizer_test.c
 
 INTERFACE_DIR = line_editing/
 INTERFACE_SRC = buffer_drawing.c buffer_works.c     \

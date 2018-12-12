@@ -25,5 +25,6 @@ int						hs_help(char **args);
 int						hs_exit(char **args);
 int						hs_where(char **args);
 int						hs_history(char **args);
+int						hs_tokenizer(char **args);
 
 #endif

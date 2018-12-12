@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/16 12:28:13 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/11/19 18:51:19 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/12/11 12:27:45 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,9 @@ void	init_term(void)
 	struct termios	*oldterm;
 	struct termios	*newterm;
 
-	oldterm = (struct termios *)malloc(sizeof(struct termios));
-	newterm = (struct termios *)malloc(sizeof(struct termios));
-	g_term = (struct s_term *)malloc(sizeof(struct s_term));
+	oldterm = (struct termios *)ft_memalloc(sizeof(struct termios));
+	newterm = (struct termios *)ft_memalloc(sizeof(struct termios));
+	g_term = (struct s_term *)ft_memalloc(sizeof(struct s_term));
 	g_term->tty_fd = (short)open("/dev/tty", O_RDWR);
 	g_term->original_term = oldterm;
 	g_term->current_term = newterm;
@@ -34,7 +34,7 @@ void	init_term(void)
 	ft_memcpy(newterm, oldterm, sizeof(struct termios));
 	newterm->c_lflag &= ~(ECHO | ICANON | IEXTEN) | ECHOE | ECHOCTL | ECHONL;
 	newterm->c_iflag &= ~(IXOFF);
-	tcsetattr(g_term->tty_fd, TCSANOW, newterm);
+	TERM_ENFORCE;
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &window);
 	tputs(tgetstr("ei", NULL), 1, &ft_putc);
 	g_term->ws_col = window.ws_col;
@@ -55,9 +55,9 @@ short	init_fd_at_home(char *filename, int flags)
 		full_path = ft_strings_join(2, "/", home, filename);
 	else
 		full_path = ft_strdup(filename);
-	if (access(full_path, F_OK) != -1 && access(full_path, 0644) == -1)
-		chmod(full_path, 0644);
-	fd = (short)open(full_path, O_RDWR | O_CREAT | flags, 0644);
+	if (access(full_path, F_OK) != -1 && access(full_path, 0600) == -1)
+		chmod(full_path, 0600);
+	fd = (short)open(full_path, O_RDWR | O_CREAT | flags, 0600);
 	free(full_path);
 	return (fd);
 }

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   tokens_mem.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2018/12/07 18:12:11 by vtarasiu          #+#    #+#             */
+/*   Updated: 2018/12/10 13:29:28 by vtarasiu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "shell_script.h"
 
 /*
@@ -25,6 +37,7 @@ void			free_token(t_token *token)
 void			push_token(t_token **head, t_token *token)
 {
 	token->next = *head;
+	token->prev = NULL;
 	*head = token;
 }
 
@@ -35,11 +48,13 @@ void			add_token(t_token **head, t_token **tail, t_token *to_add)
 	else if (*tail == NULL)
 	{
 		*tail = to_add;
+		to_add->prev = *head;
 		(*head)->next = *tail;
 	}
 	else
 	{
 		(*tail)->next = to_add;
+		to_add->prev = *tail;
 		*tail = to_add;
 	}
 }

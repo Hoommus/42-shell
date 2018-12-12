@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 14:44:48 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/05 13:18:32 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/12/12 16:03:55 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,49 +28,49 @@ char		*g_singles[] = {
 };
 
 /*
-** case and esac tokens are avoided.
-** But here they are, just in case (no pun intended)
+** case syntax structure is avoided.
+** But here its tokens are, just in case (no pun intended)
 ** {"case",          "case",        TOKEN_CASE,            false},
 ** {"esac",          "esac",        TOKEN_ESAC,            false},
+** {";;",            "DSEMI",       TOKEN_DSEMI,           true },
 */
 
 const struct s_parse_token	g_tokens[] = {
-	{"if",            "if",          TOKEN_IF,              false},
-	{"then",          "then",        TOKEN_THEN,            false},
-	{"else",          "else",        TOKEN_ELSE,            false},
-	{"elif",          "elif",        TOKEN_ELIF,            false},
-	{"fi",            "fi",          TOKEN_FI,              false},
-	{"do",            "do",          TOKEN_DO,              false},
-	{"done",          "done",        TOKEN_DONE,            false},
-	{"while",         "while",       TOKEN_WHILE,           false},
-	{"until",         "until",       TOKEN_UNTIL,           false},
-	{"for",           "for",         TOKEN_FOR,             false},
+	{"if",            "IF",          TOKEN_IF,              false},
+	{"then",          "THEN",        TOKEN_THEN,            false},
+	{"else",          "ELSE",        TOKEN_ELSE,            false},
+	{"elif",          "ELIF",        TOKEN_ELIF,            false},
+	{"fi",            "FI",          TOKEN_FI,              false},
+	{"do",            "DO",          TOKEN_DO,              false},
+	{"done",          "DONE",        TOKEN_DONE,            false},
+	{"while",         "WHILE",       TOKEN_WHILE,           false},
+	{"until",         "UNTIL",       TOKEN_UNTIL,           false},
+	{"for",           "FOR",         TOKEN_FOR,             false},
 
-	{"in",            "in",          TOKEN_IN,              false},
+	{"in",            "IN",          TOKEN_IN,              false},
 
-	{"{",             "lbrace",      TOKEN_LBRACE,          true },
-	{"}",             "rbrace",      TOKEN_RBRACE,          true },
-	{"(",             "lbracket",    TOKEN_LBRACKET,        true },
-	{")",             "rbracket",    TOKEN_RBRACKET,        true },
-	{"[",             "lsqbracket",  TOKEN_LSQBRACKET,      true },
-	{"]",             "rsqbracket",  TOKEN_RSQBRACKET,      true },
+	{"{",             "LBRACE",      TOKEN_LBRACE,          true },
+	{"}",             "RBRACE",      TOKEN_RBRACE,          true },
+	{"(",             "LBRACKET",    TOKEN_LBRACKET,        true },
+	{")",             "RBRACKET",    TOKEN_RBRACKET,        true },
+	{"[",             "LSQBRACKET",  TOKEN_LSQBRACKET,      true },
+	{"]",             "RSQBRACKET",  TOKEN_RSQBRACKET,      true },
 
-	{";",             "semicolon",   TOKEN_SEMICOLON,       true },
-	{"|",             "pipe",        TOKEN_PIPE,            true },
-	{"!",             "bang",        TOKEN_BANG,            true },
+	{";",             "SEMICOLON",   TOKEN_SEMICOLON,       true },
+	{"!",             "BANG",        TOKEN_BANG,            true },
 	{"&&",            "AND_IF",      TOKEN_AND_IF,          true },
 	{"||",            "OR_IF",       TOKEN_OR_IF,           true },
-	{";;",            "DSEMI",       TOKEN_DSEMI,           true },
+	{"|",             "PIPE",        TOKEN_PIPE,            true },
+	{"<<-",           "DLESSDASH",   TOKEN_DLESSDASH,       true },
 	{"<<",            "DLESS",       TOKEN_DLESS,           true },
 	{">>",            "DGREAT",      TOKEN_DGREAT,          true },
 	{"<&",            "LESSAND",     TOKEN_LESSAND,         true },
 	{"&>",            "GREATAND",    TOKEN_GREATAND,        true },
 	{"<>",            "LESSGREAT",   TOKEN_LESSGREAT,       true },
-	{"<<-",           "DLESSDASH",   TOKEN_DLESSDASH,       true },
 	{">|",            "CLOBBER",     TOKEN_CLOBBER,         true },
 
-	{"<",             "LESS",        TOKEN_LESS,            true },
-	{">",             "GREAT",       TOKEN_GREAT,           true },
+	{"<",             "LESS",        TOKEN_LESS,            false},
+	{">",             "GREAT",       TOKEN_GREAT,           false},
 	{"~",             "TILDE",       TOKEN_TILDE,           false},
 	{"&",             "AMPERSAND",   TOKEN_AMPERSAND,       true },
 
@@ -80,8 +80,9 @@ const struct s_parse_token	g_tokens[] = {
 	{"^\\w+\\=",      "ASSIGNMENT",  TOKEN_ASSIGNMENT_WORD, false},
 
 	{"\n",            "NEWLINE",     TOKEN_NEWLINE,         true },
-	{"",              "EMPTY_LOL",   TOKEN_EMPTY,           false},
-	{"",              "literal",     TOKEN,                 false},
+	{"!",             "EMPTY_LOL",   TOKEN_EMPTY,           false},
+	{"!",             "literal",     TOKEN,                 false},
+	{"!",             "COMMAND",     TOKEN_WORD_COMMAND,    false},
 
 	{NULL,            NULL,          TOKEN_KEYWORD,         false},
 };
@@ -95,7 +96,7 @@ const struct s_parse_token	g_tokens[] = {
 ** Returns true if char needs separate token
 */
 
-int						is_single_token(char c)
+static int				is_single_token(char c)
 {
 	int		i;
 	char	tmp[2];
@@ -113,7 +114,7 @@ int						is_single_token(char c)
 ** There is some cringy stuff going on today
 */
 
-int						count_substrings(char *str)
+static int				count_substrings(char *str)
 {
 	ssize_t	i;
 	int		subs;
@@ -131,9 +132,6 @@ int						count_substrings(char *str)
 		else if (ISQT(str[i]) && ++i)
 			while (str[i] && str[i] != c)
 				i++;
-		else if (ft_isdigit(str[i]))
-			while (str[i] && ft_isdigit(str[i]) && !is_single_token(str[i]))
-				i++;
 		else
 			while (str[i] && ft_strchr(TOKEN_DELIMITERS, str[i]) == NULL
 				&& !is_single_token(str[i]))
@@ -143,7 +141,7 @@ int						count_substrings(char *str)
 	return (subs);
 }
 
-long long				get_word_size(char *str)
+static long long		get_word_size(char *str)
 {
 	long long	i;
 	char		quote;

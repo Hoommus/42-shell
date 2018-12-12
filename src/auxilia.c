@@ -59,7 +59,7 @@ ssize_t		ponies_teleported(void)
 	}
 }
 
-void	display_prompt(enum e_state state)
+void	display_prompt(enum e_input_state state)
 {
 	if (state == STATE_NORMAL)
 		display_normal_prompt();
