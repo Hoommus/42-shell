@@ -1,18 +1,13 @@
 #include "line_editing.h"
 
-t_carpos	*get_caretpos(enum e_position type)
+t_carpos	*carpos_get(enum e_position type)
 {
 	return (g_term->carpos_db + type);
 }
 
-t_carpos	*get_carpos(enum e_position type)
+t_carpos	*carpos_save_as(enum e_position type)
 {
-	return (g_term->carpos_db + type);
-}
-
-t_carpos	*save_caret_position_as(enum e_position type)
-{
-	update_caret_position(type);
+	carpos_update(type);
 	return (g_term->carpos_db + type);
 }
 
@@ -29,7 +24,7 @@ t_carpos	*load_caret_position(enum e_position type)
 /*
 ** Updates specified position in db via ANSI request code
 */
-void		update_caret_position(enum e_position type)
+void		carpos_update(enum e_position type)
 {
 	char		response[16];
 

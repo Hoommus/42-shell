@@ -33,7 +33,6 @@ extern struct s_listener	g_key_listeners[];
 
 int							ft_putc(int c);
 int							ft_strchr_back(const char *str, char c, int i);
-int							buff_strchr_back(t_buffer *buffer, char *c, int i);
 void						buffer_clear(char symbol);
 void						buffer_redraw(int symbol_index);
 
@@ -67,11 +66,11 @@ int							toggle_escaped(void);
 void						adjust_carpos_db(void);
 int							caret_move(int distance,
 										enum e_direction direction);
-t_carpos					*get_carpos(enum e_position type);
+t_carpos					*carpos_get(enum e_position type);
 t_carpos					*get_caretpos(enum e_position type);
 t_carpos					*load_caret_position(enum e_position type);
-t_carpos					*save_caret_position_as(enum e_position type);
-void						update_caret_position(enum e_position type);
+t_carpos					*carpos_save_as(enum e_position type);
+void						carpos_update(enum e_position type);
 
 
 #endif

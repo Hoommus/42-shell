@@ -20,20 +20,20 @@ void			deal_with_printable(const char arr[8])
 	if (!toggle_state(arr) && g_term->input_state == STATE_ESCAPED_EOL)
 		g_term->input_state = STATE_NORMAL;
 	insert_single_at(g_term->buffer->iterator, arr);
-	save_caret_position_as(POS_LAST);
+	carpos_save_as(POS_LAST);
 	tputs(tgetstr("im", NULL), 1, &ft_putc);
 	write(1, arr, 8);
 	tputs(tgetstr("ei", NULL), 1, &ft_putc);
-	if (get_carpos(POS_LAST)->col == g_term->ws_col - 1)
+	if (carpos_get(POS_LAST)->col == g_term->ws_col - 1)
 	{
 		tputs(tgetstr("sf", NULL), 1, &ft_putc);
 		caret_move(1, D_RIGHT);
 	}
-	update_caret_position(POS_CURRENT);
-	if (get_carpos(POS_LAST)->row <= get_carpos(POS_CURRENT)->row
-		&& get_carpos(POS_LAST)->col < get_carpos(POS_CURRENT)->col)
+	carpos_update(POS_CURRENT);
+	if (carpos_get(POS_LAST)->row <= carpos_get(POS_CURRENT)->row
+		&& carpos_get(POS_LAST)->col < carpos_get(POS_CURRENT)->col)
 		adjust_carpos_db();
-	if (get_carpos(POS_CURRENT)->col < g_term->ws_col)
+	if (carpos_get(POS_CURRENT)->col < g_term->ws_col)
 		buffer_redraw(-1);
 }
 
@@ -93,7 +93,7 @@ char			**read_command(void)
 			commands = smart_split(history_write(buff_get_part(0, UINT64_MAX),
 										get_history_fd()), TOKEN_DELIMITERS);
 		}
-		update_caret_position(POS_CURRENT);
+		carpos_update(POS_CURRENT);
 	}
 	return (commands);
 }

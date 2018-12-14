@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/16 17:42:29 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/11/18 13:11:17 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/12/12 18:26:31 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ char				*buff_get_part(u_int64_t start, u_int64_t end);
 t_symbol			*buff_symbol_at(u_int64_t index);
 char				*buff_char_at(u_int64_t index);
 int					buff_char_at_equals(const u_int64_t index, const char *c);
+int					buff_chroff(t_buffer *buffer, const char *c, int i);
 
 int					insert_single_at(u_int64_t index, const char *str);
 int					insert_symbol_at(u_int64_t index, t_symbol *symbol);

@@ -16,7 +16,7 @@ void	buffer_redraw(int symbol_index)
 	if ((int64_t)ft_strlen(g_term->buffer) >= g_term->ws_col
 		- get_caretpos(POS_PROMPT)->col)
 	{
-		save_caret_position_as(POS_CUSTOM1);
+		carpos_save_as(POS_CUSTOM1);
 		tputs(tgetstr("cd", NULL), 1, &ft_putc);
 		ft_printf("%s", g_term->buffer + g_term->iterator);
 		load_caret_position(POS_CUSTOM1);

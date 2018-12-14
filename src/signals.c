@@ -6,12 +6,13 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:46:06 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/11 12:27:45 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/12/14 17:38:57 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "twenty_one_sh.h"
-#include "../include/line_editing.h"
+#include "shell_history.h"
+#include "line_editing.h"
 
 void	tstp(int sig)
 {
@@ -27,12 +28,16 @@ void	tstp(int sig)
 
 void	ignore(int sig)
 {
+	extern t_history		*g_history;
+
 	sig = 0;
 	clear_buffer(0);
+	g_history->iterator = g_history->size;
 	ft_printf("\n");
 	g_term->input_state = STATE_NORMAL;
 	if (g_term->running_process == 0)
 		display_normal_prompt();
+
 }
 
 void	resize(int sig)
@@ -44,7 +49,7 @@ void	resize(int sig)
 		ioctl(STDOUT_FILENO, TIOCGWINSZ, &size);
 		g_term->ws_row = size.ws_row;
 		g_term->ws_col = size.ws_col;
-		update_caret_position(POS_CURRENT);
+		carpos_update(POS_CURRENT);
 //		caret_move(ft_utf_strlen(g_term->buffer), D_LEFT);
 //		buffer_redraw(0);
 	}

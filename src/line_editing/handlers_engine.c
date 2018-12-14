@@ -11,7 +11,7 @@ struct s_listener	g_key_listeners[] =
 	{CEOT, &handle_eot},
 	{CKILL, &handle_line_kill},
 	{'\t', &handle_ignore},
-	{9, &handle_delchar},
+//	{9, &handle_delchar},
 	{0, 0}
 };
 

@@ -73,7 +73,7 @@ void	display_prompt(enum e_input_state state)
 		ft_printf("heredoc> ");
 	else
 		ft_printf("err> ");
-	update_caret_position(POS_PROMPT);
+	carpos_update(POS_PROMPT);
 }
 
 void		increment_shlvl(void)

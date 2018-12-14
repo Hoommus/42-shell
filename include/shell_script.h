@@ -108,6 +108,9 @@ struct						s_parse_token
 
 extern const struct s_parse_token	g_tokens[];
 
+/*
+ * TODO: Add information about a line where specific token resides
+ */
 typedef struct				s_token
 {
 	const char			*value;

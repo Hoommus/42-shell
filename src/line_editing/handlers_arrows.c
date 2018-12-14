@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/16 12:28:37 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/11/19 16:40:57 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/12/14 17:07:23 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,9 @@ void	handle_up(u_int64_t key)
 		|| g_term->buffer->iterator == g_term->buffer->size)
 		&& g_history->iterator > 0)
 	{
-		entry = history_get_entry(--g_history->iterator);
+		while ((entry = history_get_entry(--g_history->iterator)))
+			if (ft_strcmp(entry->command, buff_get_part(0, UINT64_MAX)))
+				break ;
 		if (!entry)
 			return ;
 		caret_move(g_term->buffer->iterator, D_LEFT);
@@ -40,7 +42,9 @@ void	handle_down(u_int64_t key)
 
 	if (key == K_DOWN && history_get_entry(g_history->iterator) != NULL)
 	{
-		entry = history_get_entry(++g_history->iterator);
+		while ((entry = history_get_entry(++g_history->iterator)))
+			if (ft_strcmp(entry->command, buff_get_part(0, UINT64_MAX)))
+				break ;
 		caret_move(g_term->buffer->iterator, D_LEFT);
 		clear_buffer(0);
 		tputs(tgetstr("cd", NULL), 1, &ft_putc);
@@ -53,8 +57,7 @@ void	handle_down(u_int64_t key)
 
 void	handle_left(u_int64_t key)
 {
-	if (key == K_LEFT && g_term->buffer->iterator > 0
-		&& ft_strcmp(buff_char_at(g_term->buffer->iterator - 1), "\n") != 0)
+	if (key == K_LEFT && g_term->buffer->iterator > 0)
 	{
 		caret_move(1, D_LEFT);
 		g_term->buffer->iterator--;

@@ -41,7 +41,7 @@ void	init_term(void)
 	g_term->ws_row = window.ws_row;
 	g_term->input_state = STATE_NORMAL;
 	init_buffer_vector(MAX_INPUT);
-	update_caret_position(POS_CURRENT);
+	carpos_update(POS_CURRENT);
 }
 
 short	init_fd_at_home(char *filename, int flags)
