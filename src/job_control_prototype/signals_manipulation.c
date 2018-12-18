@@ -1,24 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_memalloc.c                                      :+:      :+:    :+:   */
+/*   signals_manipulation.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/03/29 13:55:19 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/03/29 14:02:23 by vtarasiu         ###   ########.fr       */
+/*   Created: 2018/12/17 16:39:53 by vtarasiu          #+#    #+#             */
+/*   Updated: 2018/12/17 16:40:02 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "twenty_one_sh.h"
 
-void	*ft_memalloc(size_t size)
-{
-	unsigned char	*ptr;
 
-	ptr = (unsigned char *)malloc(sizeof(unsigned char) * size);
-	if (ptr == NULL)
-		return (NULL);
-	ft_bzero(ptr, size);
-	return ((void *)ptr);
-}
+

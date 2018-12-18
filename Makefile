@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2018/12/10 15:38:31 by vtarasiu         ###   ########.fr        #
+#    Updated: 2018/12/17 16:43:22 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,8 +22,8 @@ OBJ_DIR = ./obj/
 LIB_DIR = ./printf
 LIB_NAME = libftprintf.a
 
-SHELL_SRC = main.c environ_utils.c commands_execution.c memory.c auxilia.c     \
-            signals.c variables_replacement.c errors.c init.c \
+SHELL_SRC = main.c environ_utils.c memory.c auxilia.c     \
+            variables_replacement.c errors.c init.c \
             service_routines.c args_parsing.c\
 
 LEXER_DIR = lexer/
@@ -38,15 +38,20 @@ INTERFACE_SRC = buffer_drawing.c buffer_works.c     \
                 buffer_vector.c buffer_vector_tools1.c buffer_vector_tools2.c  \
                 state_machine.c \
                 handlers_arrows.c handlers_editing.c handlers_engine.c \
+                write_anywhere.c
+
+JOB_CONTROL_DIR = job_control_prototype/
+JOB_CONTROL_SRC = commands_execution.c signals_manipulation.c signals_basic.c
 
 HISTORY_DIR = features/history/
 HISTORY_SRC = history.c history_vector.c
 
-OBJ = $(addprefix $(OBJ_DIR), $(SHELL_SRC:.c=.o))                 \
-      $(addprefix $(OBJ_DIR)$(LEXER_DIR), $(LEXER_SRC:.c=.o))     \
-      $(addprefix $(OBJ_DIR)$(BUILTIN_DIR), $(BUILTIN_SRC:.c=.o)) \
-      $(addprefix $(OBJ_DIR)$(HISTORY_DIR), $(HISTORY_SRC:.c=.o)) \
-      $(addprefix $(OBJ_DIR)$(INTERFACE_DIR), $(INTERFACE_SRC:.c=.o))
+OBJ = $(addprefix $(OBJ_DIR), $(SHELL_SRC:.c=.o))                         \
+      $(addprefix $(OBJ_DIR)$(LEXER_DIR), $(LEXER_SRC:.c=.o))             \
+      $(addprefix $(OBJ_DIR)$(BUILTIN_DIR), $(BUILTIN_SRC:.c=.o))         \
+      $(addprefix $(OBJ_DIR)$(HISTORY_DIR), $(HISTORY_SRC:.c=.o))         \
+      $(addprefix $(OBJ_DIR)$(INTERFACE_DIR), $(INTERFACE_SRC:.c=.o))     \
+      $(addprefix $(OBJ_DIR)$(JOB_CONTROL_DIR), $(JOB_CONTROL_SRC:.c=.o))
 
 all: $(NAME)
 
@@ -72,6 +77,7 @@ prepare:
 	@mkdir -p $(OBJ_DIR)$(BUILTIN_DIR)
 	@mkdir -p $(OBJ_DIR)$(HISTORY_DIR)
 	@mkdir -p $(OBJ_DIR)$(INTERFACE_DIR)
+	@mkdir -p $(OBJ_DIR)$(JOB_CONTROL_DIR)
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
 	gcc $(FLAGS) $(HEADER) -o $@ -c $< ;

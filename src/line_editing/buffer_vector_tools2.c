@@ -3,7 +3,8 @@
 extern t_buffer	*g_buffer;
 
 /*
-** Returns last desired char offset in buffer
+** Returns last desired char's offset in buffer searching from index 'i' to 0
+** If nothing found, returns -1
 */
 
 int				buff_chroff(t_buffer *buffer, const char *c, int i)

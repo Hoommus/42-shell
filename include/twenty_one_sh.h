@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/14 17:56:34 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/12/18 15:01:58 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,12 +42,16 @@
 # define TERM_RESTORE tcsetattr(g_term->tty_fd, TCSANOW, g_term->original_term)
 # define TERM_ENFORCE tcsetattr(g_term->tty_fd, TCSANOW, g_term->current_term)
 
+# define TERM_CLR_LINES_BELOW tputs(tgetstr("cd", NULL), 1, &ft_putc)
+# define TERM_CLR_LINE tputs(tgetstr("ce", NULL), 1, &ft_putc)
+# define TERM_CLR_CHAR tputs(tgetstr("dc", NULL), 1, &ft_putc)
+
 # define HISTORY_FILE ".21sh_history"
 # define CONFIG_FILE ".21shrc"
 # define LOG_FILE ".21sh.log"
 
-# define BUILD 430
-# define BUILD_DATE "14.12.18 17:56:34 EET"
+# define BUILD 462
+# define BUILD_DATE "18.12.18 15:01:58 EET"
 
 /*
 ** Initial input of 260 is chosen because (260 * 10) % 8 == 0
@@ -84,6 +88,7 @@ enum						e_input_state
 	STATE_SEARCH,
 	STATE_PARTIAL_EXPAND,
 	STATE_NON_INTERACTIVE,
+	STATE_JOB_IN_FG,
 	BREAK
 };
 
@@ -98,7 +103,8 @@ enum						e_position
 	POS_LAST,
 	POS_TAIL,
 	POS_CUSTOM1,
-	POS_CUSTOM2
+	POS_CUSTOM2,
+	POS_ORIGIN
 };
 
 struct						s_position
@@ -115,6 +121,7 @@ typedef struct s_position	t_carpos;
 
 /*
 ** g_term stores terminal parameters as well as cursor position and input buffer
+ * TODO: extract buffer variable to separate global var and create normal API
 */
 struct						s_term
 {
@@ -122,7 +129,7 @@ struct						s_term
 	short				ws_col;
 	short				ws_row;
 	short				tty_fd;
-	t_carpos			carpos_db[6];
+	t_carpos			carpos_db[7];
 	struct termios		*original_term;
 	struct termios		*current_term;
 
@@ -215,9 +222,9 @@ int							get_history_fd(void);
 ** Arguments parsing
 */
 
-bool						has_long_flag(const char **args, const char *flag);
-bool						has_flag(const char **args, const char flag);
-char						validate_short_flags(const char **args,
+bool						flag_long_present(const char **args, const char *flag);
+bool						flag_short_present(const char **args, const char flag);
+char						flag_validate_short(const char **args,
 												const char *possible_flags);
 /*
 ** Compatibility

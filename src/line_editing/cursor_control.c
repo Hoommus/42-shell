@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/16 12:28:16 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/14 17:51:56 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/12/16 16:59:39 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@
 
 #include "line_editing.h"
 
-#include <assert.h>
 int			ft_strchr_back(const char *str, char c, int i)
 {
 	while (i >= 0)
@@ -33,7 +32,7 @@ int			ft_strchr_back(const char *str, char c, int i)
 	return (i);
 }
 
-void		adjust_carpos_db(void)
+void			carpus_adjust_db(void)
 {
 	int		i;
 
@@ -49,17 +48,18 @@ void		adjust_carpos_db(void)
 ** If distance is big, searches for first newline
 ** and counts physical coordinates from that character
 **
-** So many `-1', isn't it?
+** That's a shitload of `-1', isn't it?
+**
+** Also, 'penult' is short for 'penultimate'
 */
 
-void		left_hard(int dist, int *new_col, int *new_row)
+static void		left_hard(int dist, int *new_col, int *new_row)
 {
 	int		ult_nl;
 	int		penult_nl;
 
-	dist += 1;
 	ult_nl = (int) g_term->buffer->iterator;
-	while (--dist)
+	while (dist)
 	{
 		ult_nl = ult_nl - 1;
 		if (*new_col == 0 && buff_char_at_equals(ult_nl, "\n"))
@@ -72,13 +72,17 @@ void		left_hard(int dist, int *new_col, int *new_row)
 			*new_col = *new_col > g_term->ws_col ? *new_col % g_term->ws_col : *new_col;
 		}
 		else if (*new_col == 0)
+		{
 			*(new_col) = g_term->ws_col - 1;
+			*new_row -= 1;
+		}
 		else
 			*(new_col) -= 1;
+		dist--;
 	}
 }
 
-void		right_hard(int distance, int *new_col, int *new_row)
+static void		right_hard(int distance, int *new_col, int *new_row)
 {
 	int		i;
 
@@ -97,13 +101,21 @@ void		right_hard(int distance, int *new_col, int *new_row)
 	}
 }
 
-int			caret_move(int distance, enum e_direction direction)
+/*
+** caret_move - magically move caret in any desired direction.
+**
+** caret_move fully handles cursor movement on its own.
+** Meaning it takes into account all newlines and window size before calculating
+ * final cursor position and moving it directly there via `cm' capability
+*/
+
+int				caret_move(int distance, enum e_direction direction)
 {
 	int		new_col;
 	int		new_row;
 
-	if (distance == 0 || direction == D_NOWHERE)
-		return (0);
+	if (distance <= 0 || direction == D_NOWHERE)
+		return (1);
 	new_col = carpos_get(POS_CURRENT)->col;
 	new_row = carpos_get(POS_CURRENT)->row;
 	if (direction == D_LEFT)

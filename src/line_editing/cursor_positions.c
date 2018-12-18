@@ -14,7 +14,7 @@ t_carpos	*carpos_save_as(enum e_position type)
 /*
 ** Resets caret position to desired location
 */
-t_carpos	*load_caret_position(enum e_position type)
+t_carpos	*carpos_load(enum e_position type)
 {
 	tputs(tgoto(tgetstr("cm", NULL), g_term->carpos_db[type].col,
 				g_term->carpos_db[type].row), 1, &ft_putc);

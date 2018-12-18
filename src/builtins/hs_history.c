@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/16 12:28:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/11/19 14:33:51 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/12/16 18:47:04 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,15 +62,15 @@ int		hs_history(char **args)
 	struct s_history_entry	*entry;
 
 	*args = args[0];
-	if ((c = validate_short_flags((const char **)args, "cs")))
+	if ((c = flag_validate_short((const char **) args, "cs")))
 	{
-		ft_dprintf(2, "history: invalid argument: %c\nUsage: history -s arg\n"
+		ft_dprintf(2, "history: invalid argument -%c\nUsage: history -s arg\n"
 				"       history -c\n", c);
 		return (0);
 	}
-	if (has_flag((const char **)args, 'c'))
+	if (flag_short_present((const char **) args, 'c'))
 		clear_history_hard();
-	if (has_flag((const char **)args, 's'))
+	if (flag_short_present((const char **) args, 's'))
 		add_entry(args);
 	width = ft_nbrlen((u_int64_t)history_get_size()) + 1;
 	width = width >= 4 ? width : 4;

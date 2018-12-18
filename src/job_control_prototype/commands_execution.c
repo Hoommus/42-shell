@@ -6,11 +6,10 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:46:00 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/07/31 14:46:00 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/12/18 14:06:10 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <errno.h>
 #include "twenty_one_sh.h"
 #include "shell_builtins.h"
 
@@ -42,7 +41,8 @@ int		forknrun(char *bin, char **args)
 	}
 	else
 	{
-		//TODO: Replace with waitpid() with WUNTRACED to make Ctrl+Z workma
+		//TODO: Replace with waitpid() with WUNTRACED to make Ctrl+Z work
+		//waitpid(g_term->running_process, &status, WNOHANG | WUNTRACED);
 		wait(&status);
 		g_term->last_cmd_status = WEXITSTATUS(status);
 		g_term->running_process = 0;

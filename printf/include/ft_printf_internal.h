@@ -6,12 +6,12 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/01 15:02:40 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/07/01 17:38:50 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/12/18 15:09:12 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_PRINTF_FT_PRINTF_INTERNAL_H
-# define FT_PRINTF_FT_PRINTF_INTERNAL_H
+#ifndef FT_PRINTF_INTERNAL_H
+# define FT_PRINTF_INTERNAL_H
 
 # include "../../libft/libft.h"
 # include "ft_printf.h"
@@ -30,7 +30,7 @@
 # define ITOA_LOWER "0123456789abcdef"
 # define ABS(a) (a < 0 ? -(a) : a)
 
-# define BUFFER_SIZE 2048
+# define BUFFER_SIZE 512
 
 int				g_symbols;
 long long		g_written;

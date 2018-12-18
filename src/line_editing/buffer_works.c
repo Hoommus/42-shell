@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   buffer_works.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2018/12/14 18:43:20 by vtarasiu          #+#    #+#             */
+/*   Updated: 2018/12/16 19:06:24 by vtarasiu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "twenty_one_sh.h"
 #include "line_editing.h"
 #include "shell_script.h"
@@ -19,22 +31,15 @@ void			deal_with_printable(const char arr[8])
 {
 	if (!toggle_state(arr) && g_term->input_state == STATE_ESCAPED_EOL)
 		g_term->input_state = STATE_NORMAL;
-	insert_single_at(g_term->buffer->iterator, arr);
-	carpos_save_as(POS_LAST);
-	tputs(tgetstr("im", NULL), 1, &ft_putc);
-	write(1, arr, 8);
-	tputs(tgetstr("ei", NULL), 1, &ft_putc);
-	if (carpos_get(POS_LAST)->col == g_term->ws_col - 1)
-	{
-		tputs(tgetstr("sf", NULL), 1, &ft_putc);
-		caret_move(1, D_RIGHT);
-	}
+	buff_insert_single_at(g_term->buffer->iterator, arr);
+	carpos_update(POS_LAST);
+	ft_printf("%s", arr);
 	carpos_update(POS_CURRENT);
 	if (carpos_get(POS_LAST)->row <= carpos_get(POS_CURRENT)->row
 		&& carpos_get(POS_LAST)->col < carpos_get(POS_CURRENT)->col)
-		adjust_carpos_db();
+		carpus_adjust_db();
 	if (carpos_get(POS_CURRENT)->col < g_term->ws_col)
-		buffer_redraw(-1);
+		buffer_redraw();
 }
 
 void			deal_with_newline(const char arr[8])
@@ -43,30 +48,20 @@ void			deal_with_newline(const char arr[8])
 		|| g_term->input_state == STATE_DQUOTE
 		|| g_term->input_state == STATE_ESCAPED_EOL)
 	{
-		write(STDOUT_FILENO, "\n", 1);
-		insert_single_at(g_term->buffer->iterator, arr);
+		ft_printf("\n");
+		buff_insert_single_at(g_term->buffer->iterator, arr);
 		display_prompt(g_term->input_state);
-		toggle_escaped();
-		buffer_redraw(-1);
+		if (g_term->input_state == STATE_ESCAPED_EOL)
+			g_term->input_state = STATE_NORMAL;
+		buffer_redraw();
 	}
 	else
 	{
-		if (ft_strcmp(buff_char_at(g_term->buffer->iterator), "\0") == 0)
-			caret_move(g_term->buffer->size - g_term->buffer->iterator, D_RIGHT);
+		caret_move(g_term->buffer->size - g_term->buffer->iterator, D_RIGHT);
 		write(STDOUT_FILENO, "\n", 1);
 		g_term->input_state = STATE_COMMIT;
 	}
 }
-
-/*
-** Using union just to use it anywhere
-*/
-
-union			u_char
-{
-	u_int64_t	lng;
-	char		arr[8];
-};
 
 /*
 ** TODO: Make this one handle long input from Command + V
@@ -86,7 +81,7 @@ char			**read_command(void)
 		else if (is_printable(input.arr) && input.arr[0] != '\n')
 			deal_with_printable(input.arr);
 		else
-			handle_key(input.lng);
+			handle_key(input);
 		if (g_term->input_state == STATE_COMMIT)
 		{
 			// TODO: Fix leak from buff_get_part
