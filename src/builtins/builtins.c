@@ -26,6 +26,7 @@ struct s_builtin	g_builtins[] = {
 	{"where", &hs_where},
 	{"history", &hs_history},
 	{"tokenizer", &hs_tokenizer},
+	{"syntax", &hs_syntax},
 	{NULL, NULL}
 };
 

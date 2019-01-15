@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:36 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/08/01 13:15:07 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/12/24 14:37:37 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,9 +71,11 @@ void	display_prompt(enum e_input_state state)
 		ft_printf("> ");
 	else if (state == STATE_HEREDOC)
 		ft_printf("heredoc> ");
+	else if (state == STATE_EMPTY_PIPE)
+		ft_printf("pipe> ");
 	else
 		ft_printf("err> ");
-	update_caret_position(POS_PROMPT);
+	carpos_update(POS_PROMPT);
 }
 
 void		increment_shlvl(void)

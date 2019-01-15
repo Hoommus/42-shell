@@ -20,7 +20,7 @@ static int		read_fd(int fd, char **result)
 	return (1);
 }
 
-static int	read_filename(char *file, char **data)
+int				read_filename(char *file, char **data)
 {
 	int			fd;
 	struct stat	s;

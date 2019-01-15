@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:32 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/11/19 17:33:21 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/12/17 17:22:35 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ int				shell_loop(void)
 	{
 		display_prompt(g_term->input_state = STATE_NORMAL);
 		g_term->last_cmd_status = 0;
-		clear_buffer(0);
+		buff_clear(0);
 		commands = read_command();
 		i = -1;
 		offset = 0;

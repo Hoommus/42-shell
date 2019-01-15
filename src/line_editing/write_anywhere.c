@@ -1,38 +1,39 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   buffer_drawing.c                                   :+:      :+:    :+:   */
+/*   write_anywhere.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/12/16 18:13:57 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/24 14:53:08 by vtarasiu         ###   ########.fr       */
+/*   Created: 2018/12/16 19:41:32 by vtarasiu          #+#    #+#             */
+/*   Updated: 2018/12/18 15:08:14 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "twenty_one_sh.h"
 #include "line_editing.h"
 
-/*
-** TODO: Consider adding capability to redraw starting at some position in buff
-*/
-
-void	buffer_redraw(void)
+void		write_at(int col, int row, char *string)
 {
-	t_buffer	*buffer;
-	char		*string;
+	int		i;
 
-	buffer = g_term->buffer;
-	carpos_update(POS_CUSTOM1);
-	tputs(tgetstr("cd", NULL), 1, &ft_putc);
-	string = buff_get_part(buffer->iterator, -1);
-	ft_printf("%s", string);
-	free(string);
+	carpos_save_as(POS_CUSTOM1);
+	tputs(tgoto(tgetstr("cm", NULL), col, row), 1, &ft_putc);
+	ft_printf("\x1b[37;1m");
+	TERM_CLR_LINE;
+	ft_printf("%llu\n", *((long long *)string));
+	TERM_CLR_LINE;
+	i = 0;
+	while (string[i])
+		ft_printf("%-2c", string[i++]);
+	ft_printf("\n");
+	TERM_CLR_LINE;
+	i = 0;
+	while (string[i])
+		ft_printf("%2.2x", string[i++]);
+	ft_printf("\n");
+	TERM_CLR_LINE;
+	ft_printf("\x1b[0m");
 	carpos_load(POS_CUSTOM1);
 }
 
-void	buffer_visual_erase(int from_index)
-{
-	caret_move(g_term->buffer->iterator - from_index, D_LEFT);
-	tputs(tgetstr("cd", NULL), 1, &ft_putc);
-}

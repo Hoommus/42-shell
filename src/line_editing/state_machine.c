@@ -45,7 +45,8 @@ int		toggle_state(const char *c)
 		return (toggle_dquote());
 	else if (ft_strcmp(c, "`") == 0)
 		return (toggle_bquote());
-	else if (ft_strcmp(c, "\\") == 0)
+	else if (ft_strcmp(c, "\\") == 0 &&
+			g_term->buffer->iterator == g_term->buffer->size)
 		return (toggle_escaped());
 	else
 		return (0);

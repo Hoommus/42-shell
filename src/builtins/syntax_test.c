@@ -1,24 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_memalloc.c                                      :+:      :+:    :+:   */
+/*   syntax_test.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/03/29 13:55:19 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/03/29 14:02:23 by vtarasiu         ###   ########.fr       */
+/*   Created: 2018/12/21 18:28:22 by vtarasiu          #+#    #+#             */
+/*   Updated: 2018/12/22 17:20:41 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "twenty_one_sh.h"
+#include "shell_script.h"
 
-void	*ft_memalloc(size_t size)
+int				hs_syntax(char **args)
 {
-	unsigned char	*ptr;
+	char	*string;
 
-	ptr = (unsigned char *)malloc(sizeof(unsigned char) * size);
-	if (ptr == NULL)
-		return (NULL);
-	ft_bzero(ptr, size);
-	return ((void *)ptr);
+	TERM_RESTORE;
+	if (read_filename(args[0], &string))
+	{
+		TERM_ENFORCE;
+		return (OK);
+	}
+	run_script(tokenize(string, TOKEN_DELIMITERS));
+	TERM_ENFORCE;
+	return (0);
 }

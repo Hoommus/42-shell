@@ -6,23 +6,23 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/16 12:27:57 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/11/19 16:55:06 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/12/16 18:47:04 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "twenty_one_sh.h"
 
 /*
-** Returns 0 if all's good and specific flag if it is invalid
+** Returns 0 if all's good or specific flag otherwise
 */
 
-char	validate_short_flags(const char **args, const char *possible_flags)
+char	flag_validate_short(const char **args, const char *possible_flags)
 {
 	int		i;
 	int		k;
 
 	i = -1;
-	while (args && args[++i] && ft_strncmp(args[i], "-", 1) == 0 && !(k = 0))
+	while (args && args[++i] && ft_strncmp(args[i], "-", 2) != '-' && !(k = 0))
 		while (args[i][++k])
 			if (ft_strchr(possible_flags, args[i][k]) == NULL)
 				return (args[i][k]);
@@ -33,7 +33,7 @@ char	validate_short_flags(const char **args, const char *possible_flags)
 ** TODO: add '--' check so loop doesn't stop
 */
 
-bool	has_long_flag(const char **args, const char *flag)
+bool	flag_long_present(const char **args, const char *flag)
 {
 	bool	status;
 	int		i;
@@ -41,12 +41,12 @@ bool	has_long_flag(const char **args, const char *flag)
 	i = 0;
 	status = false;
 	while (args && args[i] && !status && ft_strncmp(args[i], "--", 2) == 0)
-		status = !!(ft_strcmp(args[i++], flag) == 0);
+		status = (ft_strcmp(args[i++] + 2, flag) == 0);
 	return (status);
 
 }
 
-bool	has_flag(const char **args, const char flag)
+bool	flag_short_present(const char **args, const char flag)
 {
 	bool	status;
 	char	*copy;

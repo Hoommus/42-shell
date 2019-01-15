@@ -32,7 +32,7 @@ void			reallocate_buffer_vector(void)
 ** TODO: Add visual size table lookup
 */
 
-int				insert_symbol_at(const u_int64_t index, t_symbol *symbol)
+int				buff_insert_symbol_at(u_int64_t index, t_symbol *symbol)
 {
 	if (g_buffer->size >= g_buffer->capacity - 2)
 		reallocate_buffer_vector();
@@ -49,15 +49,15 @@ int				insert_symbol_at(const u_int64_t index, t_symbol *symbol)
 	return (OK);
 }
 
-int				insert_single_at(u_int64_t index, const char str[8])
+int				buff_insert_single_at(u_int64_t index, const char str[8])
 {
 	t_symbol	symbol;
 
 	ft_memcpy(symbol.s, str, 8);
-	return (insert_symbol_at(index, &symbol));
+	return (buff_insert_symbol_at(index, &symbol));
 }
 
-int				insert_string_at(u_int64_t index, const char *string)
+int				buff_insert_string_at(u_int64_t index, const char *string)
 {
 	u_int64_t	i;
 	u_int64_t	limit;
@@ -74,7 +74,7 @@ int				insert_string_at(u_int64_t index, const char *string)
 	{
 		ft_bzero(arr, sizeof(char) * 8);
 		jump = 1 + utf_body_size(*string);
-		insert_single_at(index + i, ft_memcpy(arr, string, jump));
+		buff_insert_single_at(index + i, ft_memcpy(arr, string, jump));
 		string += jump;
 		i++;
 	}

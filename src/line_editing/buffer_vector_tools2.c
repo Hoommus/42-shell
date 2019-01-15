@@ -2,12 +2,17 @@
 
 extern t_buffer	*g_buffer;
 
-int				buff_strchr_back(t_buffer *buffer, const char *c, int i)
+/*
+** Returns last desired char's offset in buffer searching from index 'i' to 0
+** If nothing found, returns -1
+*/
+
+int				buff_chroff(t_buffer *buffer, const char *c, int i)
 {
 	while (i >= 0)
 	{
 		if (ft_strcmp(buffer->array[i].s, c) == 0)
-			break;
+			break ;
 		i--;
 	}
 	return (i);
@@ -27,7 +32,7 @@ int				buff_char_at_equals(const u_int64_t index, const char *c)
 {
 	if (c == NULL || ft_strlen((char *)c) > 8)
 		return (0);
-	return (ft_strcmp(g_buffer->array[index].s, c));
+	return (!ft_strcmp(g_buffer->array[index].s, c));
 }
 
 
