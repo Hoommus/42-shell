@@ -168,6 +168,7 @@ static long long		get_word_size(char *str)
 ** Split that takes into account quotes ("", '', ``), separators - ';', '\n'
 ** and brackets
 ** TODO: Try to fix that too high memory allocation thing
+ * TODO: Remove this shit
 */
 char					**smart_split(char *str, char *delimiters)
 {

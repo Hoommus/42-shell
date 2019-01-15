@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   signals.c                                          :+:      :+:    :+:   */
+/*   signals_basic.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:46:06 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/17 16:16:14 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/12/21 17:26:15 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,8 +49,8 @@ static void		resize(int sig)
 		g_term->ws_row = size.ws_row;
 		g_term->ws_col = size.ws_col;
 		carpos_update(POS_CURRENT);
-//		caret_move(ft_utf_strlen(g_term->buffer), D_LEFT);
-//		buffer_redraw(0);
+//		caret_move(g_term->buffer->size, D_LEFT);
+//		buffer_redraw();
 	}
 }
 

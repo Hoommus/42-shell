@@ -69,8 +69,8 @@ enum e_token_type	get_token_type_contextual(const char *str)
 		i++;
 	}
 	last_token = TOKEN_EMPTY;
-	if (g_parser_state.list_tail != NULL)
-		last_token = g_parser_state.list_tail->type;
+	if (g_ps.list_tail != NULL)
+		last_token = g_ps.list_tail->type;
 	if (type == TOKEN)
 	{
 		if (is_assignment_word(str))

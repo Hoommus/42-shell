@@ -28,7 +28,7 @@ void		carpos_update(enum e_position type)
 {
 	char		response[16];
 
-	ft_printf("\x1b[6n");
+	write(2, "\x1b[6n", 4);
 	read(STDIN_FILENO, response, 16);
 	if (ft_strchr(response, '[') && ft_strchr(response, ';'))
 	{

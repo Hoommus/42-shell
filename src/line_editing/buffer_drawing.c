@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/16 18:13:57 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/16 19:06:24 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/12/24 14:53:08 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,11 +20,14 @@
 void	buffer_redraw(void)
 {
 	t_buffer	*buffer;
+	char		*string;
 
 	buffer = g_term->buffer;
 	carpos_update(POS_CUSTOM1);
 	tputs(tgetstr("cd", NULL), 1, &ft_putc);
-	ft_printf("%s", buff_get_part(buffer->iterator, -1));
+	string = buff_get_part(buffer->iterator, -1);
+	ft_printf("%s", string);
+	free(string);
 	carpos_load(POS_CUSTOM1);
 }
 

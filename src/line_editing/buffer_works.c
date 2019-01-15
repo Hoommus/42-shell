@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/14 18:43:20 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/16 19:06:24 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/12/21 17:34:43 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,11 @@ void			deal_with_printable(const char arr[8])
 	buff_insert_single_at(g_term->buffer->iterator, arr);
 	carpos_update(POS_LAST);
 	ft_printf("%s", arr);
+	if (carpos_get(POS_LAST)->col == g_term->ws_col - 1)
+	{
+		tputs(tgetstr("sf", NULL), 1, &ft_putc);
+		caret_move(1, D_RIGHT);
+	}
 	carpos_update(POS_CURRENT);
 	if (carpos_get(POS_LAST)->row <= carpos_get(POS_CURRENT)->row
 		&& carpos_get(POS_LAST)->col < carpos_get(POS_CURRENT)->col)

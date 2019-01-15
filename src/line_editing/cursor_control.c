@@ -106,7 +106,7 @@ static void		right_hard(int distance, int *new_col, int *new_row)
 **
 ** caret_move fully handles cursor movement on its own.
 ** Meaning it takes into account all newlines and window size before calculating
- * final cursor position and moving it directly there via `cm' capability
+** final cursor position and moving it directly there via `cm' capability
 */
 
 int				caret_move(int distance, enum e_direction direction)

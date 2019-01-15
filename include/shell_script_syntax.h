@@ -6,14 +6,14 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/02 13:37:37 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/10 13:22:30 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/12/19 14:40:43 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SYNTAX_RULES_H
 # define SYNTAX_RULES_H
 
-# include <shell_script.h>
+# include "shell_script.h"
 
 /*
 ** Syntax rule is an entity that contains an array of possible expansions
@@ -54,26 +54,33 @@
 // TODO: shrink down expands_to size
 typedef struct		s_syntax_rule
 {
-	enum e_token_type			representation[3];
+	const enum e_token_type		token;
 	const struct s_syntax_rule	*expands_to[10][10];
+	const char					*restrict const human_readable;
 }					t_rule;
 
 extern const t_rule	g_program;
 extern const t_rule	g_complete_commands;
+extern const t_rule	g_complete_commands_dash;
 extern const t_rule	g_complete_command;
 extern const t_rule	g_list;
+extern const t_rule	g_list_dash;
 extern const t_rule	g_and_or;
+extern const t_rule	g_and_or_dash;
 extern const t_rule	g_pipeline;
 extern const t_rule	g_pipe_sequence;
+extern const t_rule	g_pipe_sequence_dash;
 extern const t_rule	g_command;
 extern const t_rule	g_compound_command;
 extern const t_rule	g_subshell;
 extern const t_rule	g_compound_list;
 extern const t_rule	g_term_rule;
+extern const t_rule	g_term_rule_dash;
 extern const t_rule	g_for_clause;
 extern const t_rule	g_name;
 extern const t_rule	g_in;
 extern const t_rule	g_wordlist;
+extern const t_rule	g_wordlist_dash;
 extern const t_rule	g_if_clause;
 extern const t_rule	g_else_part;
 extern const t_rule	g_while_clause;
@@ -97,20 +104,25 @@ extern const t_rule	g_simple_command;
 extern const t_rule	g_cmd_name;
 extern const t_rule	g_cmd_word;
 extern const t_rule	g_cmd_prefix;
+extern const t_rule	g_cmd_prefix_dash;
 extern const t_rule	g_cmd_suffix;
+extern const t_rule	g_cmd_suffix_dash;
 extern const t_rule	g_redirect_list;
+extern const t_rule	g_redirect_list_dash;
 extern const t_rule	g_io_redirect;
 extern const t_rule	g_io_file;
 extern const t_rule	g_filename;
 extern const t_rule	g_io_here;
 extern const t_rule	g_here_end;
 extern const t_rule	g_newline_list;
+extern const t_rule	g_newline_list_dash;
 extern const t_rule	g_linebreak;
 extern const t_rule	g_separator_op;
 extern const t_rule	g_separator;
 extern const t_rule	g_sequential_sep;
 
 extern const t_rule	g_semicolon_token;
+extern const t_rule g_ampersand_token;
 extern const t_rule	g_newline_token;
 extern const t_rule	g_and_if_token;
 extern const t_rule	g_or_if_token;

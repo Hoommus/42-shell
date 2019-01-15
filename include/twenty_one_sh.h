@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/18 15:01:58 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/01/15 15:01:50 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,8 @@
 # define CONFIG_FILE ".21shrc"
 # define LOG_FILE ".21sh.log"
 
-# define BUILD 462
-# define BUILD_DATE "18.12.18 15:01:58 EET"
+# define BUILD 545
+# define BUILD_DATE "15.01.19 15:01:49 EET"
 
 /*
 ** Initial input of 260 is chosen because (260 * 10) % 8 == 0
@@ -83,6 +83,8 @@ enum						e_input_state
 	STATE_BQUOTE,
 	STATE_HEREDOC,
 	STATE_ESCAPED_EOL,
+	STATE_EMPTY_PIPE,
+	STATE_PIPE_HEREDOC,
 	STATE_NEXT_ESCAPED,
 	STATE_COMMIT,
 	STATE_SEARCH,

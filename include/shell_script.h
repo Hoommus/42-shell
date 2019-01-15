@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 14:44:44 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/11 15:15:43 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2018/12/20 13:59:41 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,14 @@
 # include "ft_printf.h"
 # include <stdbool.h>
 
-# define TOKEN_DELIMITERS "\t \r\a"
+# define TOKEN_DELIMITERS " \t\r\a"
 # define ISQT(x) (((x) == '\'' || (x) == '"' || (x) == '`') ? (1) : (0))
+
+# define LEXER_OUTSIDE_QUOTE       0
+# define LEXER_INSIDE_QUOTE        1
+# define LEXER_NEXT_ESCAPED        2
+# define LEXER_NEXT_UNQUOTED_DELIM 4
+# define LEXER_NEXT_UNQUOTED_PRINT 8
 
 /*
 ** Do not change order in which these entries appear. They provide easy random
@@ -87,7 +93,7 @@ enum						e_token_type
 
 
 	SEPARATOR,
-	COMMAND,
+	AST_COMMAND,
 	VARIABLE,
 	END_OF_SCRIPT,
 };
@@ -134,25 +140,28 @@ typedef struct				s_node
 	enum e_type			data_type;
 	struct s_node		*left;
 	struct s_node		*right;
+	struct s_node		*middle;
 }							t_node;
 
 /*
 ** Lexer
 */
-struct s_token				*tokenize(const char *str, const char *delimiters);
+struct s_token				*tokenize(char *str, const char *delimiters);
 struct s_token				*new_token(char *value, enum e_token_type type);
 void						add_token(t_token **head, t_token **tail,
 														t_token *to_add);
 void						free_token(struct s_token *token);
 
 enum e_token_type			get_token_type_contextual(const char *str);
-
 char						**smart_split(char *str, char *delimiters);
 
-extern void					free_array(char **array);
+void						free_array(char **array);
 
-/*
+void						run_script(t_token *stream_head);
+
+/*Y
 ** File reading and executing
 */
+int							read_filename(char *file, char **data);
 
 #endif
