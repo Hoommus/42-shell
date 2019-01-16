@@ -81,7 +81,7 @@ const struct s_parse_token	g_tokens[] = {
 
 	{"\n",            "NEWLINE",     TOKEN_NEWLINE,         true },
 	{"!",             "EMPTY_LOL",   TOKEN_EMPTY,           false},
-	{"!",             "literal",     TOKEN,                 false},
+	{"!",             "literal",     TOKEN_NOT_APPLICABLE,  false},
 	{"!",             "COMMAND",     TOKEN_WORD_COMMAND,    false},
 
 	{NULL,            NULL,          TOKEN_KEYWORD,         false},

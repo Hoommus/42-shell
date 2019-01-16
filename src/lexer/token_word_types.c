@@ -61,8 +61,8 @@ enum e_token_type	get_token_type_contextual(const char *str)
 	int					i;
 
 	i = TOKEN_IF;
-	type = TOKEN;
-	while (str && g_tokens[i].token_name != NULL && type == TOKEN)
+	type = TOKEN_NOT_APPLICABLE;
+	while (str && g_tokens[i].token_name != NULL && type == TOKEN_NOT_APPLICABLE)
 	{
 		if (ft_strcmp(g_tokens[i].text, str) == 0)
 			type = g_tokens[i].type;
@@ -71,7 +71,7 @@ enum e_token_type	get_token_type_contextual(const char *str)
 	last_token = TOKEN_EMPTY;
 	if (g_ps.list_tail != NULL)
 		last_token = g_ps.list_tail->type;
-	if (type == TOKEN)
+	if (type == TOKEN_NOT_APPLICABLE)
 	{
 		if (is_assignment_word(str))
 			type = TOKEN_ASSIGNMENT_WORD;

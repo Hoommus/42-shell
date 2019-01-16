@@ -6,7 +6,7 @@ If the token is an operator, the token identifier for that operator shall result
 If the string consists solely of digits and the delimiter character is one of
 '<' or '>', the token identifier IO_NUMBER shall be returned.
 
-Otherwise, the token identifier TOKEN results.
+Otherwise, the token identifier TOKEN_NOT_APPLICABLE results.
 
 /* -------------------------------------------------------
    The grammar symbols

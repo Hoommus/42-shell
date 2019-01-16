@@ -16,19 +16,6 @@
 
 #define INDENT "│ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ "
 
-t_state			*offset_destructive(t_state *state, int offset)
-{
-	int		i;
-
-	i = 0;
-	while (i < offset && state->list_head)
-	{
-		state->list_head = state->list_head->next;
-		i++;
-	}
-	return (state);
-}
-
 t_token			*list_offset(t_token *list, int offset)
 {
 	int		i;
@@ -48,23 +35,26 @@ t_token			*list_revert(t_token *list, int offset)
 
 struct s_result	*handle_terminal(struct s_result *result, t_state *state)
 {
-	ft_printf("%.*s  %s terminal in rule [%s] at %s (%s) \n",
-		2 + (state->depth) * 2, INDENT, "└─",
-		state->rule->human_readable,
-		g_tokens[state->list_offset->type].token_name,
-		state->list_offset->value);
+//	ft_printf("%.*s  %s terminal in rule [%s] at %s (%s) \n",
+//		2 + (state->depth) * 2, INDENT, "└─",
+//		state->rule->human_readable,
+//		g_tokens[state->list_offset->type].token_name,
+//		state->list_offset->type == TOKEN_NEWLINE ? "\\n" :
+//			state->list_offset->value);
 	if (state->rule->token == TOKEN_EMPTY)
 	{
-		ft_printf("%.*s    %s empty is allowed\n", 2 + (state->depth) * 2, INDENT, "└─");
+//		ft_printf("%.*s    %s empty is allowed\n", 2 + (state->depth) * 2, INDENT, "└─");
 		result->valid = true;
 		result->to_skip = 0;
 	}
 	else
 	{
-		ft_printf("%.*s    %s expected token: (%s); got (%s)\n",
-			2 + (state->depth) * 2, INDENT, "└─",
-			g_tokens[state->rule->token].token_name,
-			g_tokens[state->list_offset->type].token_name);
+//		if (state->rule->token == state->list_offset->type)
+//			ft_printf("%.*s    %s expected token: (%s); got (%s)\n",
+//				2 + (state->depth) * 2, INDENT, "└─",
+//				g_tokens[state->rule->token].token_name,
+//				state->list_offset->type == TOKEN_NEWLINE ? "\\n" :
+//				g_tokens[state->list_offset->type].token_name);
 		result->valid = state->list_offset->type == state->rule->token;
 		result->to_skip = result->valid;
 	}
@@ -81,20 +71,22 @@ struct s_result	is_syntax_valid(t_state const prev_state)
 
 	state = prev_state;
 	ft_bzero(&result, sizeof(struct s_result));
+	ft_bzero(&tmp, sizeof(struct s_result));
+//	ft_printf("%.*s%s inside [%s];\n", 2 + (++state.depth) * 2, INDENT, "└─",
+//		state.rule->human_readable);
 	if (state.rule != NULL && state.list_offset == NULL)
 	{
-		ft_printf("Unexpected end of command at: %s\n", state.list_offset->prev->value);
+//		if (state.list_offset != NULL)
+//			ft_printf("Unexpected end of command\n");
+		result.to_skip = 2147483647;
 		return (result);
 	}
 	else if (IS_TERMINAL(state.rule))
 		return (*handle_terminal(&result, &state));
-	ft_printf("%.*s%s inside [%s]; head token [%s, %s]\n", 2 + (++state.depth) * 2, INDENT, "└─",
-		state.rule->human_readable,
-		g_tokens[state.list_offset->type].token_name,
-		state.list_offset->value);
 	i = -1;
 	while (!result.valid && ++i < 10 && prev_state.rule->expands_to[i][0] && (j = -1))
 	{
+		result.to_skip = 0;
 		while (prev_state.rule->expands_to[i][++j])
 		{
 			state.rule = prev_state.rule->expands_to[i][j];
