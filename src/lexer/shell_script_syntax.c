@@ -585,7 +585,7 @@ const t_rule g_linebreak = {
 };
 const t_rule g_separator_op = {
 	.token = TOKEN_NOT_APPLICABLE,
-	{
+	.expands_to = {
 		{&g_semicolon_token},
 		{&g_ampersand_token}
 	},
@@ -593,7 +593,7 @@ const t_rule g_separator_op = {
 };
 const t_rule g_separator = {
 	.token = TOKEN_NOT_APPLICABLE,
-	{
+	.expands_to = {
 		{&g_separator_op, &g_linebreak},
 		{&g_newline_list}
 	},
@@ -601,7 +601,7 @@ const t_rule g_separator = {
 };
 const t_rule g_sequential_sep = {
 	.token = TOKEN_NOT_APPLICABLE,
-	{
+	.expands_to = {
 		{&g_semicolon_token, &g_linebreak},
 		{&g_newline_list}
 	},

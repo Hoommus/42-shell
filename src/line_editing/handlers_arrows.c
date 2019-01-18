@@ -13,6 +13,8 @@
 #include "line_editing.h"
 #include "shell_history.h"
 
+// TODO: add partial command completion from history
+
 void	handle_up(union u_char key)
 {
 	extern t_history		*g_history;

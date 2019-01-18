@@ -57,7 +57,6 @@ typedef struct		s_syntax_rule
 	const enum e_token_type		token;
 	const struct s_syntax_rule	*restrict expands_to[10][10];
 	const char					*restrict const human_readable;
-	const bool					expand_or_die;
 }					t_rule;
 
 extern const t_rule	g_program;

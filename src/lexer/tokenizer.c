@@ -24,10 +24,11 @@ static u_int64_t		get_quoted_size(const char *str, const char *delims)
 	i = 0;
 	quote = str[i];
 	state = LEXER_INSIDE_QUOTE;
-	while (str[++i] && state != LEXER_OUTSIDE_QUOTE)
+	while (str[++i] && state != LEXER_OUTSIDE_QUOTE
+					&& state != LEXER_NEXT_UNQUOTED_DELIM)
 	{
-		if (str[i] == 0 || (state == LEXER_NEXT_UNQUOTED_PRINT &&
-			ft_strchr(delims, str[i + 1]) == NULL && str[i + 1] != '\n'))
+		if (ft_strchr(delims, str[i + 1]) == NULL
+			&& str[i + 1] != '\n' && state != LEXER_INSIDE_QUOTE)
 			break ;
 		else if (state == LEXER_NEXT_ESCAPED)
 			state = LEXER_INSIDE_QUOTE;
@@ -93,7 +94,16 @@ static char				*strip_escaped_nl(char *string)
 
 char				*strip_comments(char *string)
 {
-	// TODO
+	u_int64_t	i;
+
+	i = 0;
+	while (string[i])
+	{
+		if (string[i] == '#')
+			while (string[i] && string[i] != '\n')
+				string[i++] = ' ';
+		i++;
+	}
 	return (string);
 }
 
@@ -117,7 +127,7 @@ struct s_token		*tokenize(char *string, const char *delimiters)
 	head = NULL;
 	tail = NULL;
 	i = -1;
-	strip_escaped_nl(string);
+	strip_escaped_nl(strip_comments(string));
 	while (string && string[++i])
 	{
 		if (ft_strchr(delimiters, string[i]) != NULL)
