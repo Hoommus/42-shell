@@ -24,16 +24,17 @@ enum							e_parser_state
 
 typedef struct					s_syntax_error
 {
-
+	short		code;
+	char		*text;
 }								t_error;
 
 typedef struct					s_parser_state
 {
+	const struct s_syntax_rule	*rule;
 	t_token						*list_head;
 	t_token						*list_offset;
 	t_token						*list_tail;
 	int							depth;
-	const struct s_syntax_rule	*rule;
 	bool						is_syntax_valid : 1;
 	t_node						*pending_tree;
 }								t_state;
@@ -41,6 +42,8 @@ typedef struct					s_parser_state
 struct							s_result
 {
 	t_error		*error;
+	bool		expansion_requested;
+	bool		fatal;
 	int			to_skip;
 	bool		valid;
 };
@@ -48,3 +51,11 @@ struct							s_result
 extern struct s_parser_state	g_ps;
 
 #endif
+
+/*
+if readme ; then ;
+echo 'The file "readme.txt" exists.'
+else ;
+echo 'The file "readme.txt" does not exist.'
+fi ;
+*/
