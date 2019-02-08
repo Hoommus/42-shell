@@ -53,8 +53,8 @@ const struct s_parse_token	g_tokens[] = {
 	{"}",             "RBRACE",      TOKEN_RBRACE,          true },
 	{"(",             "LBRACKET",    TOKEN_LBRACKET,        true },
 	{")",             "RBRACKET",    TOKEN_RBRACKET,        true },
-	{"[",             "LSQBRACKET",  TOKEN_LSQBRACKET,      true },
-	{"]",             "RSQBRACKET",  TOKEN_RSQBRACKET,      true },
+//	{"[",             "LSQBRACKET",  TOKEN_LSQBRACKET,      true },
+//	{"]",             "RSQBRACKET",  TOKEN_RSQBRACKET,      true },
 
 	{";",             "SEMICOLON",   TOKEN_SEMICOLON,       true },
 	{"!",             "BANG",        TOKEN_BANG,            true },

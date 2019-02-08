@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:32 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/17 17:22:35 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/08 13:16:00 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ void			execute_command(char **command)
 
 	restore_variables();
 	expand_variables(command);
+	// TODO: run_script(tokenizer(), false);
 	status = execute(command);
 	if (status != 0)
 		ft_dprintf(2, "21sh: command not found: %s\n", command[0]);

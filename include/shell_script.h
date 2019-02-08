@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 14:44:44 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/20 13:59:41 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/08 15:54:55 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 # define SHELL_SCRIPT_LANG_H
 
 # include "libft.h"
-# include "get_next_line.h"
 # include "ft_printf.h"
 # include <stdbool.h>
 
@@ -26,6 +25,12 @@
 # define LEXER_NEXT_ESCAPED        2
 # define LEXER_NEXT_UNQUOTED_DELIM 4
 # define LEXER_NEXT_UNQUOTED_PRINT 8
+
+/*
+** TODO: Add functions capability:
+**         global function database
+**         lifespan control
+*/
 
 /*
 ** Do not change order in which these entries appear. They provide easy random
@@ -51,8 +56,8 @@ enum						e_token_type
 	TOKEN_RBRACE,
 	TOKEN_LBRACKET,
 	TOKEN_RBRACKET,
-	TOKEN_LSQBRACKET,
-	TOKEN_RSQBRACKET,
+//	TOKEN_LSQBRACKET,
+//	TOKEN_RSQBRACKET,
 
 	TOKEN_SEMICOLON,
 	TOKEN_BANG,
@@ -125,6 +130,13 @@ typedef struct				s_token
 	struct s_token		*next;
 }							t_token;
 
+enum						e_node_type
+{
+	NODE_GENERIC,
+	NODE_STRING,
+	NODE_COMMAND,
+};
+
 typedef enum				e_type
 {
 	STRING,
@@ -137,11 +149,25 @@ typedef struct				s_node
 {
 	void				*value;
 	enum e_token_type	token_type;
-	enum e_type			data_type;
+	enum e_node_type	node_type;
 	struct s_node		*left;
 	struct s_node		*right;
-	struct s_node		*middle;
 }							t_node;
+
+struct						s_io_redirect
+{
+	short	fd_what;
+	short	fd_where;
+	bool	append;
+};
+
+struct						s_command
+{
+	char					**args;
+	t_token					*assignments;
+	struct s_io_redirect	*io_alterations;
+	bool					is_bg;
+};
 
 /*
 ** Lexer
@@ -157,9 +183,8 @@ char						**smart_split(char *str, char *delimiters);
 
 void						free_array(char **array);
 
-void						run_script(t_token *stream_head);
-
-/*Y
+void						run_script(t_token *stream_head, bool log_recursion);
+/*
 ** File reading and executing
 */
 int							read_filename(char *file, char **data);

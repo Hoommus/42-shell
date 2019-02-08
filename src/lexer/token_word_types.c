@@ -26,7 +26,7 @@ static bool			is_name(const char *str)
 
 static bool			is_io_number(const char *str)
 {
-	if (!str && ft_strchr_any(str, "<>") == NULL)
+	if (!str || (ft_strchr_any(str, "<>") == NULL))
 		return (false);
 	while (*str)
 	{
@@ -69,8 +69,6 @@ enum e_token_type	get_token_type_contextual(const char *str)
 		i++;
 	}
 	last_token = TOKEN_EMPTY;
-	if (g_ps.list_tail != NULL)
-		last_token = g_ps.list_tail->type;
 	if (type == TOKEN_NOT_APPLICABLE)
 	{
 		if (is_assignment_word(str))

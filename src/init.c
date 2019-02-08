@@ -51,7 +51,7 @@ short	init_fd_at_home(char *filename, int flags)
 	char	*full_path;
 
 	home = get_env("HOME");
-	if (home[0] != '\0')
+	if (home && home[0] != '\0')
 		full_path = ft_strings_join(2, "/", home, filename);
 	else
 		full_path = ft_strdup(filename);

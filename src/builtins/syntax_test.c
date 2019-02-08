@@ -16,14 +16,18 @@
 int				hs_syntax(char **args)
 {
 	char	*string;
+	bool	logging;
 
+	logging = flag_short_present((const char **)args, 'l');
+	if (logging)
+		args++;
 	TERM_RESTORE;
 	if (read_filename(args[0], &string))
 	{
 		TERM_ENFORCE;
 		return (OK);
 	}
-	run_script(tokenize(string, TOKEN_DELIMITERS));
+	run_script(tokenize(string, TOKEN_DELIMITERS), logging);
 	TERM_ENFORCE;
 	return (0);
 }

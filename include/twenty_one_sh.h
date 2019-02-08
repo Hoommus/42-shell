@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/01/18 16:18:21 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/08 18:03:53 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,10 +30,10 @@
 # include <limits.h>
 # include <sys/termios.h>
 
-# include "ft_printf.h"
 # include "libft.h"
-# include "get_next_line.h"
+# include "ft_printf.h"
 # include "buffer_works.h"
+# include "get_next_line.h"
 
 # define SNWH (copy[i + 1] == '/' || copy[i + 1] == 0 || ft_iswhsp(copy[i + 1]))
 # define ABS(a) ((a) < 0 ? -(a) : (a))
@@ -50,8 +50,8 @@
 # define CONFIG_FILE ".21shrc"
 # define LOG_FILE ".21sh.log"
 
-# define BUILD 603
-# define BUILD_DATE "18.01.19 16:18:20 EET"
+# define BUILD 625
+# define BUILD_DATE "08.02.19 18:03:52 EET"
 
 /*
 ** Initial input of 260 is chosen because (260 * 10) % 8 == 0

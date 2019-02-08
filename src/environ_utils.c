@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:54 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/08/01 12:27:56 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/08 13:01:41 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,11 +108,11 @@ char	**copy_env(char **argenv, char **globalenv)
 
 	environ = argenv != NULL ? argenv : globalenv;
 	i = 0;
-	while (environ[i++])
+	while (environ && environ[i++])
 		;
-	new = (char **)ft_memalloc(sizeof(char *) * (i--));
+	new = (char **)ft_memalloc(sizeof(char *) * (i + 1));
 	i = 0;
-	while (environ[i])
+	while (environ && environ[i])
 	{
 		new[i] = ft_strdup(environ[i]);
 		i++;
