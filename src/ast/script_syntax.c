@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "shell_script_syntax.h"
+#include "shell_script_parser.h"
 
 /*
 ** *****************************************************************************
@@ -30,7 +30,8 @@ const t_rule g_program = {
 		{&g_linebreak, &g_complete_commands, &g_linebreak},
 		{&g_linebreak}
 	},
-	.human_readable = "program"
+	.human_readable = "program",
+	.tree_builder = NULL
 };
 
 /*
@@ -49,7 +50,8 @@ const t_rule g_complete_commands = {
 	.expands_to = {
 		{&g_complete_command, &g_complete_commands_dash},
 	},
-	.human_readable = "complete_commands_alt"
+	.human_readable = "complete_commands_alt",
+	.tree_builder = NULL
 };
 
 const t_rule g_complete_commands_dash = {
@@ -58,7 +60,8 @@ const t_rule g_complete_commands_dash = {
 		{&g_complete_command, &g_complete_commands_dash},
 		{&g_empty_token},
 	},
-	.human_readable = "complete_commands_dash"
+	.human_readable = "complete_commands_dash",
+	.tree_builder = NULL
 };
 
 const t_rule g_complete_command = {
@@ -67,7 +70,8 @@ const t_rule g_complete_command = {
 		{&g_list, &g_separator_op},
 		{&g_list}
 	},
-	.human_readable = "complete_command"
+	.human_readable = "complete_command",
+	.tree_builder = NULL
 };
 
 /*
@@ -86,7 +90,8 @@ const t_rule g_list = {
 	.expands_to = {
 		{&g_and_or, &g_list_dash}
 	},
-	.human_readable = "list_alt"
+	.human_readable = "list_alt",
+	.tree_builder = NULL
 };
 
 const t_rule g_list_dash = {
@@ -95,27 +100,17 @@ const t_rule g_list_dash = {
 		{&g_separator_op, &g_and_or, &g_list_dash},
 		{&g_empty_token}
 	},
-	.human_readable = "list_dash"
+	.human_readable = "list_dash",
+	.tree_builder = NULL
 };
-
-/*
-** const t_rule g_and_or = {
-** 	.token = TOKEN_NOT_APPLICABLE,
-** 	.expands_to = {
-** 		{&g_pipeline},
-** 		{&g_and_or, &g_and_if_token, &g_linebreak, &g_pipeline},
-** 		{&g_and_or, &g_or_if_token, &g_linebreak, &g_pipeline}
-** 	},
-** 	.human_readable = "and_or"
-** };
-*/
 
 const t_rule g_and_or = {
 	.token = TOKEN_NOT_APPLICABLE,
 	.expands_to = {
 		{&g_pipeline, &g_and_or_dash}
 	},
-	.human_readable = "and_or_alt"
+	.human_readable = "and_or_alt",
+	.tree_builder = NULL
 };
 
 const t_rule g_and_or_dash = {
@@ -125,7 +120,8 @@ const t_rule g_and_or_dash = {
 		{&g_or_if_token, &g_linebreak,  &g_and_or_dash},
 		{&g_empty_token}
 	},
-	.human_readable = "and_or_dash"
+	.human_readable = "and_or_dash",
+	.tree_builder = NULL
 };
 
 const t_rule g_pipeline = {
@@ -134,26 +130,17 @@ const t_rule g_pipeline = {
 		{&g_pipe_sequence},
 		{&g_bang_token, &g_pipe_sequence}
 	},
-	.human_readable = "pipeline"
+	.human_readable = "pipeline",
+	.tree_builder = NULL
 };
-
-/*
-** const t_rule g_pipe_sequence = {
-** 	.token = TOKEN_NOT_APPLICABLE,
-** 	.expands_to = {
-** 		{&g_command},
-** 		{&g_pipe_sequence, &g_pipe_token, &g_linebreak, &g_command},
-** 	},
-** 	"pipe_sequence"
-** };
-*/
 
 const t_rule g_pipe_sequence = {
 .token = TOKEN_NOT_APPLICABLE,
 	.expands_to = {
 		{&g_command, &g_pipe_sequence_dash}
 	},
-	.human_readable = "pipe_sequence_alt"
+	.human_readable = "pipe_sequence_alt",
+	.tree_builder = NULL
 };
 
 const t_rule g_pipe_sequence_dash = {
@@ -162,7 +149,8 @@ const t_rule g_pipe_sequence_dash = {
 		{&g_pipe_token, &g_linebreak, &g_pipe_sequence_dash},
 		{&g_empty_token}
 	},
-	.human_readable = "pipe_sequence_dash"
+	.human_readable = "pipe_sequence_dash",
+	.tree_builder = NULL
 };
 
 /*
@@ -176,7 +164,8 @@ const t_rule g_command = {
 		{&g_compound_command},
 		{&g_compound_command, &g_redirect_list}
 	},
-	.human_readable = "command"
+	.human_readable = "command",
+	.tree_builder = NULL
 };
 
 /*
@@ -194,14 +183,16 @@ const t_rule g_compound_command = {
 		{&g_while_clause},
 		{&g_until_clause},
 	},
-	.human_readable = "compound_command"
+	.human_readable = "compound_command",
+	.tree_builder = NULL
 };
 const t_rule g_subshell = {
 	.token = TOKEN_NOT_APPLICABLE,
 	.expands_to = {
 		{&g_lbracket_token, &g_compound_list, &g_rbracket_token}
 	},
-	.human_readable = "subshell"
+	.human_readable = "subshell",
+	.tree_builder = NULL
 };
 
 const t_rule g_compound_list = {
@@ -210,7 +201,8 @@ const t_rule g_compound_list = {
 		{&g_linebreak, &g_term_rule},
 		{&g_linebreak, &g_term_rule, &g_separator}
 	},
-	.human_readable = "compound_list"
+	.human_readable = "compound_list",
+	.tree_builder = NULL
 };
 
 /*
@@ -229,7 +221,8 @@ const t_rule g_term_rule = {
 	.expands_to = {
 		{&g_and_or, &g_term_rule_dash}
 	},
-	.human_readable = "term_rule_alt"
+	.human_readable = "term_rule_alt",
+	.tree_builder = NULL
 };
 const t_rule g_term_rule_dash = {
 	.token = TOKEN_NOT_APPLICABLE,
@@ -237,7 +230,8 @@ const t_rule g_term_rule_dash = {
 		{&g_separator, &g_and_or, &g_term_rule_dash},
 		{&g_empty_token}
 	},
-	.human_readable = "term_rule_dash"
+	.human_readable = "term_rule_dash",
+	.tree_builder = NULL
 };
 
 const t_rule g_for_clause = {
@@ -272,11 +266,12 @@ const t_rule g_for_clause = {
 			&g_do_group
 		}
 	},
-	.human_readable = "for_clause"
+	.human_readable = "for_clause",
+	.tree_builder = NULL
 };
 
-const t_rule g_name = { TOKEN_NAME, {{0}}, "name" };
-const t_rule g_in = { TOKEN_IN, {{0}}, "in" };
+const t_rule g_name = { TOKEN_NAME, {{0}}, "name", NULL };
+const t_rule g_in = { TOKEN_IN, {{0}}, "in", NULL };
 
 /*
 ** const t_rule g_wordlist = {
@@ -294,7 +289,8 @@ const t_rule g_wordlist = {
 	.expands_to = {
 		{&g_word_token, &g_wordlist_dash}
 	},
-	.human_readable = "wordlist_alt"
+	.human_readable = "wordlist_alt",
+	.tree_builder = NULL
 };
 const t_rule g_wordlist_dash = {
 	TOKEN_NOT_APPLICABLE,
@@ -302,7 +298,8 @@ const t_rule g_wordlist_dash = {
 		{&g_word_token, &g_wordlist_dash},
 		{&g_empty_token}
 	},
-	.human_readable = "wordlist_dash"
+	.human_readable = "wordlist_dash",
+	.tree_builder = NULL
 };
 
 const t_rule g_if_clause = {
@@ -324,7 +321,8 @@ const t_rule g_if_clause = {
 			&g_fi_token
 		}
 	},
-	.human_readable = "if_clause"
+	.human_readable = "if_clause",
+	.tree_builder = NULL
 };
 const t_rule g_else_part = {
 	.token = TOKEN_NOT_APPLICABLE,
@@ -347,21 +345,24 @@ const t_rule g_else_part = {
 			&g_compound_list
 		}
 	},
-	.human_readable = "else_part"
+	.human_readable = "else_part",
+	.tree_builder = NULL
 };
 const t_rule g_while_clause = {
 	.token = TOKEN_NOT_APPLICABLE,
 	.expands_to = {
 		{&g_while_token, &g_compound_list, &g_do_group}
 	},
-	.human_readable = "while_clause"
+	.human_readable = "while_clause",
+	.tree_builder = NULL
 };
 const t_rule g_until_clause = {
 	.token = TOKEN_NOT_APPLICABLE,
 	.expands_to = {
 		{&g_until_token, &g_compound_list, &g_do_group}
 	},
-	.human_readable = "until_clause"
+	.human_readable = "until_clause",
+	.tree_builder = NULL
 };
 
 /*
@@ -381,14 +382,14 @@ const t_rule g_until_clause = {
 **     }
 ** };
 ** const t_rule g_function_body = {
-	.token = TOKEN_NOT_APPLICABLE,
+**  .token = TOKEN_NOT_APPLICABLE,
 **     .expands_to = {
 **         {&g_complete_command},
 **         {&g_complete_command, &g_redirect_list}
 **     }
 ** };
 ** const t_rule g_fname = {
-	.token = TOKEN_NOT_APPLICABLE,
+**  .token = TOKEN_NOT_APPLICABLE,
 **     .expands_to = {
 **         {&g_name}
 **     }
@@ -400,14 +401,16 @@ const t_rule g_brace_group = {
 	.expands_to = {
 		{&g_lbrace_token, &g_compound_list, &g_rbrace_token}
 	},
-	.human_readable = "brace_group"
+	.human_readable = "brace_group",
+	.tree_builder = NULL
 };
 const t_rule g_do_group = {
 	.token = TOKEN_NOT_APPLICABLE,
 	.expands_to = {
 		{&g_do_token, &g_compound_list, &g_done_token}
 	},
-	.human_readable = "do_group"
+	.human_readable = "do_group",
+	.tree_builder = NULL
 };
 const t_rule g_simple_command = {
 	.token = TOKEN_NOT_APPLICABLE,
@@ -418,14 +421,15 @@ const t_rule g_simple_command = {
 		{&g_cmd_name, &g_cmd_suffix},
 		{&g_cmd_name}
 	},
-	.human_readable = "simple_command"
+	.human_readable = "simple_command",
+	.tree_builder = NULL
 };
-const t_rule g_cmd_name = { TOKEN_WORD, {{0}}, "cmd_name" }; /* Apply rule 7a */
-const t_rule g_cmd_word = { TOKEN_WORD, {{0}}, "cmd_word" }; /* Apply rule 7b */
+const t_rule g_cmd_name = { TOKEN_WORD, {{0}}, "cmd_name", NULL }; /* Apply rule 7a */
+const t_rule g_cmd_word = { TOKEN_WORD, {{0}}, "cmd_word", NULL }; /* Apply rule 7b */
 
 /*
 ** const t_rule g_cmd_prefix = {
-	.token = TOKEN_NOT_APPLICABLE,
+** 	.token = TOKEN_NOT_APPLICABLE,
 ** 	.expands_to = {
 ** 		{&g_io_redirect},
 ** 		{&g_cmd_prefix, &g_io_redirect},
@@ -442,7 +446,8 @@ const t_rule g_cmd_prefix = {
 		{&g_io_redirect, &g_cmd_prefix_dash},
 		{&g_assignment_word_token, &g_cmd_prefix_dash}
 	},
-	.human_readable = "cmd_prefix_alt"
+	.human_readable = "cmd_prefix_alt",
+	.tree_builder = NULL
 };
 const t_rule g_cmd_prefix_dash = {
 	TOKEN_NOT_APPLICABLE,
@@ -451,7 +456,8 @@ const t_rule g_cmd_prefix_dash = {
 		{&g_assignment_word_token, &g_cmd_prefix_dash},
 		{&g_empty_token}
 	},
-	.human_readable = "cmd_prefix_dash"
+	.human_readable = "cmd_prefix_dash",
+	.tree_builder = NULL
 };
 
 /*
@@ -473,7 +479,8 @@ const t_rule g_cmd_suffix = {
 		{&g_io_redirect, &g_cmd_suffix_dash},
 		{&g_word_token, &g_cmd_suffix_dash},
 	},
-	.human_readable = "cmd_suffix_alt"
+	.human_readable = "cmd_suffix_alt",
+	.tree_builder = NULL
 };
 const t_rule g_cmd_suffix_dash = {
 	.token = TOKEN_NOT_APPLICABLE,
@@ -482,7 +489,8 @@ const t_rule g_cmd_suffix_dash = {
 		{&g_word_token, &g_cmd_suffix_dash},
 		{&g_empty_token}
 	},
-	.human_readable = "cmd_suffix_dash"
+	.human_readable = "cmd_suffix_dash",
+	.tree_builder = NULL
 };
 
 /*
@@ -501,7 +509,8 @@ const t_rule g_redirect_list = {
 	.expands_to = {
 		{&g_io_redirect, &g_redirect_list_dash}
 	},
-	.human_readable = "redirect_list_alt"
+	.human_readable = "redirect_list_alt",
+	.tree_builder = NULL
 };
 const t_rule g_redirect_list_dash = {
 	.token = TOKEN_NOT_APPLICABLE,
@@ -509,7 +518,8 @@ const t_rule g_redirect_list_dash = {
 		{&g_io_redirect, &g_redirect_list_dash},
 		{&g_empty_token}
 	},
-	.human_readable = "redirect_list_dash"
+	.human_readable = "redirect_list_dash",
+	.tree_builder = NULL
 };
 
 const t_rule g_io_redirect = {
@@ -520,7 +530,8 @@ const t_rule g_io_redirect = {
 		{&g_io_here},
 		{&g_io_number_token, &g_io_here}
 	},
-	.human_readable = "io_redirect"
+	.human_readable = "io_redirect",
+	.tree_builder = NULL
 };
 const t_rule g_io_file = {
 	.token = TOKEN_NOT_APPLICABLE,
@@ -534,22 +545,24 @@ const t_rule g_io_file = {
 		{&g_clobber_token, &g_filename},
 		{NULL}
 	},
-	.human_readable = "io_file"
+	.human_readable = "io_file",
+	.tree_builder = NULL
 };
-const t_rule g_filename = { TOKEN_WORD, {{0}}, "filename" }; /* Apply rule 2 */
+const t_rule g_filename = { TOKEN_WORD, {{0}}, "filename", NULL }; /* Apply rule 2 */
 const t_rule g_io_here = {
 	.token = TOKEN_NOT_APPLICABLE,
 	.expands_to = {
 		{&g_dless_token, &g_here_end},
 		{&g_dlessdash_token, &g_here_end}
 	},
-	.human_readable = "io_here"
+	.human_readable = "io_here",
+	.tree_builder = NULL
 };
-const t_rule g_here_end = { TOKEN_WORD, {{0}}, "here_end" }; /* Apply rule 3 */
+const t_rule g_here_end = { TOKEN_WORD, {{0}}, "here_end", NULL }; /* Apply rule 3 */
 
 /*
 ** const t_rule g_newline_list = {
-	.token = TOKEN_NOT_APPLICABLE,
+**	.token = TOKEN_NOT_APPLICABLE,
 ** 	.expands_to = {
 ** 		{&g_newline_token},
 ** 		{&g_newline_list, &g_newline_token}
@@ -563,7 +576,8 @@ const t_rule g_newline_list = {
 	.expands_to = {
 		{&g_newline_token, &g_newline_list_dash}
 	},
-	.human_readable = "newline_list_alt"
+	.human_readable = "newline_list_alt",
+	.tree_builder = NULL
 };
 
 const t_rule g_newline_list_dash = {
@@ -572,7 +586,8 @@ const t_rule g_newline_list_dash = {
 		{&g_newline_token, &g_newline_list_dash},
 		{&g_empty_token}
 	},
-	.human_readable = "newline_list_dash"
+	.human_readable = "newline_list_dash",
+	.tree_builder = NULL
 };
 
 const t_rule g_linebreak = {
@@ -581,7 +596,8 @@ const t_rule g_linebreak = {
 		{&g_newline_list},
 		{&g_empty_token}
 	},
-	.human_readable = "linebreak"
+	.human_readable = "linebreak",
+	.tree_builder = NULL
 };
 const t_rule g_separator_op = {
 	.token = TOKEN_NOT_APPLICABLE,
@@ -589,7 +605,8 @@ const t_rule g_separator_op = {
 		{&g_semicolon_token},
 		{&g_ampersand_token}
 	},
-	.human_readable = "separator_op"
+	.human_readable = "separator_op",
+	.tree_builder = NULL
 };
 const t_rule g_separator = {
 	.token = TOKEN_NOT_APPLICABLE,
@@ -597,7 +614,8 @@ const t_rule g_separator = {
 		{&g_separator_op, &g_linebreak},
 		{&g_newline_list}
 	},
-	.human_readable = "separator"
+	.human_readable = "separator",
+	.tree_builder = NULL
 };
 const t_rule g_sequential_sep = {
 	.token = TOKEN_NOT_APPLICABLE,
@@ -605,43 +623,215 @@ const t_rule g_sequential_sep = {
 		{&g_semicolon_token, &g_linebreak},
 		{&g_newline_list}
 	},
-	.human_readable = "sequential_sep"
+	.human_readable = "sequential_sep",
+	.tree_builder = NULL
 };
 
-const t_rule g_semicolon_token = { TOKEN_SEMICOLON, {{NULL}}, "semicolon_t" };
-const t_rule g_ampersand_token = { TOKEN_AMPERSAND, {{NULL}}, "ampersand_t" };
-const t_rule g_newline_token = { TOKEN_NEWLINE, {{NULL}}, "newline_t" };
-const t_rule g_and_if_token = { TOKEN_AND_IF, {{0}}, "and_if_t" };
-const t_rule g_or_if_token = { TOKEN_OR_IF, {{0}}, "or_if_t" };
-const t_rule g_bang_token = { TOKEN_BANG, {{0}}, "bang_t" };
-const t_rule g_pipe_token = { TOKEN_PIPE, {{0}}, "pipe_t" };
-const t_rule g_empty_token = { TOKEN_EMPTY, {{0}}, "empty_t" };
-const t_rule g_lbracket_token = { TOKEN_LBRACKET, {{0}}, "lbracket_t" };
-const t_rule g_rbracket_token = { TOKEN_RBRACKET, {{0}}, "rbracket_t" };
-const t_rule g_lbrace_token = { TOKEN_LBRACE, {{0}}, "lbrace_t" };
-const t_rule g_rbrace_token = { TOKEN_RBRACE, {{0}}, "rbrace_t" };
-const t_rule g_word_token = { TOKEN_WORD, {{0}}, "word_t" };
-const t_rule g_if_token = { TOKEN_IF, {{0}}, "if_t" };
-const t_rule g_then_token = { TOKEN_THEN, {{0}}, "then_t" };
-const t_rule g_fi_token = { TOKEN_FI, {{0}}, "fi_t" };
-const t_rule g_elif_token = { TOKEN_ELIF, {{0}}, "elif_t" };
-const t_rule g_else_token = { TOKEN_ELSE, {{0}}, "else_t" };
-const t_rule g_for_token = { TOKEN_FOR, {{0}}, "for_t" };
-const t_rule g_while_token = { TOKEN_WHILE, {{0}}, "while_t" };
-const t_rule g_until_token = { TOKEN_UNTIL, {{0}}, "until_t" };
-const t_rule g_do_token = { TOKEN_DO, {{0}}, "do_t" };
-const t_rule g_done_token = { TOKEN_DONE, {{0}}, "done_t" };
-const t_rule g_assignment_word_token = { TOKEN_ASSIGNMENT_WORD, {{0}},
-												"assingment_word_t" };
-const t_rule g_io_number_token = { TOKEN_IO_NUMBER, {{0}}, "io_nbr_t" };
-const t_rule g_dless_token = { TOKEN_DLESS, {{0}}, "dless_t" };
-const t_rule g_dlessdash_token = { TOKEN_DLESSDASH, {{0}}, "dlessdash_t" };
-const t_rule g_less_token = { TOKEN_LESS, {{0}}, "less_t" };
-const t_rule g_lessand_token = { TOKEN_LESSAND, {{0}}, "lessand_t" };
-const t_rule g_great_token = { TOKEN_GREAT, {{0}}, "great_t" };
-const t_rule g_greatand_token = { TOKEN_GREATAND, {{0}}, "greatand_t" };
-const t_rule g_dgreat_token = { TOKEN_DGREAT, {{0}}, "dgreat_t" };
-const t_rule g_lessgreat_token = { TOKEN_LESSGREAT, {{0}}, "lessgreat_t" };
-const t_rule g_clobber_token = { TOKEN_CLOBBER, {{0}}, "clobber_t" };
+
+
+const t_rule g_semicolon_token = {
+	TOKEN_SEMICOLON,
+	{{NULL}},
+	"semicolon_t",
+	.tree_builder = NULL
+};
+const t_rule g_ampersand_token = {
+	TOKEN_AMPERSAND,
+	{{0}},
+	"ampersand_t",
+	.tree_builder = NULL
+};
+const t_rule g_newline_token = {
+	TOKEN_NEWLINE,
+	{{0}},
+	"newline_t",
+	.tree_builder = NULL
+};
+const t_rule g_and_if_token = {
+	TOKEN_AND_IF,
+	{{0}},
+	"and_if_t",
+	.tree_builder = NULL
+};
+const t_rule g_or_if_token = {
+	TOKEN_OR_IF,
+	{{0}},
+	"or_if_t",
+	.tree_builder = NULL
+};
+const t_rule g_bang_token = {
+	TOKEN_BANG,
+	{{0}},
+	"bang_t",
+	.tree_builder = NULL
+};
+const t_rule g_pipe_token = {
+	TOKEN_PIPE,
+	{{0}},
+	"pipe_t",
+	.tree_builder = NULL
+};
+const t_rule g_empty_token = {
+	TOKEN_EMPTY,
+	{{0}},
+	"empty_t",
+	.tree_builder = NULL
+};
+const t_rule g_lbracket_token = {
+	TOKEN_LBRACKET,
+	{{0}},
+	"lbracket_t",
+	.tree_builder = NULL
+};
+const t_rule g_rbracket_token = {
+	TOKEN_RBRACKET,
+	{{0}},
+	"rbracket_t",
+	.tree_builder = NULL
+};
+const t_rule g_lbrace_token = {
+	TOKEN_LBRACE,
+	{{0}},
+	"lbrace_t",
+	.tree_builder = NULL
+};
+const t_rule g_rbrace_token = {
+	TOKEN_RBRACE,
+	{{0}},
+	"rbrace_t",
+	.tree_builder = NULL
+};
+const t_rule g_word_token = {
+	TOKEN_WORD,
+	{{0}},
+	"word_t",
+	.tree_builder = NULL
+};
+const t_rule g_if_token = {
+	TOKEN_IF,
+	{{0}},
+	"if_t",
+	.tree_builder = NULL
+};
+const t_rule g_then_token = {
+	TOKEN_THEN,
+	{{0}},
+	"then_t",
+	.tree_builder = NULL
+};
+const t_rule g_fi_token = {
+	TOKEN_FI,
+	{{0}},
+	"fi_t",
+	.tree_builder = NULL
+};
+const t_rule g_elif_token = {
+	TOKEN_ELIF,
+	{{0}},
+	"elif_t",
+	.tree_builder = NULL
+};
+const t_rule g_else_token = {
+	TOKEN_ELSE,
+	{{0}},
+	"else_t",
+	.tree_builder = NULL
+};
+const t_rule g_for_token = {
+	TOKEN_FOR,
+	{{0}},
+	"for_t",
+	.tree_builder = NULL
+};
+const t_rule g_while_token = {
+	TOKEN_WHILE,
+	{{0}},
+	"while_t",
+	.tree_builder = NULL
+};
+const t_rule g_until_token = {
+	TOKEN_UNTIL,
+	{{0}},
+	"until_t",
+	.tree_builder = NULL
+};
+const t_rule g_do_token = {
+	TOKEN_DO,
+	{{0}},
+	"do_t",
+	.tree_builder = NULL
+};
+const t_rule g_done_token = {
+	TOKEN_DONE,
+	{{0}},
+	"done_t",
+	.tree_builder = NULL
+};
+const t_rule g_assignment_word_token = {
+	TOKEN_ASSIGNMENT_WORD,
+	{{0}},
+	"assingment_word_t",
+	.tree_builder = NULL
+};
+const t_rule g_io_number_token = {
+	TOKEN_IO_NUMBER,
+	{{0}},
+	"io_nbr_t",
+	.tree_builder = NULL
+};
+const t_rule g_dless_token = {
+	TOKEN_DLESS,
+	{{0}},
+	"dless_t",
+	.tree_builder = NULL
+};
+const t_rule g_dlessdash_token = {
+	TOKEN_DLESSDASH,
+	{{0}},
+	"dlessdash_t",
+	.tree_builder = NULL
+};
+const t_rule g_less_token = {
+	TOKEN_LESS,
+	{{0}},
+	"less_t",
+	.tree_builder = NULL
+};
+const t_rule g_lessand_token = {
+	TOKEN_LESSAND,
+	{{0}},
+	"lessand_t",
+	.tree_builder = NULL
+};
+const t_rule g_great_token = {
+	TOKEN_GREAT,
+	{{0}},
+	"great_t",
+	.tree_builder = NULL
+};
+const t_rule g_greatand_token = {
+	TOKEN_GREATAND,
+	{{0}},
+	"greatand_t",
+	.tree_builder = NULL
+};
+const t_rule g_dgreat_token = {
+	TOKEN_DGREAT,
+	{{0}},
+	"dgreat_t",
+	.tree_builder = NULL
+};
+const t_rule g_lessgreat_token = {
+	TOKEN_LESSGREAT,
+	{{0}},
+	"lessgreat_t",
+	.tree_builder = NULL
+};
+const t_rule g_clobber_token = {
+	TOKEN_CLOBBER,
+	{{0}},
+	"clobber_t",
+	.tree_builder = NULL
+};
 
 #pragma clang diagnostic pop

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:36 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/24 14:37:37 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/08 13:13:09 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@ int			is_valid_var(char *var)
 	return (1);
 }
 
+// TODO: consider removing this routine
+//  I think it is very harmful
 void		restore_variables(void)
 {
 	char	*var;

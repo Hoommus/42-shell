@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2018/12/22 17:18:32 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/02/06 16:05:38 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,8 +27,10 @@ SHELL_SRC = main.c environ_utils.c memory.c auxilia.c     \
             service_routines.c args_parsing.c\
 
 LEXER_DIR = lexer/
-LEXER_SRC = quotes.c smart_split.c tokenizer.c tokens_mem.c token_word_types.c \
-            shell_script_syntax.c
+LEXER_SRC = quotes.c smart_split.c tokenizer.c tokens_mem.c token_word_types.c
+
+AST_DIR = ast/
+AST_SRC = parser.c entry_point.c script_syntax.c
 
 BUILTIN_DIR = builtins/
 BUILTIN_SRC = cd.c where.c builtins.c builtins2.c hs_history.c tokenizer_test.c \
@@ -44,9 +46,6 @@ INTERFACE_SRC = buffer_drawing.c buffer_works.c     \
 
 JOB_CONTROL_DIR = job_control_prototype/
 JOB_CONTROL_SRC = commands_execution.c signals_manipulation.c signals_basic.c
-
-AST_DIR = ast/
-AST_SRC = parser.c
 
 HISTORY_DIR = features/history/
 HISTORY_SRC = history.c history_vector.c

@@ -139,7 +139,5 @@ struct s_token		*tokenize(char *string, const char *delimiters)
 	}
 	if (!tail || (tail->type != TOKEN_SEMICOLON && tail->type != TOKEN_NEWLINE))
 		add_token(&head, &tail, create_token("\n"));
-	g_ps.list_head = head;
-	g_ps.list_tail = tail;
 	return (head);
 }
