@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/09 16:35:29 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/12 17:16:04 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/17 15:02:22 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ static bool			is_assignment_word(const char *str)
 	char	**split;
 	bool	status;
 
-	if (!str)
+	if (!str || !ft_strchr(str, '='))
 		return (false);
 	status = false;
 	split = ft_strsplit(str, '=');
@@ -54,10 +54,10 @@ static bool			is_assignment_word(const char *str)
 	return (status);
 }
 
-enum e_token_type	get_token_type_contextual(const char *str)
+enum e_token_type	token_class_contextual(const char *str,
+											enum e_token_type prev)
 {
 	enum e_token_type	type;
-	enum e_token_type	last_token;
 	int					i;
 
 	i = TOKEN_IF;
@@ -68,17 +68,13 @@ enum e_token_type	get_token_type_contextual(const char *str)
 			type = g_tokens[i].type;
 		i++;
 	}
-	last_token = TOKEN_EMPTY;
 	if (type == TOKEN_NOT_APPLICABLE)
 	{
-		if (is_assignment_word(str))
+		if ((prev == TOKEN_ASSIGNMENT_WORD || prev == TOKEN_NEWLINE ||
+			 prev == TOKEN_SEMICOLON) && is_assignment_word(str))
 			type = TOKEN_ASSIGNMENT_WORD;
 		else if (is_io_number(str))
 			type = TOKEN_IO_NUMBER;
-//		else if (g_parser_state.list_tail == NULL
-//			|| last_token == TOKEN_SEMICOLON
-//			|| last_token == TOKEN_NEWLINE)
-//			type = TOKEN_WORD_COMMAND;
 		else
 			type = TOKEN_WORD;
 	}

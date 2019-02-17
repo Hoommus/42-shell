@@ -1,13 +1,23 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   tokenizer.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/02/15 15:55:49 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/02/15 15:55:49 by vtarasiu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "shell_script.h"
 #include "shell_script_parser.h"
-
-struct s_parser_state	g_ps;
 
 static size_t			is_separate(const char *str)
 {
 	int		i;
 
-	i = TOKEN_IN;
+	i = TOKEN_LBRACE;
 	while (g_tokens[++i].token_name != NULL)
 		if (g_tokens[i].requires_single &&
 			ft_strncmp(str, g_tokens[i].text, ft_strlen(g_tokens[i].text)) == 0)
@@ -63,11 +73,17 @@ static char				*next_token(const char *str, const char *delims)
 	return (ft_strsub(str, 0, i));
 }
 
-static struct s_token	*create_token(const char *str)
+
+/*
+** Defaults to TOKEN_SEMICOLON, because it does not affect any contextual
+** classification
+*/
+static struct s_token	*create_token(const char *str, t_token *last)
 {
 	enum e_token_type	type;
 
-	type = get_token_type_contextual(str);
+	type = token_class_contextual(str, last == NULL ? TOKEN_SEMICOLON
+													: last->type);
 	return (new_token(ft_strdup(str), type));
 }
 
@@ -133,11 +149,11 @@ struct s_token		*tokenize(char *string, const char *delimiters)
 		if (ft_strchr(delimiters, string[i]) != NULL)
 			continue ;
 		token_value = next_token(string + i, delimiters);
-		add_token(&head, &tail, create_token(token_value));
+		add_token(&head, &tail, create_token(token_value, tail));
 		i += ft_strlen(token_value) - 1;
 		free(token_value);
 	}
 	if (!tail || (tail->type != TOKEN_SEMICOLON && tail->type != TOKEN_NEWLINE))
-		add_token(&head, &tail, create_token("\n"));
+		add_token(&head, &tail, create_token("\n", tail));
 	return (head);
 }

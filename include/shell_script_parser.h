@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/10 13:17:59 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/21 19:06:12 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/15 16:02:02 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,17 +69,18 @@ typedef struct					s_parser_state
 **      .tree_builder = &command_build
 **  };
 */
+typedef struct s_build_result	t_bresult;
 
-typedef t_node		*(t_builder) (t_state state, int tokens_number);
+typedef t_bresult				*(t_builder) (t_state state, int tokens_number);
 
 // TODO: shrink down expands_to size
-typedef struct		s_syntax_rule
+typedef struct					s_syntax_rule
 {
 	const enum e_token_type		token;
 	const struct s_syntax_rule	*restrict expands_to[10][10];
 	const char					*restrict const human_readable;
 	t_builder					*const tree_builder;
-}					t_rule;
+}								t_rule;
 
 typedef struct					s_syntax_error
 {
@@ -87,16 +88,17 @@ typedef struct					s_syntax_error
 	char		*text;
 }								t_error;
 
-typedef struct					s_build_result
+struct							s_build_result
 {
 	t_error		*error;
 	t_node		*ast_root;
 	t_rule		*request;
-}								t_bresult;
+};
 
 struct							s_result
 {
 	t_error		*error;
+	t_bresult	*node;
 	bool		fatal;
 	int			consumed;
 	bool		valid;
@@ -110,9 +112,6 @@ struct s_result					is_syntax_valid(t_state const prev);
 bool							check_rule(struct s_result *result,
 		t_state *state, const t_rule *restrict const rule);
 
-extern const t_rule	g_program;
-extern const t_rule	g_complete_commands;
-extern const t_rule	g_complete_commands_dash;
 extern const t_rule	g_complete_command;
 extern const t_rule	g_list;
 extern const t_rule	g_list_dash;
@@ -127,7 +126,7 @@ extern const t_rule	g_subshell;
 extern const t_rule	g_compound_list;
 extern const t_rule	g_term_rule;
 extern const t_rule	g_term_rule_dash;
-extern const t_rule	g_for_clause;
+
 extern const t_rule	g_name;
 extern const t_rule	g_in;
 extern const t_rule	g_wordlist;
@@ -135,10 +134,11 @@ extern const t_rule	g_wordlist_dash;
 extern const t_rule	g_if_clause;
 extern const t_rule	g_else_part;
 extern const t_rule	g_while_clause;
-extern const t_rule	g_until_clause;
 
 /*
-** Function and case rules are omitted. But here they are:
+** some rules are omitted. But here they are:
+** extern const t_rule	g_for_clause;
+** extern const t_rule	g_until_clause;
 **
 ** extern const t_rule	g_function_definition;
 ** extern const t_rule	g_function_body;

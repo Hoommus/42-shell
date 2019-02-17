@@ -1,8 +1,19 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   line_editing.h                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/02/15 15:56:36 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/02/15 15:56:36 by vtarasiu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef LINE_EDITING_H
 # define LINE_EDITING_H
 
 # include "twenty_one_sh.h"
-
 
 # define K_CTRL_W          23
 # define K_BSP             127
@@ -33,49 +44,49 @@
 # define K_ALT_SHIFT_LEFT  19193286420945691
 # define K_ALT_SHIFT_RIGHT 18911811444235035
 
-
 /*
- *  if (ch == 127)
-		symbol_del(shell);
-	else if (ch >= 32 && ch < 127)
-		enter_ch(shell, ch);
-	else if (ch == 4283163)
-		history_up(shell);
-	else if (ch == 4348699)
-		history_down(shell);
-	else if (ch == 4414235)
-		right_key(shell);
-	else if (ch == 4479771)
-		left_key(shell);
-	else if (ch == 25115)
-		alt_left_key(shell);
-	else if (ch == 26139)
-		alt_right_key(shell);
-	else if (ch == 4741915)
-		home_key(shell);
-	else if (ch == 4610843)
-		end_key(shell);
-	else if (ch == 74982532143899)
-		shift_left(shell);
-	else if (ch == 73883020516123)
-		shift_right(shell);
-	else if (ch == 23)
-		cut(shell);
-	else if (ch == 27)
-		left_selection(shell);
-	else if (ch == 29)
-		right_selection(shell);
-	else if (ch == 5)
-		copy(shell);
-	else if (ch == 18)
-		paste(shell);
-	else if (ch == 4)
-		printf("CTRL+D\n");
-	else if (ch == 16)
-		play_music();
-	else if (ch == 12)
-		stop_music();
- */
+**  if (ch == 127)
+**		symbol_del(shell);
+**	else if (ch >= 32 && ch < 127)
+**		enter_ch(shell, ch);
+**	else if (ch == 4283163)
+**		history_up(shell);
+**	else if (ch == 4348699)
+**		history_down(shell);
+**	else if (ch == 4414235)
+**		right_key(shell);
+**	else if (ch == 4479771)
+**		left_key(shell);
+**	else if (ch == 25115)
+**		alt_left_key(shell);
+**	else if (ch == 26139)
+**		alt_right_key(shell);
+**	else if (ch == 4741915)
+**		home_key(shell);
+**	else if (ch == 4610843)
+**		end_key(shell);
+**	else if (ch == 74982532143899)
+**		shift_left(shell);
+**	else if (ch == 73883020516123)
+**		shift_right(shell);
+**	else if (ch == 23)
+**		cut(shell);
+**	else if (ch == 27)
+**		left_selection(shell);
+**	else if (ch == 29)
+**		right_selection(shell);
+**	else if (ch == 5)
+**		copy(shell);
+**	else if (ch == 18)
+**		paste(shell);
+**	else if (ch == 4)
+**		printf("CTRL+D\n");
+**	else if (ch == 16)
+**		play_music();
+**	else if (ch == 12)
+**		stop_music();
+*/
+
 /*
 ** Cursor movement direction
 */
@@ -135,6 +146,5 @@ t_carpos					*carpos_save_as(enum e_position type);
 void						carpos_update(enum e_position type);
 
 void						write_at(int col, int row, char *string);
-
 
 #endif

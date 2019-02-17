@@ -67,10 +67,10 @@ int				hs_tokenizer(char **args)
 	tokens = head;
 	while (tokens)
 	{
-		if (!(tokens->type >= TOKEN_WORD && tokens->type <= TOKEN_ASSIGNMENT_WORD))
-			ft_printf("(%s) ", g_tokens[tokens->type].token_name);
-		else
+		if (tokens->type >= TOKEN_WORD && tokens->type <= TOKEN_ASSIGNMENT_WORD)
 			ft_printf("(%s %s) ", g_tokens[tokens->type].token_name, tokens->value);
+		else
+			ft_printf("(%s) ", g_tokens[tokens->type].token_name);
 		if (tokens->type == TOKEN_NEWLINE)
 			ft_printf("\n");
 		swap = tokens;

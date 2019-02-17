@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:38 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/08 16:09:19 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/17 14:35:06 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,11 @@ struct s_result	*handle_terminal(struct s_result *result, const t_state *state)
 				g_tokens[state->rule->token].token_name,
 				state->list_offset->type == TOKEN_NEWLINE ? "\\n" :
 				g_tokens[state->list_offset->type].token_name);
-		result->valid = state->list_offset->type == state->rule->token;
-		result->consumed = result->valid;
+		if (state->list_offset->type == state->rule->token)
+		{
+			result->valid = true;
+			result->consumed = 1;
+		}
 	}
 	return (result);
 }
@@ -63,12 +66,18 @@ bool			check_rule(struct s_result *result, t_state *state,
 	result->valid = tmp.valid;
 	result->consumed += tmp.consumed;
 	if (tmp.valid)
-		state->list_offset = offset_list(state->list_offset, result->consumed);
-	else
+	{
+		state->list_offset = offset_list(state->list_offset, tmp.consumed);
+	}
+	else if (tmp.valid == false && result->consumed != 0)
+	{
 		state->list_offset = offset_list(state->list_offset, -result->consumed);
+		result->consumed = 0;
+	}
 	return (tmp.valid);
 }
 
+// TODO: Remove logging
 struct s_result	is_syntax_valid(t_state const prev)
 {
 	struct s_result		result;
@@ -91,7 +100,9 @@ struct s_result	is_syntax_valid(t_state const prev)
 	while (!result.valid && ++i < 10 && prev.rule->expands_to[i][0] && (j = -1))
 		while (prev.rule->expands_to[i][++j])
 			if (!check_rule(&result, &state, prev.rule->expands_to[i][j]))
+			{
 				break ;
+			}
 	//ft_printf("consumed %d tokens\n", result.consumed);
 	return (result);
 }

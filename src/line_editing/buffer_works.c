@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/14 18:43:20 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/21 17:34:43 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/17 14:22:04 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,8 @@ char			**read_command(void)
 			commands = smart_split(history_write(buff_get_part(0, UINT64_MAX),
 										get_history_fd()), TOKEN_DELIMITERS);
 		}
-		carpos_update(POS_CURRENT);
+		if (input.lng != 0)
+			carpos_update(POS_CURRENT);
 	}
 	return (commands);
 }

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 14:44:48 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/12 16:03:55 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/17 15:21:30 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,10 +44,10 @@ const struct s_parse_token	g_tokens[] = {
 	{"do",            "DO",          TOKEN_DO,              false},
 	{"done",          "DONE",        TOKEN_DONE,            false},
 	{"while",         "WHILE",       TOKEN_WHILE,           false},
-	{"until",         "UNTIL",       TOKEN_UNTIL,           false},
-	{"for",           "FOR",         TOKEN_FOR,             false},
+//	{"until",         "UNTIL",       TOKEN_UNTIL,           false},
+//	{"for",           "FOR",         TOKEN_FOR,             false},
 
-	{"in",            "IN",          TOKEN_IN,              false},
+//	{"in",            "IN",          TOKEN_IN,              false},
 
 	{"{",             "LBRACE",      TOKEN_LBRACE,          true },
 	{"}",             "RBRACE",      TOKEN_RBRACE,          true },
@@ -60,14 +60,15 @@ const struct s_parse_token	g_tokens[] = {
 	{"!",             "BANG",        TOKEN_BANG,            true },
 	{"&&",            "AND_IF",      TOKEN_AND_IF,          true },
 	{"||",            "OR_IF",       TOKEN_OR_IF,           true },
-	{"|",             "PIPE",        TOKEN_PIPE,            true },
+
 	{"<<-",           "DLESSDASH",   TOKEN_DLESSDASH,       true },
 	{"<<",            "DLESS",       TOKEN_DLESS,           true },
 	{">>",            "DGREAT",      TOKEN_DGREAT,          true },
 	{"<&",            "LESSAND",     TOKEN_LESSAND,         true },
-	{"&>",            "GREATAND",    TOKEN_GREATAND,        true },
+	{">&",            "GREATAND",    TOKEN_GREATAND,        true },
 	{"<>",            "LESSGREAT",   TOKEN_LESSGREAT,       true },
 	{">|",            "CLOBBER",     TOKEN_CLOBBER,         true },
+	{"|",             "PIPE",        TOKEN_PIPE,            true },
 
 	{"<",             "LESS",        TOKEN_LESS,            false},
 	{">",             "GREAT",       TOKEN_GREAT,           false},

@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/02/06 16:05:38 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/02/11 17:17:31 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -30,7 +30,7 @@ LEXER_DIR = lexer/
 LEXER_SRC = quotes.c smart_split.c tokenizer.c tokens_mem.c token_word_types.c
 
 AST_DIR = ast/
-AST_SRC = parser.c entry_point.c script_syntax.c
+AST_SRC = parser.c entry_point.c syntax_rules.c
 
 BUILTIN_DIR = builtins/
 BUILTIN_SRC = cd.c where.c builtins.c builtins2.c hs_history.c tokenizer_test.c \
