@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   handlers_editing.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/02/18 13:45:39 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/02/18 13:45:39 by vtarasiu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "line_editing.h"
 #include "shell_script.h"
 
@@ -37,5 +49,23 @@ void	handle_line_kill(union u_char key)
 		caret_move(g_term->buffer->size, D_LEFT);
 		tputs(tgetstr("cd", NULL), 1, &ft_putc);
 		buff_clear(0);
+	}
+}
+
+void	handle_home(union u_char key)
+{
+	if (key.lng == K_HOME)
+	{
+		caret_move(g_term->buffer->iterator, D_LEFT);
+		g_term->buffer->iterator = 0;
+	}
+}
+
+void	handle_end(union u_char key)
+{
+	if (key.lng == K_END)
+	{
+		caret_move(g_term->buffer->size - g_term->buffer->iterator, D_RIGHT);
+		g_term->buffer->iterator = g_term->buffer->size;
 	}
 }

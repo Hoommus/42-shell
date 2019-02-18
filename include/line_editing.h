@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:56:36 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/15 15:56:36 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/18 12:28:25 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,8 +115,13 @@ void						buffer_redraw(void);
 void						handle_key(union u_char key);
 
 void					handle_delchar(union u_char key);
+void						handle_home(union u_char key);
+void						handle_end(union u_char key);
 void						handle_del(union u_char key);
 void						handle_eot(union u_char key);
+
+void						handle_ctrl_w(union u_char key);
+
 void						handle_up(union u_char key);
 void						handle_down(union u_char key);
 void						handle_left(union u_char key);
@@ -124,7 +129,10 @@ void						handle_right(union u_char key);
 void						handle_ignore(union u_char key);
 void						handle_line_kill(union u_char key);
 void						handle_backspace(union u_char key);
-
+void						handle_alt_up(union u_char key);
+void						handle_alt_down(union u_char key);
+void						handle_alt_left(union u_char key);
+void						handle_alt_right(union u_char key);
 /*
 ** State machine (state_machine.c)
 */

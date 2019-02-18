@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:46:06 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/21 17:26:15 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/18 13:34:03 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ static void		tstp(int sig)
 	display_normal_prompt();
 	g_term->input_state = STATE_NORMAL;
 	ft_printf("\7");
+	write(0, "\4", 1);
 }
 
 static void		ignore(int sig)
@@ -30,13 +31,12 @@ static void		ignore(int sig)
 	extern t_history	*g_history;
 
 	sig = 0;
+	caret_move(g_term->buffer->size - g_term->buffer->iterator, D_RIGHT);
 	buff_clear(0);
-	g_history->iterator = g_history->size;
 	ft_printf("\n");
 	g_term->input_state = STATE_NORMAL;
 	if (g_term->running_process == 0)
 		display_normal_prompt();
-
 }
 
 static void		resize(int sig)
@@ -49,8 +49,6 @@ static void		resize(int sig)
 		g_term->ws_row = size.ws_row;
 		g_term->ws_col = size.ws_col;
 		carpos_update(POS_CURRENT);
-//		caret_move(g_term->buffer->size, D_LEFT);
-//		buffer_redraw();
 	}
 }
 

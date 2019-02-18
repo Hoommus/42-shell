@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   handlers_engine.c                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/02/18 11:54:55 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/02/18 12:29:32 by vtarasiu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "line_editing.h"
 
 static struct s_listener	g_key_listeners[] =
@@ -6,10 +18,17 @@ static struct s_listener	g_key_listeners[] =
 	{{K_DOWN}, &handle_down},
 	{{K_LEFT}, &handle_left},
 	{{K_RIGHT}, &handle_right},
+	{{K_ALT_UP}, &handle_alt_up},
+	{{K_ALT_DOWN}, &handle_alt_down},
+	{{K_ALT_LEFT}, &handle_alt_left},
+	{{K_ALT_RIGHT}, &handle_alt_right},
 	{{K_BSP}, &handle_backspace},
 	{{K_DEL}, &handle_del},
 	{{CEOT}, &handle_eot},
 	{{CKILL}, &handle_line_kill},
+	{{K_HOME}, &handle_home},
+	{{K_END}, &handle_end},
+	{{K_CTRL_W}, &handle_ctrl_w},
 	{{'\t'}, &handle_ignore},
 //	{9, &handle_delchar},
 	{{0}, 0}
@@ -48,5 +67,5 @@ void						handle_key(union u_char key)
 	while (g_key_listeners[++i].handler != 0)
 		if (g_key_listeners[i].key.lng == key.lng)
 			g_key_listeners[i].handler(key);
-	//write_at(0, 0, key.arr);
+	write_at(0, 0, key.arr);
 }

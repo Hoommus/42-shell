@@ -42,6 +42,7 @@ INTERFACE_SRC = buffer_drawing.c buffer_works.c     \
                 buffer_vector.c buffer_vector_tools1.c buffer_vector_tools2.c  \
                 state_machine.c \
                 handlers_arrows.c handlers_editing.c handlers_engine.c \
+                handlers_arrows_mods.c handlers_arrows_vertical.c \
                 write_anywhere.c
 
 JOB_CONTROL_DIR = job_control_prototype/
