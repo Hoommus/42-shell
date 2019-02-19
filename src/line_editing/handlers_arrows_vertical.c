@@ -1,19 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   nodes_manipulations.c                              :+:      :+:    :+:   */
+/*   handlers_arrows_vertical.c                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/02/15 15:56:52 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/15 15:56:52 by vtarasiu         ###   ########.fr       */
+/*   Created: 2019/02/18 11:54:48 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/02/18 12:30:32 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "shell_script.h"
-#include "shell_script_parser.h"
+#include "line_editing.h"
 
-void		ast_node_insert(t_node *pivot, t_node *insertion)
+void	handle_alt_up(union u_char key)
 {
+	int64_t		i;
 
+	if (key.lng != K_ALT_UP)
+		return ;
+	i = g_term->buffer->iterator;
+	while (i >= 0)
+	{
+
+	}
 }
+
+void	handle_alt_down(union u_char key)
+{
+	key.lng = 0;
+}
+

@@ -14,6 +14,7 @@
 # define BUFFER_WORKS_H
 
 # include <stdlib.h>
+# include <stdbool.h>
 # include "libft.h"
 
 /*
@@ -46,7 +47,8 @@ int					buff_del_symbol(u_int64_t at_index);
 char				*buff_get_part(u_int64_t from_index, u_int64_t to_index);
 t_symbol			*buff_symbol_at(u_int64_t index);
 char				*buff_char_at(u_int64_t index);
-int					buff_char_at_equals(const u_int64_t index, const char *c);
+int					buff_char_at_equals(u_int64_t index, const char *c);
+int					buff_char_at_equals_any(u_int64_t index, const char *c);
 int					buff_chroff(t_buffer *buffer, const char *c, int i);
 
 int					buff_insert_single_at(u_int64_t index, const char *str);

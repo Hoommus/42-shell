@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/08 18:03:53 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/18 16:35:07 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,8 @@
 # define CONFIG_FILE ".21shrc"
 # define LOG_FILE ".21sh.log"
 
-# define BUILD 625
-# define BUILD_DATE "08.02.19 18:03:52 EET"
+# define BUILD 803
+# define BUILD_DATE "18.02.19 16:35:07 EET"
 
 /*
 ** Initial input of 260 is chosen because (260 * 10) % 8 == 0
@@ -75,7 +75,7 @@
 ** Used for controlling input state
 */
 
-enum						e_input_state
+enum					e_input_state
 {
 	STATE_NORMAL,
 	STATE_QUOTE,
@@ -98,7 +98,7 @@ enum						e_input_state
 ** Used to store specific caret positions. Heavy usage in cursor_positions.c
 ** Also, see line_editing.h
 */
-enum						e_position
+enum					e_position
 {
 	POS_CURRENT,
 	POS_PROMPT,
@@ -109,23 +109,21 @@ enum						e_position
 	POS_ORIGIN
 };
 
-struct						s_position
-{
-	short				col;
-	short				row;
-};
-
 /*
 ** CArPOS. Got it? Like Carbon-Argentum-Phosphorus-Oxygen-Sulfur
 ** Alright, it's carpos for 'caret position'
 */
-typedef struct s_position	t_carpos;
+typedef struct			s_position
+{
+	short				col;
+	short				row;
+}						t_carpos;
 
 /*
 ** g_term stores terminal parameters as well as cursor position and input buffer
- * TODO: extract buffer variable to separate global var and create normal API
+** TODO: extract buffer variable to separate global var and create normal API
 */
-struct						s_term
+struct					s_term
 {
 	enum e_input_state	input_state;
 	short				ws_col;
@@ -146,93 +144,95 @@ struct						s_term
 	t_buffer			*buffer;
 };
 
-char						**g_environ;
-extern struct s_term		*g_term;
+char					**g_environ;
+extern struct s_term	*g_term;
 
 /*
 ** What is it? A design pattern? Really???
 */
 
-int							execute(char **args);
+int						execute(char **args);
 
 /*
 ** Init (init.c)
 */
-void						init_term(void);
-void						init_files(void);
-short						init_fd_at_home(char *filename, int flags);
+void					init_term(void);
+void					init_files(void);
+short					init_fd_at_home(char *filename, int flags);
 
 /*
 ** Environment (environ_utils.c)
 */
 
-char						*get_env(char *name);
-int							set_env(char *key, char *value);
-int							unset_env(char *name);
-char						**copy_env(char **argenv, char **environ);
+char					*get_env(char *name);
+int						set_env(char *key, char *value);
+int						unset_env(char *name);
+char					**copy_env(char **argenv, char **environ);
 
 /*
 ** Main Loop (main.c, )
 */
 
-char						**read_command(void);
-int							shell_loop(void);
-void						setup_signal_handlers(void);
-void						display_prompt(enum e_input_state state);
-int							display_normal_prompt(void);
+char					**read_command(void);
+int						shell_loop(void);
+void					setup_signal_handlers(void);
+void					display_prompt(enum e_input_state state);
+int						display_normal_prompt(void);
 
 /*
 ** Auxilia (auxilia.c)
 */
 
-ssize_t						ponies_teleported(void);
-void						increment_shlvl(void);
+ssize_t					ponies_teleported(void);
+void					increment_shlvl(void);
 
 /*
 ** Final input parsing (variables_replacement.c)
 */
 
-char						*replace_variables(char *line);
-char						*replace_home(char *line);
-void						restore_variables(void);
-void						expand_variables(char **line);
-int							is_valid_var(char *var);
+char					*replace_variables(char *line);
+char					*replace_home(char *line);
+void					restore_variables(void);
+void					expand_variables(char **line);
+int						is_valid_var(char *var);
 
 /*
 ** Memory utils (memory.c)
 */
 
-void						chfree(void *obj);
-void						chfree_n(int n, ...);
-void						free_array(char **array);
+void					chfree(void *obj);
+void					chfree_n(int n, ...);
+void					free_array(char **array);
 
-void						history_load(int fd);
+void					history_load(int fd);
 
 /*
 ** errors.c
 */
 
-void						throw_fatal(char *cause);
+void					throw_fatal(char *cause);
 
 /*
 ** service_routines.c
 */
 
-int							get_history_fd(void);
+int						get_history_fd(void);
 
 /*
 ** Arguments parsing
 */
 
-bool						flag_long_present(const char **args, const char *flag);
-bool						flag_short_present(const char **args, const char flag);
-char						flag_validate_short(const char **args,
-												const char *possible_flags);
+bool					flag_long_present(const char **args, const char *flag);
+bool					flag_short_present(const char **args, const char flag);
+char					flag_validate_short(const char **args,
+											const char *possible_flags);
 /*
 ** Compatibility
 */
 # ifdef __linux__
-int							gethostname(char *arr, size_t size)
+
+int						gethostname(char *arr, size_t size);
+
 # endif
 
 #endif

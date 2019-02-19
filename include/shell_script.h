@@ -6,12 +6,12 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 14:44:44 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/08 15:54:55 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/17 14:51:33 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SHELL_SCRIPT_LANG_H
-# define SHELL_SCRIPT_LANG_H
+#ifndef SHELL_SCRIPT_H
+# define SHELL_SCRIPT_H
 
 # include "libft.h"
 # include "ft_printf.h"
@@ -47,10 +47,10 @@ enum						e_token_type
 	TOKEN_DO,
 	TOKEN_DONE,
 	TOKEN_WHILE,
-	TOKEN_UNTIL,
-	TOKEN_FOR,
+//	TOKEN_UNTIL,
+//	TOKEN_FOR,
 
-	TOKEN_IN,
+//	TOKEN_IN,
 
 	TOKEN_LBRACE,
 	TOKEN_RBRACE,
@@ -63,7 +63,7 @@ enum						e_token_type
 	TOKEN_BANG,
 	TOKEN_AND_IF,
 	TOKEN_OR_IF,
-	TOKEN_PIPE,
+
 	TOKEN_DLESSDASH,
 	TOKEN_DLESS,
 	TOKEN_DGREAT,
@@ -71,6 +71,7 @@ enum						e_token_type
 	TOKEN_GREATAND,
 	TOKEN_LESSGREAT,
 	TOKEN_CLOBBER,
+	TOKEN_PIPE,
 
 	TOKEN_LESS,
 	TOKEN_GREAT,
@@ -96,7 +97,6 @@ enum						e_token_type
 	REDIRECTION,
 	OPERATOR,
 
-
 	SEPARATOR,
 	AST_COMMAND,
 	VARIABLE,
@@ -120,10 +120,11 @@ struct						s_parse_token
 extern const struct s_parse_token	g_tokens[];
 
 /*
- * TODO: Add information about a line where specific token resides
- */
+** TODO: Add information about a line where specific token resides
+*/
 typedef struct				s_token
 {
+	int					line_nbr;
 	const char			*value;
 	enum e_token_type	type;
 	struct s_token		*prev;
@@ -165,7 +166,7 @@ struct						s_command
 {
 	char					**args;
 	t_token					*assignments;
-	struct s_io_redirect	*io_alterations;
+	struct s_io_redirect	*io_redirects;
 	bool					is_bg;
 };
 
@@ -178,12 +179,13 @@ void						add_token(t_token **head, t_token **tail,
 														t_token *to_add);
 void						free_token(struct s_token *token);
 
-enum e_token_type			get_token_type_contextual(const char *str);
+enum e_token_type			token_class_contextual(const char *str,
+														enum e_token_type prev);
 char						**smart_split(char *str, char *delimiters);
 
 void						free_array(char **array);
 
-void						run_script(t_token *stream_head, bool log_recursion);
+void						run_script(t_token *list_head, bool log_recursion);
 /*
 ** File reading and executing
 */

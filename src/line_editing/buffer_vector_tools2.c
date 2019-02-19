@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   buffer_vector_tools2.c                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/02/18 11:54:59 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/02/18 11:54:59 by vtarasiu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "buffer_works.h"
 
 extern t_buffer	*g_buffer;
@@ -31,8 +43,21 @@ char			*buff_char_at(const u_int64_t index)
 int				buff_char_at_equals(const u_int64_t index, const char *c)
 {
 	if (c == NULL || ft_strlen((char *)c) > 8)
-		return (0);
+		return (false);
 	return (!ft_strcmp(g_buffer->array[index].s, c));
+}
+
+int				buff_char_at_equals_any(const u_int64_t index, const char *c)
+{
+	if (c == NULL)
+		return (false);
+	while (c)
+	{
+		if (g_buffer->array[index].s[0] == *c)
+			return (true);
+		c++;
+	}
+	return (false);
 }
 
 

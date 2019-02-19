@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/14 18:43:20 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/21 17:34:43 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/17 14:22:04 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,16 +15,16 @@
 #include "shell_script.h"
 #include "shell_history.h"
 
-int				is_printable(const char c[8])
+bool			is_printable(const char c[8])
 {
-	if ((c[0] >= 10 && c[0] <= 13) || (c[0] >= 32 && c[0] != 127))
-		return (1);
+	if (c[1] == 0 && ((c[0] >= 10 && c[0] <= 13) || (c[0] >= 32 && c[0] != 127)))
+		return (true);
 	else if (((c[0] & 0xC0) && (c[1] & 0x80))
 		|| ((c[0] & 0xE0) && (c[1] & 0x80) && (c[2] & 0x80))
 		|| ((c[0] & 0xF0) && (c[1] & 0x80) && (c[2] & 0x80) && (c[3] & 0x80)))
-		return (1);
+		return (true);
 	else
-		return (0);
+		return (false);
 }
 
 void			deal_with_printable(const char arr[8])
@@ -93,7 +93,8 @@ char			**read_command(void)
 			commands = smart_split(history_write(buff_get_part(0, UINT64_MAX),
 										get_history_fd()), TOKEN_DELIMITERS);
 		}
-		carpos_update(POS_CURRENT);
+		if (input.lng != 0)
+			carpos_update(POS_CURRENT);
 	}
 	return (commands);
 }
