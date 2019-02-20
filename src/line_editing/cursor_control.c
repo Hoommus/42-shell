@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/16 12:28:16 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/16 16:59:39 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/18 18:40:27 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,14 +32,16 @@ int			ft_strchr_back(const char *str, char c, int i)
 	return (i);
 }
 
-void			carpus_adjust_db(void)
+void	carpos_adjust_db(int by)
 {
 	int		i;
 
+	if (by < 1)
+		return ;
 	i = 0;
 	while (i < POS_CUSTOM2)
 	{
-		g_term->carpos_db[i].row -= 1;
+		g_term->carpos_db[i].row -= by;
 		i++;
 	}
 }

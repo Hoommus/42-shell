@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/23 17:04:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/21 14:47:51 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/19 14:29:25 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,11 +72,11 @@ size_t			ft_strlen_unsafe(char *str)
 	while (1)
 	{
 		longword = *longswap++;
-		if ((size = consider_return(str, longword, longswap)) != (u_int64_t)-1)
+		if ((size = consider_return(str, longword, longswap))
+			!= (u_int64_t) - 1)
 			return (size);
 	}
 }
-
 
 size_t			ft_strlen(char *str)
 {

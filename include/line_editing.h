@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:56:36 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/18 12:28:25 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/18 18:40:27 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 # include "twenty_one_sh.h"
 
 # define K_CTRL_W          23
+# define K_CTRL_U          CKILL
+# define K_CTRL_D          CEOT
 # define K_BSP             127
 
 # define K_DEL             2117294875
@@ -144,14 +146,14 @@ int							toggle_escaped(void);
 /*
 ** Caret positions manipulation (cursor_positions.c)
 */
-void						carpus_adjust_db(void);
+void						carpos_adjust_db(int by);
 int							caret_move(int distance,
 										enum e_direction direction);
 t_carpos					*carpos_get(enum e_position type);
 t_carpos					*get_caretpos(enum e_position type);
 t_carpos					*carpos_load(enum e_position type);
 t_carpos					*carpos_save_as(enum e_position type);
-void						carpos_update(enum e_position type);
+t_carpos					*carpos_update(enum e_position type);
 
 void						write_at(int col, int row, char *string);
 

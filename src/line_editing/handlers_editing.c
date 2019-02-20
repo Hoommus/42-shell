@@ -46,7 +46,7 @@ void	handle_line_kill(union u_char key)
 {
 	if (key.lng == CKILL && g_term->buffer->size > 0)
 	{
-		caret_move(g_term->buffer->size, D_LEFT);
+		caret_move(g_term->buffer->iterator, D_LEFT);
 		tputs(tgetstr("cd", NULL), 1, &ft_putc);
 		buff_clear(0);
 	}

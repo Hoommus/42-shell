@@ -43,6 +43,7 @@ typedef struct		s_buffer
 
 void				init_buffer_vector(u_int64_t capacity);
 void				buff_clear(u_int64_t from_index);
+void				buff_clear_part(u_int64_t from_index, u_int64_t to_index);
 int					buff_del_symbol(u_int64_t at_index);
 char				*buff_get_part(u_int64_t from_index, u_int64_t to_index);
 t_symbol			*buff_symbol_at(u_int64_t index);

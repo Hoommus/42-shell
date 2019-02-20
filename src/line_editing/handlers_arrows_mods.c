@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/18 15:19:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/18 16:34:57 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/20 16:43:59 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,9 +70,7 @@ void	handle_ctrl_w(union u_char key)
 
 	if (key.lng != K_CTRL_W)
 		return ;
-	i = g_term->buffer->iterator;
-	if (!is_buffer_symbol_at_index_wsp(g_term->buffer->iterator))
-		buff_del_symbol(i--);
+	i = g_term->buffer->iterator - 1;
 	while (i >= 0 && is_buffer_symbol_at_index_wsp(i))
 		buff_del_symbol(i--);
 	while (i >= 0)

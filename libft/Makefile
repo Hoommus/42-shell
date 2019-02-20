@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2018/07/01 17:40:38 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/02/19 12:39:13 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,7 +28,7 @@ SRC = ft_atoi.c ft_bzero.c ft_isalnum.c ft_isalpha.c ft_isascii.c ft_isdigit.c \
       ft_strrchr.c ft_strsplit.c ft_strstr.c ft_strsub.c ft_strtrim.c          \
       ft_strulen.c ft_tolower.c ft_toupper.c ft_utf_strlen.c ft_wchar_strlen.c \
       get_next_line.c ft_strsplit_wht.c ft_strings_join.c ft_iswhsp.c          \
-      ft_unicode.c ft_rand.c
+      ft_unicode.c ft_rand.c ft_linecount.c  
 
 OBJ = $(addprefix $(OBJ_DIR), $(SRC:.c=.o))
 

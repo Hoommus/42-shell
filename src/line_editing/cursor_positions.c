@@ -24,7 +24,7 @@ t_carpos	*carpos_load(enum e_position type)
 /*
 ** Updates specified position in db via ANSI request code
 */
-void		carpos_update(enum e_position type)
+t_carpos	*carpos_update(enum e_position type)
 {
 	char		response[16];
 
@@ -37,4 +37,5 @@ void		carpos_update(enum e_position type)
 		g_term->carpos_db[type].col =
 				(short)(ft_atoi(ft_strchr(response, ';') + 1) - 1);
 	}
+	return (g_term->carpos_db + type);
 }

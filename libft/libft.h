@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/23 17:43:19 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/07/19 12:38:43 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/18 19:15:25 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,5 +116,6 @@ char			*to_unicode(wchar_t codepoint);
 char			*to_unicode_string(wchar_t *string);
 
 u_int64_t		ft_rand(u_int64_t limit);
+size_t			linecount(const char *str, int64_t line_width);
 
 #endif

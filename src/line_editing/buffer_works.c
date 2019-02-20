@@ -42,7 +42,7 @@ void			deal_with_printable(const char arr[8])
 	carpos_update(POS_CURRENT);
 	if (carpos_get(POS_LAST)->row <= carpos_get(POS_CURRENT)->row
 		&& carpos_get(POS_LAST)->col < carpos_get(POS_CURRENT)->col)
-		carpus_adjust_db();
+		carpos_adjust_db(1);
 	if (carpos_get(POS_CURRENT)->col < g_term->ws_col)
 		buffer_redraw();
 }

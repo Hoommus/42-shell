@@ -34,6 +34,8 @@ void	handle_up(union u_char key)
 		tputs(tgetstr("cd", NULL), 1, &ft_putc);
 		buff_insert_string_at(0, entry->command);
 		ft_printf("%s", entry->command);
+		if (carpos_update(POS_CUSTOM1)->row == g_term->ws_row)
+			carpos_adjust_db(linecount(entry->command, g_term->ws_col) - 1);
 	}
 }
 
