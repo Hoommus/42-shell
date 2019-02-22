@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/16 12:28:37 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/16 19:06:24 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/22 14:34:30 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,17 +19,21 @@ void	handle_up(union u_char key)
 {
 	extern t_history		*g_history;
 	struct s_history_entry	*entry;
+	char					*tmp;
 
 	if (key.lng == K_UP && (!g_term->buffer->iterator || !g_term->buffer->size
 		|| g_term->buffer->iterator == g_term->buffer->size)
 		&& g_history->iterator > 0)
 	{
-		while ((entry = history_get_entry(--g_history->iterator)))
-			if (ft_strcmp(entry->command, buff_get_part(0, UINT64_MAX)))
+		tmp = buff_get_part(0, UINT64_MAX);
+		while (tmp && (entry = history_get_entry(--g_history->iterator)))
+			if (ft_strcmp(entry->command, tmp))
 				break ;
+		ft_strdel(&tmp);
 		if (!entry)
 			return ;
 		caret_move(g_term->buffer->iterator, D_LEFT);
+		carpos_update(POS_PROMPT);
 		buff_clear(0);
 		tputs(tgetstr("cd", NULL), 1, &ft_putc);
 		buff_insert_string_at(0, entry->command);

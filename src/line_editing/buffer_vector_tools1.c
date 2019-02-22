@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/19 15:35:29 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/18 16:23:35 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/22 15:30:26 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,9 +88,4 @@ char			*buff_get_part(u_int64_t from_index, u_int64_t to_index)
 	stripped = ft_strdup(buffer);
 	free(buffer);
 	return (stripped);
-}
-
-char			*buff_get_string(void)
-{
-	return (NULL);
 }

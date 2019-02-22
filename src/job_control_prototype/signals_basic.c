@@ -60,12 +60,12 @@ void			fatal(int sig)
 
 void			setup_signal_handlers(void)
 {
-	struct sigaction	*action;
+	struct sigaction	action;
 
-	action = ft_memalloc(sizeof(struct sigaction));
-	action->sa_flags = SA_RESTART;
-	action->__sigaction_u.__sa_handler = &tstp;
-	sigaction(SIGTSTP, action, NULL);
+	ft_bzero(&action, sizeof(struct sigaction));
+	action.sa_flags = SA_RESTART;
+	action.__sigaction_u.__sa_handler = &tstp;
+	sigaction(SIGTSTP, &action, NULL);
 //	signal(SIGTERM, SIG_IGN);
 	signal(SIGINT, &ignore);
 	//signal(SIGSEGV, &fatal);

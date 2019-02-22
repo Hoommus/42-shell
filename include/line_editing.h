@@ -147,7 +147,7 @@ int							toggle_escaped(void);
 ** Caret positions manipulation (cursor_positions.c)
 */
 void						carpos_adjust_db(int by);
-int							caret_move(int distance,
+t_carpos					caret_move(int distance,
 										enum e_direction direction);
 t_carpos					*carpos_get(enum e_position type);
 t_carpos					*get_caretpos(enum e_position type);

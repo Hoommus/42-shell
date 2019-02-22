@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/18 15:19:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/20 16:43:59 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/22 13:18:46 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ void	handle_alt_left(union u_char key)
 
 void	handle_alt_right(union u_char key)
 {
-	u_int64_t			i;
+	int64_t			i;
 
 	if (key.lng != K_ALT_RIGHT)
 		return ;
@@ -76,7 +76,11 @@ void	handle_ctrl_w(union u_char key)
 	while (i >= 0)
 	{
 		if (is_buffer_symbol_at_index_wsp(i))
+		{
+			buff_del_symbol(i);
 			break ;
+		}
+		toggle_state(buff_char_at(i));
 		buff_del_symbol(i--);
 	}
 	if (i == -1)

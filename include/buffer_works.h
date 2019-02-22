@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/16 17:42:29 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/16 19:06:24 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/22 15:37:10 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,6 @@
 # include <stdlib.h>
 # include <stdbool.h>
 # include "libft.h"
-
-/*
-** Using union just to use it anywhere
-*/
 
 union				u_char
 {

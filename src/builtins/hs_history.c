@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/16 12:28:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/16 18:47:04 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/21 16:12:34 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void	add_entry(char **args)
 }
 
 /*
-** TODO: Remove reallocation with something more clever
+** TODO: Replace reallocation with something more clever
 */
 
 void	clear_history_hard(void)
@@ -42,8 +42,13 @@ void	clear_history_hard(void)
 	capacity = g_history->capacity;
 	i = 0;
 	while (i < g_history->size)
-		free(g_history->entries[i++]);
+	{
+		free(g_history->entries[i]->command);
+		free(g_history->entries[i]);
+		i++;
+	}
 	ft_bzero(g_history, sizeof(t_history));
+	free(g_history->entries);
 	free(g_history);
 	history_init_vector(capacity);
 	close(g_term->history_file);

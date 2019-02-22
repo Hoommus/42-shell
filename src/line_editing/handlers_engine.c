@@ -67,5 +67,5 @@ void						handle_key(union u_char key)
 	while (g_key_listeners[++i].handler != 0)
 		if (g_key_listeners[i].key.lng == key.lng)
 			g_key_listeners[i].handler(key);
-	write_at(0, 0, key.arr);
+	//write_at(0, 0, key.arr);
 }

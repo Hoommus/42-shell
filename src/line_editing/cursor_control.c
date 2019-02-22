@@ -111,19 +111,24 @@ static void		right_hard(int distance, int *new_col, int *new_row)
 ** final cursor position and moving it directly there via `cm' capability
 */
 
-int				caret_move(int distance, enum e_direction direction)
+t_carpos		caret_move(int distance, enum e_direction direction)
 {
-	int		new_col;
-	int		new_row;
+	int			new_col;
+	int			new_row;
+	t_carpos	position;
 
+	position.col = -1;
+	position.row = -1;
 	if (distance <= 0 || direction == D_NOWHERE)
-		return (1);
+		return (position);
 	new_col = carpos_get(POS_CURRENT)->col;
 	new_row = carpos_get(POS_CURRENT)->row;
 	if (direction == D_LEFT)
 		left_hard(distance, &new_col, &new_row);
 	else if (direction == D_RIGHT)
 		right_hard(distance, &new_col, &new_row);
+	position.col = new_col;
+	position.row = new_row;
 	tputs(tgoto(tgetstr("cm", NULL), new_col, new_row), 1, &ft_putc);
-	return (0);
+	return (position);
 }
