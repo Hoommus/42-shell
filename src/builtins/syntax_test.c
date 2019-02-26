@@ -28,6 +28,7 @@ int				hs_syntax(char **args)
 		return (OK);
 	}
 	run_script(tokenize(string, TOKEN_DELIMITERS), logging);
+	free(string);
 	TERM_ENFORCE;
 	return (0);
 }

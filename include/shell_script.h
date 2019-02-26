@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 14:44:44 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/17 14:51:33 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/26 15:33:24 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,18 +89,7 @@ enum						e_token_type
 	TOKEN_NOT_APPLICABLE,
 
 	TOKEN_KEYWORD,
-	TOKEN_WORD_COMMAND,
-
-	LITERAL,
-	LITERAL_ARRAY,
-	BRACE,
-	REDIRECTION,
-	OPERATOR,
-
-	SEPARATOR,
-	AST_COMMAND,
-	VARIABLE,
-	END_OF_SCRIPT,
+	TOKEN_WORD_COMMAND
 };
 
 /*
@@ -127,6 +116,7 @@ typedef struct				s_token
 	int					line_nbr;
 	const char			*value;
 	enum e_token_type	type;
+	bool				did_builder_consume;
 	struct s_token		*prev;
 	struct s_token		*next;
 }							t_token;
@@ -155,18 +145,25 @@ typedef struct				s_node
 	struct s_node		*right;
 }							t_node;
 
+union						u_io_rdr_param
+{
+	char		*string;
+	int			fd;
+};
+
 struct						s_io_redirect
 {
-	short	fd_what;
-	short	fd_where;
-	bool	append;
+	union u_io_rdr_param	what;
+	union u_io_rdr_param	where;
+	enum e_token_type		type;
+	bool					append;
 };
 
 struct						s_command
 {
 	char					**args;
-	t_token					*assignments;
-	struct s_io_redirect	*io_redirects;
+	char					**assignments;
+	struct s_io_redirect	**io_redirects;
 	bool					is_bg;
 };
 

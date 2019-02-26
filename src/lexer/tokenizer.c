@@ -6,12 +6,24 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:55:49 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/15 15:55:49 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/26 17:55:57 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell_script.h"
 #include "shell_script_parser.h"
+
+/*
+** Awfully hardcoded solution for exceptions
+*/
+
+static size_t			is_exception(const char *str)
+{
+	if (str && (str[0] == '>' || str[0] == '<') &&
+		(ft_isalpha(str[1]) || ft_strchr("/\\\"\'`", str[1])))
+		return (1);
+	return (0);
+}
 
 static size_t			is_separate(const char *str)
 {
@@ -64,11 +76,11 @@ static char				*next_token(const char *str, const char *delims)
 	c = str[i];
 	if (ISQT(c) && ++i)
 		i = get_quoted_size(str, delims);
-	else if ((i = is_separate(str)))
+	else if ((i = is_separate(str)) || (i = is_exception(str)))
 		return (ft_strsub(str, 0, i));
 	else
 		while (str[i] && ft_strchr(delims, str[i]) == NULL
-			&& !is_separate(str + i))
+			&& !is_separate(str + i) && !is_exception(str + i))
 			i += str[i] == '\\' ? 2 : 1;
 	return (ft_strsub(str, 0, i));
 }
@@ -78,13 +90,16 @@ static char				*next_token(const char *str, const char *delims)
 ** Defaults to TOKEN_SEMICOLON, because it does not affect any contextual
 ** classification
 */
-static struct s_token	*create_token(const char *str, t_token *last)
+static struct s_token	*create_token(const char *str, t_token *last, int line)
 {
 	enum e_token_type	type;
+	t_token				*token;
 
 	type = token_class_contextual(str, last == NULL ? TOKEN_SEMICOLON
 													: last->type);
-	return (new_token(ft_strdup(str), type));
+	token = new_token(ft_strdup(str), type);
+	token->line_nbr = line;
+	return (token);
 }
 
 /*
@@ -139,9 +154,11 @@ struct s_token		*tokenize(char *string, const char *delimiters)
 	struct s_token	*tail;
 	char			*token_value;
 	u_int64_t		i;
+	int				line;
 
 	head = NULL;
 	tail = NULL;
+	line = 1;
 	i = -1;
 	strip_escaped_nl(strip_comments(string));
 	while (string && string[++i])
@@ -149,11 +166,12 @@ struct s_token		*tokenize(char *string, const char *delimiters)
 		if (ft_strchr(delimiters, string[i]) != NULL)
 			continue ;
 		token_value = next_token(string + i, delimiters);
-		add_token(&head, &tail, create_token(token_value, tail));
+		line += ft_strcmp(token_value, "\n") == 0 ? 1 : 0;
+		add_token(&head, &tail, create_token(token_value, tail, line));
 		i += ft_strlen(token_value) - 1;
 		free(token_value);
 	}
 	if (!tail || (tail->type != TOKEN_SEMICOLON && tail->type != TOKEN_NEWLINE))
-		add_token(&head, &tail, create_token("\n", tail));
+		add_token(&head, &tail, create_token("\n", tail, line));
 	return (head);
 }

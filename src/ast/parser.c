@@ -6,14 +6,14 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:38 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/17 14:35:06 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/26 18:34:55 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell_script_parser.h"
 #include "shell_script.h"
 
-t_token			*offset_list(t_token *list, int offset)
+t_token					*offset_list(t_token *list, int offset)
 {
 	int		i;
 
@@ -56,7 +56,7 @@ struct s_result	*handle_terminal(struct s_result *result, const t_state *state)
 	return (result);
 }
 
-bool			check_rule(struct s_result *result, t_state *state,
+bool				check_rule(struct s_result *result, t_state *state,
 								const t_rule *restrict const rule)
 {
 	struct s_result		tmp;
@@ -73,12 +73,13 @@ bool			check_rule(struct s_result *result, t_state *state,
 	{
 		state->list_offset = offset_list(state->list_offset, -result->consumed);
 		result->consumed = 0;
+		ast_free_recursive(result->node->ast_root);
 	}
 	return (tmp.valid);
 }
 
 // TODO: Remove logging
-struct s_result	is_syntax_valid(t_state const prev)
+struct s_result			is_syntax_valid(t_state const prev)
 {
 	struct s_result		result;
 	t_state				state;
@@ -100,9 +101,11 @@ struct s_result	is_syntax_valid(t_state const prev)
 	while (!result.valid && ++i < 10 && prev.rule->expands_to[i][0] && (j = -1))
 		while (prev.rule->expands_to[i][++j])
 			if (!check_rule(&result, &state, prev.rule->expands_to[i][j]))
-			{
 				break ;
-			}
+	if (state.rule->tree_builder && result.valid)
+		result.node = state.rule->tree_builder(&state, result.consumed);
+	if (result.node)
+		print_command_node(result.node->ast_root);
 	//ft_printf("consumed %d tokens\n", result.consumed);
 	return (result);
 }

@@ -40,9 +40,9 @@ void			deal_with_printable(const char arr[8])
 		caret_move(1, D_RIGHT);
 	}
 	carpos_update(POS_CURRENT);
-	if (carpos_get(POS_LAST)->row <= carpos_get(POS_CURRENT)->row
+	if (carpos_get(POS_LAST)->row == carpos_get(POS_CURRENT)->row
 		&& carpos_get(POS_LAST)->col < carpos_get(POS_CURRENT)->col)
-		carpus_adjust_db();
+		carpos_adjust_db(1);
 	if (carpos_get(POS_CURRENT)->col < g_term->ws_col)
 		buffer_redraw();
 }
@@ -90,8 +90,9 @@ char			**read_command(void)
 		if (g_term->input_state == STATE_COMMIT)
 		{
 			// TODO: Fix leak from buff_get_part
-			commands = smart_split(history_write(buff_get_part(0, UINT64_MAX),
-										get_history_fd()), TOKEN_DELIMITERS);
+			char *tmp = buff_get_part(0, UINT64_MAX);
+			commands = smart_split(history_write(tmp, get_history_fd()), TOKEN_DELIMITERS);
+			free(tmp);
 		}
 		if (input.lng != 0)
 			carpos_update(POS_CURRENT);

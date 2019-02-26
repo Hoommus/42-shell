@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/16 17:42:29 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/16 19:06:24 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/22 15:37:10 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,6 @@
 # include <stdlib.h>
 # include <stdbool.h>
 # include "libft.h"
-
-/*
-** Using union just to use it anywhere
-*/
 
 union				u_char
 {
@@ -43,6 +39,7 @@ typedef struct		s_buffer
 
 void				init_buffer_vector(u_int64_t capacity);
 void				buff_clear(u_int64_t from_index);
+void				buff_clear_part(u_int64_t from_index, u_int64_t to_index);
 int					buff_del_symbol(u_int64_t at_index);
 char				*buff_get_part(u_int64_t from_index, u_int64_t to_index);
 t_symbol			*buff_symbol_at(u_int64_t index);

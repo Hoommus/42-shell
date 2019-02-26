@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/03 16:28:37 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/18 13:38:14 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/25 16:52:13 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -306,13 +306,13 @@ const t_rule g_else_part = {
 	.expands_to = {
 		{
 			&g_elif_token,
-			&g_simple_command, &g_separator,
+			&g_compound_list,
 			&g_then_token,
 			&g_compound_list
 		},
 		{
 			&g_elif_token,
-			&g_simple_command, &g_separator,
+			&g_compound_list,
 			&g_then_token,
 			&g_compound_list,
 			&g_else_part
@@ -329,7 +329,7 @@ const t_rule g_else_part = {
 const t_rule g_while_clause = {
 	.token = TOKEN_NOT_APPLICABLE,
 	.expands_to = {
-		{&g_while_token, &g_simple_command, &g_separator, &g_do_group}
+		{&g_while_token, &g_compound_list, &g_do_group}
 	},
 	.human_readable = "while_clause",
 	.tree_builder = NULL
@@ -403,7 +403,7 @@ const t_rule g_simple_command = {
 		{&g_cmd_name}
 	},
 	.human_readable = "simple_command",
-	.tree_builder = NULL
+	.tree_builder = &simple_command_build
 };
 
 /*

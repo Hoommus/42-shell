@@ -34,6 +34,8 @@ void	ast_free_recursive(t_node *node)
 		ast_free_recursive(node->left);
 	if (node->right != NULL)
 		ast_free_recursive(node->right);
+//	if (node->node_type == NODE_COMMAND)
+//		free_command();
 	free(node->value);
 	free(node);
 }

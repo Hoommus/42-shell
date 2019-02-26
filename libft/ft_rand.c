@@ -23,4 +23,3 @@ u_int64_t		ft_rand(u_int64_t limit)
 	read(fd, &ponies, sizeof(ssize_t));
 	return (ponies % limit);
 }
-

@@ -155,7 +155,7 @@ static long long		get_word_size(char *str)
 		while (str[i] && str[i] != quote)
 			i++;
 	else if (ft_isdigit(*str) && ++i)
-		while (str[i] && ft_isdigit(str[i]))
+		while (str[i] && ft_isalnum(str[i]))
 			i++;
 	else
 		while (str[i] && !is_single_token(str[i]) && !ft_strchr(TOKEN_DELIMITERS, str[i]))

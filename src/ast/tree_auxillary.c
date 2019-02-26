@@ -5,77 +5,61 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/02/15 15:57:06 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/15 15:57:06 by vtarasiu         ###   ########.fr       */
+/*   Created: 2019/02/25 18:12:02 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/02/26 17:21:31 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell_script.h"
 #include "shell_script_parser.h"
-#include "shell_script_builders.h"
 
-static char			**get_args_command(t_token *list, size_t length)
-{
-	char	**args;
-	int		i;
-	int		size;
-	t_token	*copy;
-
-	size = 0;
-	while (list && list->type == TOKEN_ASSIGNMENT_WORD)
-		list = list->next;
-	while (list && size < length && list->type != TOKEN_IO_NUMBER)
-	{
-		list = list->next;
-		size++;
-	}
-}
-
-static t_token		*get_assignments(t_token **list, size_t length)
+int			get_tree_depth(t_node *parent)
 {
 	int		i;
-	int		size;
-	t_token	*assignments;
-	t_token	*copy;
+	int		left;
+	int		right;
+
 
 	i = 0;
-	size = 0;
-	copy = *list;
-	while (copy && size < length && copy->type == TOKEN_ASSIGNMENT_WORD)
+	if (parent && (parent->left != NULL || parent->right != NULL))
 	{
-		copy = copy->next;
-		size++;
+		left = get_tree_depth(parent->left);
+		right = get_tree_depth(parent->right);
+		i += left > right ? left : right;
 	}
-	assignments = (t_token *)ft_memalloc(sizeof(t_token) * (size + 1));
-	copy = *list;
-	while (i < size)
-	{
-		assignments[i++] = *copy;
-		copy = copy->next;
-	}
-	*list = offset_list(*list, size);
-	return (assignments);
+	if (parent && parent->left == NULL && parent->right == NULL)
+		i = 1; // last layer
+	return (i);
 }
 
-t_bresult			simple_command_build(t_token *list, size_t length)
+void		print_command_node(t_node *node)
 {
-	t_node				*node;
-	int					i;
-	t_token				copy;
-	t_bresult			result;
-	struct s_command	*command;
+	struct s_command	*cmd;
 
-	command = (struct s_command *)ft_memalloc(sizeof(struct s_command));
-	command->args = (char **)ft_memalloc(sizeof(char *) * (length + 1));
-	command->assignments = get_assignments(list, length);
-	i = 0;
-	while (i < length)
+	if (node->node_type == NODE_COMMAND)
 	{
-
-		command->args[i++] = list->value;
+		ft_printf("COMMAND ");
+		cmd = (struct s_command *)node->value;
+		ft_printf("[ %s ] :\n", cmd->is_bg ? "async" : "regular");
+		ft_printf("args: [ ");
+		for (int i = 0; cmd->args[i] != NULL; i++)
+			ft_printf("%s, ", cmd->args[i]);
+		ft_printf("] \n assignments: [ ");
+		for (int i = 0; cmd->assignments[i] != NULL; i++)
+			ft_printf("%s, ", cmd->assignments[i]);
+		ft_printf("] \n redirects: [ ");
+		for (int i = 0; cmd->io_redirects[i] != NULL; i++)
+		{
+			if ((u_int32_t)cmd->io_redirects[i]->what.fd < 10)
+				ft_printf("%d ", cmd->io_redirects[i]->what.fd);
+			else
+				ft_printf("%s ", cmd->io_redirects[i]->what.string);
+			ft_printf("%s ", g_tokens[cmd->io_redirects[i]->type].token_name);
+			if ((u_int32_t)cmd->io_redirects[i]->where.fd < 10)
+				ft_printf("%d ", cmd->io_redirects[i]->where.fd);
+			else
+				ft_printf("%s ", cmd->io_redirects[i]->where.string);
+		}
+		ft_printf("] \n");
 	}
-	node = ast_new_node(command, TOKEN_NOT_APPLICABLE, NODE_COMMAND);
-	result.ast_root = node;
-	result.error = NULL;
-	return (result);
 }

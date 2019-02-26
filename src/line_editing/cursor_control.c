@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/16 12:28:16 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/16 16:59:39 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/18 18:40:27 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,14 +32,16 @@ int			ft_strchr_back(const char *str, char c, int i)
 	return (i);
 }
 
-void			carpus_adjust_db(void)
+void	carpos_adjust_db(int by)
 {
 	int		i;
 
+	if (by < 1)
+		return ;
 	i = 0;
 	while (i < POS_CUSTOM2)
 	{
-		g_term->carpos_db[i].row -= 1;
+		g_term->carpos_db[i].row -= by;
 		i++;
 	}
 }
@@ -109,19 +111,24 @@ static void		right_hard(int distance, int *new_col, int *new_row)
 ** final cursor position and moving it directly there via `cm' capability
 */
 
-int				caret_move(int distance, enum e_direction direction)
+t_carpos		caret_move(int distance, enum e_direction direction)
 {
-	int		new_col;
-	int		new_row;
+	int			new_col;
+	int			new_row;
+	t_carpos	position;
 
+	position.col = -1;
+	position.row = -1;
 	if (distance <= 0 || direction == D_NOWHERE)
-		return (1);
+		return (position);
 	new_col = carpos_get(POS_CURRENT)->col;
 	new_row = carpos_get(POS_CURRENT)->row;
 	if (direction == D_LEFT)
 		left_hard(distance, &new_col, &new_row);
 	else if (direction == D_RIGHT)
 		right_hard(distance, &new_col, &new_row);
+	position.col = new_col;
+	position.row = new_row;
 	tputs(tgoto(tgetstr("cm", NULL), new_col, new_row), 1, &ft_putc);
-	return (0);
+	return (position);
 }
