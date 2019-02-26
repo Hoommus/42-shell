@@ -41,12 +41,12 @@ int		magic(char **line, char **buf)
 
 int		get_next_line(const int fd, char **line)
 {
-	static char	*buf[4864];
+	static char	*buf[10];
 	char		*b;
 	char		*swap;
 	long long	cat;
 
-	if (fd < 0 || fd >= 4864 || line == NULL)
+	if (fd < 0 || fd >= 10 || line == NULL)
 		return (-1);
 	buf[fd] = buf[fd] == NULL ? ft_strnew(0) : buf[fd];
 	b = ft_strnew(BUFF_SIZE);

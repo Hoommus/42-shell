@@ -52,9 +52,9 @@ void	handle_alt_right(union u_char key)
 		return ;
 	i = g_term->buffer->iterator;
 	if (is_buffer_symbol_at_index_wsp(g_term->buffer->iterator))
-		while (i < g_term->buffer->size && is_buffer_symbol_at_index_wsp(i))
+		while (i < (int64_t)g_term->buffer->size && is_buffer_symbol_at_index_wsp(i))
 			i++;
-	while (i < g_term->buffer->size)
+	while (i < (int64_t)g_term->buffer->size)
 	{
 		if (is_buffer_symbol_at_index_wsp(i))
 			break ;

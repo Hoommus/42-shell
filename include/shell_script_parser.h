@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/10 13:17:59 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/15 16:02:02 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/26 16:57:57 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ typedef struct					s_parser_state
 */
 typedef struct s_build_result	t_bresult;
 
-typedef t_bresult				*(t_builder) (t_state state, int tokens_number);
+typedef t_bresult				*(*t_builder) (const t_state *state, int tokens_number);
 
 // TODO: shrink down expands_to size
 typedef struct					s_syntax_rule
@@ -79,7 +79,7 @@ typedef struct					s_syntax_rule
 	const enum e_token_type		token;
 	const struct s_syntax_rule	*restrict expands_to[10][10];
 	const char					*restrict const human_readable;
-	t_builder					*const tree_builder;
+	t_builder					tree_builder;
 }								t_rule;
 
 typedef struct					s_syntax_error
@@ -90,9 +90,9 @@ typedef struct					s_syntax_error
 
 struct							s_build_result
 {
-	t_error		*error;
-	t_node		*ast_root;
-	t_rule		*request;
+	t_error			*error;
+	t_node			*ast_root;
+	const t_rule	*request;
 };
 
 struct							s_result
@@ -111,6 +111,16 @@ t_token							*offset_list(t_token *list, int offset);
 struct s_result					is_syntax_valid(t_state const prev);
 bool							check_rule(struct s_result *result,
 		t_state *state, const t_rule *restrict const rule);
+
+t_bresult						*simple_command_build(const t_state *state, int size);
+
+t_node							*ast_new_node(void *value,
+	enum e_token_type token_type, enum e_node_type node_type);
+void							ast_free_recursive(t_node *node);
+
+int								get_tree_depth(t_node *parent);
+void							print_command_node(t_node *node);
+
 
 extern const t_rule	g_complete_command;
 extern const t_rule	g_list;

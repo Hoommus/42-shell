@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:56:01 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/15 15:57:32 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/25 14:27:32 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,13 +29,15 @@ void			run_script(t_token *list_head, bool log_recursion)
 	result = is_syntax_valid(state);
 	if (result.error != NULL)
 		ft_dprintf(2, "Syntax error: %s\n", result.error->text);
-	state.list_offset = offset_list(state.list_offset, result.consumed + result.valid + 1);
+	state.list_offset = offset_list(state.list_offset, result.consumed + result.valid);
 	ft_printf("is_valid = %s\n", result.valid ? "true" : "false");
 	ft_printf("consumed de-facto: %d\n", result.consumed);
 	if (state.list_offset != NULL)
-		ft_dprintf(2, "21sh: \x1b[31msyntax error\x1b[0m near token '%s'\n",
+		ft_dprintf(2,
+			"21sh: \x1b[31msyntax error\x1b[0m near token '%s' on line %d\n",
 			ft_strcmp(state.list_offset->value, "\n") == 0 ? "\\n" :
-			state.list_offset->value);
+			state.list_offset->value,
+			state.list_offset->line_nbr);
 	else
 		ft_dprintf(2, "\x1b[32mSyntax valid\x1b[0m\n");
 //  TODO: execute(tree);
