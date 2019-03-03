@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/26 19:34:37 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/03 18:04:20 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,8 @@
 # define CONFIG_FILE ".21shrc"
 # define LOG_FILE ".21sh.log"
 
-# define BUILD 880
-# define BUILD_DATE "26.02.19 19:34:36 EET"
+# define BUILD 986
+# define BUILD_DATE "03.03.19 18:04:20 EET"
 
 /*
 ** Initial input of 260 is chosen because (260 * 10) % 8 == 0
@@ -202,7 +202,7 @@ int						is_valid_var(char *var);
 
 void					chfree(void *obj);
 void					chfree_n(int n, ...);
-void					free_array(char **array);
+void					free_array(void **array);
 
 void					history_load(int fd);
 

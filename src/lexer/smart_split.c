@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 14:44:48 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/17 15:21:30 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/27 18:38:01 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,8 +70,8 @@ const struct s_parse_token	g_tokens[] = {
 	{">|",            "CLOBBER",     TOKEN_CLOBBER,         true },
 	{"|",             "PIPE",        TOKEN_PIPE,            true },
 
-	{"<",             "LESS",        TOKEN_LESS,            false},
-	{">",             "GREAT",       TOKEN_GREAT,           false},
+	{"<",             "LESS",        TOKEN_LESS,            true },
+	{">",             "GREAT",       TOKEN_GREAT,           true },
 	{"~",             "TILDE",       TOKEN_TILDE,           false},
 	{"&",             "AMPERSAND",   TOKEN_AMPERSAND,       true },
 
@@ -117,13 +117,14 @@ static int				is_single_token(char c)
 
 static int				count_substrings(char *str)
 {
-	ssize_t	i;
+	size_t	i;
 	int		subs;
 	char	c;
 
 	subs = 0;
-	i = -1;
-	while (str && str[++i])
+	i = 0;
+	size_t len = ft_strlen(str);
+	while (str && i < len)
 	{
 		c = str[i];
 		if (ft_strchr(LIBFT_WHTSP, str[i]) != NULL && ++i)
@@ -138,6 +139,7 @@ static int				count_substrings(char *str)
 				&& !is_single_token(str[i]))
 				i++;
 		subs++;
+		i++;
 	}
 	return (subs);
 }

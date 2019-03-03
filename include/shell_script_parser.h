@@ -1,3 +1,5 @@
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "readability-avoid-const-params-in-decls"
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
@@ -6,7 +8,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/10 13:17:59 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/26 16:57:57 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/03 14:18:01 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,15 +71,21 @@ typedef struct					s_parser_state
 **      .tree_builder = &command_build
 **  };
 */
-typedef struct s_build_result	t_bresult;
 
-typedef t_bresult				*(*t_builder) (const t_state *state, int tokens_number);
+/*
+** Forward declarations
+*/
+typedef struct s_build_result	t_bresult;
+struct							s_result;
+
+typedef t_bresult				*(*t_builder) (const t_state *state,
+	struct s_result *last_build);
 
 // TODO: shrink down expands_to size
 typedef struct					s_syntax_rule
 {
 	const enum e_token_type		token;
-	const struct s_syntax_rule	*restrict expands_to[10][10];
+	const struct s_syntax_rule	*restrict expands_to[8][6];
 	const char					*restrict const human_readable;
 	t_builder					tree_builder;
 }								t_rule;
@@ -98,7 +106,8 @@ struct							s_build_result
 struct							s_result
 {
 	t_error		*error;
-	t_bresult	*node;
+	t_bresult	*ast;
+	t_bresult	*backup_ast;
 	bool		fatal;
 	int			consumed;
 	bool		valid;
@@ -112,7 +121,12 @@ struct s_result					is_syntax_valid(t_state const prev);
 bool							check_rule(struct s_result *result,
 		t_state *state, const t_rule *restrict const rule);
 
-t_bresult						*simple_command_build(const t_state *state, int size);
+t_bresult						*simple_command_build(const t_state *state,
+											struct s_result *last_build);
+t_bresult						*pipe_sequence_dash_build(const t_state *state,
+														   struct s_result *last_build);
+t_bresult						*pipe_sequence_finalizer(const t_state *state,
+									  struct s_result *last_build);
 
 t_node							*ast_new_node(void *value,
 	enum e_token_type token_type, enum e_node_type node_type);
@@ -122,31 +136,31 @@ int								get_tree_depth(t_node *parent);
 void							print_command_node(t_node *node);
 
 
-extern const t_rule	g_complete_command;
-extern const t_rule	g_list;
-extern const t_rule	g_list_dash;
-extern const t_rule	g_and_or;
-extern const t_rule	g_and_or_dash;
-extern const t_rule	g_pipeline;
-extern const t_rule	g_pipe_sequence;
-extern const t_rule	g_pipe_sequence_dash;
-extern const t_rule	g_command;
-extern const t_rule	g_compound_command;
-extern const t_rule	g_subshell;
-extern const t_rule	g_compound_list;
-extern const t_rule	g_term_rule;
-extern const t_rule	g_term_rule_dash;
+extern const t_rule				g_complete_command;
+extern const t_rule				g_list;
+extern const t_rule				g_list_dash;
+extern const t_rule				g_and_or;
+extern const t_rule				g_and_or_dash;
+extern const t_rule				g_pipeline;
+extern const t_rule				g_pipe_sequence;
+extern const t_rule				g_pipe_sequence_dash;
+extern const t_rule				g_command;
+extern const t_rule				g_compound_command;
+extern const t_rule				g_subshell;
+extern const t_rule				g_compound_list;
+extern const t_rule				g_term_rule;
+extern const t_rule				g_term_rule_dash;
 
-extern const t_rule	g_name;
-extern const t_rule	g_in;
-extern const t_rule	g_wordlist;
-extern const t_rule	g_wordlist_dash;
-extern const t_rule	g_if_clause;
-extern const t_rule	g_else_part;
-extern const t_rule	g_while_clause;
+extern const t_rule				g_name;
+extern const t_rule				g_in;
+extern const t_rule				g_wordlist;
+extern const t_rule				g_wordlist_dash;
+extern const t_rule				g_if_clause;
+extern const t_rule				g_else_part;
+extern const t_rule				g_while_clause;
 
 /*
-** some rules are omitted. But here they are:
+** some rules are omitted because I am a bad programmer. But here they are:
 ** extern const t_rule	g_for_clause;
 ** extern const t_rule	g_until_clause;
 **
@@ -159,63 +173,65 @@ extern const t_rule	g_while_clause;
 ** extern const t_rule	g_case_item;
 */
 
-extern const t_rule	g_brace_group;
-extern const t_rule	g_do_group;
-extern const t_rule	g_simple_command;
-extern const t_rule	g_cmd_name;
-extern const t_rule	g_cmd_word;
-extern const t_rule	g_cmd_prefix;
-extern const t_rule	g_cmd_prefix_dash;
-extern const t_rule	g_cmd_suffix;
-extern const t_rule	g_cmd_suffix_dash;
-extern const t_rule	g_redirect_list;
-extern const t_rule	g_redirect_list_dash;
-extern const t_rule	g_io_redirect;
-extern const t_rule	g_io_file;
-extern const t_rule	g_filename;
-extern const t_rule	g_io_here;
-extern const t_rule	g_here_end;
-extern const t_rule	g_newline_list;
-extern const t_rule	g_newline_list_dash;
-extern const t_rule	g_linebreak;
-extern const t_rule	g_separator_op;
-extern const t_rule	g_separator;
-extern const t_rule	g_sequential_sep;
+extern const t_rule				g_brace_group;
+extern const t_rule				g_do_group;
+extern const t_rule				g_simple_command;
+extern const t_rule				g_cmd_name;
+extern const t_rule				g_cmd_word;
+extern const t_rule				g_cmd_prefix;
+extern const t_rule				g_cmd_prefix_dash;
+extern const t_rule				g_cmd_suffix;
+extern const t_rule				g_cmd_suffix_dash;
+extern const t_rule				g_redirect_list;
+extern const t_rule				g_redirect_list_dash;
+extern const t_rule				g_io_redirect;
+extern const t_rule				g_io_file;
+extern const t_rule				g_filename;
+extern const t_rule				g_io_here;
+extern const t_rule				g_here_end;
+extern const t_rule				g_newline_list;
+extern const t_rule				g_newline_list_dash;
+extern const t_rule				g_linebreak;
+extern const t_rule				g_separator_op;
+extern const t_rule				g_separator;
+extern const t_rule				g_sequential_sep;
 
-extern const t_rule	g_semicolon_token;
-extern const t_rule g_ampersand_token;
-extern const t_rule	g_newline_token;
-extern const t_rule	g_and_if_token;
-extern const t_rule	g_or_if_token;
-extern const t_rule	g_bang_token;
-extern const t_rule	g_pipe_token;
-extern const t_rule	g_empty_token;
-extern const t_rule	g_lbracket_token;
-extern const t_rule	g_rbracket_token;
-extern const t_rule	g_lbrace_token;
-extern const t_rule	g_rbrace_token;
-extern const t_rule	g_for_token;
-extern const t_rule	g_word_token;
-extern const t_rule	g_if_token;
-extern const t_rule	g_then_token;
-extern const t_rule	g_fi_token;
-extern const t_rule	g_elif_token;
-extern const t_rule	g_else_token;
-extern const t_rule	g_while_token;
-extern const t_rule	g_until_token;
-extern const t_rule	g_do_token;
-extern const t_rule	g_done_token;
-extern const t_rule	g_assignment_word_token;
-extern const t_rule	g_io_number_token;
-extern const t_rule	g_dless_token;
-extern const t_rule	g_dlessdash_token;
+extern const t_rule				g_semicolon_token;
+extern const t_rule				g_ampersand_token;
+extern const t_rule				g_newline_token;
+extern const t_rule				g_and_if_token;
+extern const t_rule				g_or_if_token;
+extern const t_rule				g_bang_token;
+extern const t_rule				g_pipe_token;
+extern const t_rule				g_empty_token;
+extern const t_rule				g_lbracket_token;
+extern const t_rule				g_rbracket_token;
+extern const t_rule				g_lbrace_token;
+extern const t_rule				g_rbrace_token;
+extern const t_rule				g_for_token;
+extern const t_rule				g_word_token;
+extern const t_rule				g_if_token;
+extern const t_rule				g_then_token;
+extern const t_rule				g_fi_token;
+extern const t_rule				g_elif_token;
+extern const t_rule				g_else_token;
+extern const t_rule				g_while_token;
+extern const t_rule				g_until_token;
+extern const t_rule				g_do_token;
+extern const t_rule				g_done_token;
+extern const t_rule				g_assignment_word_token;
+extern const t_rule				g_io_number_token;
+extern const t_rule				g_dless_token;
+extern const t_rule				g_dlessdash_token;
 
-extern const t_rule	g_less_token;
-extern const t_rule	g_lessand_token;
-extern const t_rule	g_great_token;
-extern const t_rule	g_greatand_token;
-extern const t_rule	g_dgreat_token;
-extern const t_rule	g_lessgreat_token;
-extern const t_rule	g_clobber_token;
+extern const t_rule				g_less_token;
+extern const t_rule				g_lessand_token;
+extern const t_rule				g_great_token;
+extern const t_rule				g_greatand_token;
+extern const t_rule				g_dgreat_token;
+extern const t_rule				g_lessgreat_token;
+extern const t_rule				g_clobber_token;
 
 #endif
+
+#pragma clang diagnostic pop

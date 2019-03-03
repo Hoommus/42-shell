@@ -6,24 +6,12 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:55:49 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/26 17:55:57 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/28 16:07:54 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell_script.h"
 #include "shell_script_parser.h"
-
-/*
-** Awfully hardcoded solution for exceptions
-*/
-
-static size_t			is_exception(const char *str)
-{
-	if (str && (str[0] == '>' || str[0] == '<') &&
-		(ft_isalpha(str[1]) || ft_strchr("/\\\"\'`", str[1])))
-		return (1);
-	return (0);
-}
 
 static size_t			is_separate(const char *str)
 {
@@ -34,6 +22,27 @@ static size_t			is_separate(const char *str)
 		if (g_tokens[i].requires_single &&
 			ft_strncmp(str, g_tokens[i].text, ft_strlen(g_tokens[i].text)) == 0)
 			return (ft_strlen(g_tokens[i].text));
+	return (0);
+}
+
+/*
+** Awfully hardcoded solution for exceptions
+*/
+
+u_int64_t		is_exception(const char *str)
+{
+	u_int64_t	i;
+
+	if (!str)
+		return (0);
+	i = 0;
+	if ((str[0] == '>' || str[0] == '<') &&
+		(ft_isalpha(str[1]) || ft_strchr("/\\\"\'`", str[1])))
+		return (1);
+	while (ft_isdigit(str[i]))
+		i++;
+	if (i > 0 && ft_strchr("<>", str[i]) && !is_separate(str + i))
+		return (i + 1);
 	return (0);
 }
 
@@ -76,11 +85,11 @@ static char				*next_token(const char *str, const char *delims)
 	c = str[i];
 	if (ISQT(c) && ++i)
 		i = get_quoted_size(str, delims);
-	else if ((i = is_separate(str)) || (i = is_exception(str)))
+	else if ((i = is_separate(str)))
 		return (ft_strsub(str, 0, i));
 	else
 		while (str[i] && ft_strchr(delims, str[i]) == NULL
-			&& !is_separate(str + i) && !is_exception(str + i))
+			&& !is_separate(str + i))
 			i += str[i] == '\\' ? 2 : 1;
 	return (ft_strsub(str, 0, i));
 }
@@ -167,7 +176,8 @@ struct s_token		*tokenize(char *string, const char *delimiters)
 			continue ;
 		token_value = next_token(string + i, delimiters);
 		line += ft_strcmp(token_value, "\n") == 0 ? 1 : 0;
-		add_token(&head, &tail, create_token(token_value, tail, line));
+		add_token(&head, &tail,
+			create_token(token_value, pop_token(&head, &tail), line));
 		i += ft_strlen(token_value) - 1;
 		free(token_value);
 	}

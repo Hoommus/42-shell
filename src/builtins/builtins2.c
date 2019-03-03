@@ -46,7 +46,7 @@ int				hs_setenv(char **args)
 			set_env(swap[0], swap[1]);
 		else
 			ft_dprintf(2, "setenv: arguments not valid in this context.\n");
-		free_array(swap);
+		free_array((void **)swap);
 	}
 	return (0);
 }

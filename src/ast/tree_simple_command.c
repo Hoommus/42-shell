@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:57:06 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/26 18:18:16 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/03 12:52:35 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ static char					**get_args(t_token *list, int length)
 }
 
 /*
-** : Segfault prone at strdup lines
+** Segfault prone at strdup lines
 ** Syntax analyzer should catch this shit, tho
 */
 
@@ -69,18 +69,22 @@ static void					rdr_from_io_nbr(t_token *pivot,
 	if (ft_strchr(pivot->value, '<') != NULL)
 	{
 		rdr->where.fd = ft_atoi(pivot->value);
-		if (ft_strchr_any(pivot->value, "<") && ft_isdigit(*(ft_strchr_any(pivot->value, "<") + 1)))
+		if (ft_strchr_any(pivot->value, "<") &&
+			ft_isdigit(*(ft_strchr_any(pivot->value, "<") + 1)))
 			rdr->what.fd = ft_atoi(ft_strchr_any(pivot->value, "<") + 1);
 		else
 			rdr->what.string = ft_strdup(pivot->next->value);
+		rdr->type = TOKEN_LESS;
 	}
 	else
 	{
 		rdr->what.fd = (ft_atoi(pivot->value) != 0 ? ft_atoi(pivot->value) : 1);
-		if (ft_strchr_any(pivot->value, ">") && ft_isdigit(*(ft_strchr_any(pivot->value, ">") + 1)))
+		if (ft_strchr_any(pivot->value, ">") &&
+			ft_isdigit(*(ft_strchr_any(pivot->value, ">") + 1)))
 			rdr->where.fd = ft_atoi(ft_strchr_any(pivot->value, ">") + 1);
 		else
 			rdr->where.string = ft_strdup(pivot->next->value);
+		rdr->type = TOKEN_GREAT;
 	}
 }
 
@@ -107,7 +111,8 @@ static void					construct_redirect(t_token *pivot,
 		{
 			rdr->what.fd = (ft_atoi(pivot->prev->value) == 0 ? 1
 												: ft_atoi(pivot->prev->value));
-			rdr->where.string = ft_strdup(pivot->next->value);
+			if (pivot->next->type == TOKEN_WORD)
+				rdr->where.string = ft_strdup(pivot->next->value);
 		}
 }
 
@@ -131,10 +136,11 @@ static struct s_io_redirect	**get_redirects(t_token *list, int length)
 	array = ft_memalloc(sizeof(struct s_io_redirect *) * (size + 1));
 	copy = list;
 	i = 0;
-	while (copy && i < length)
+	while (copy && i < size && length--)
 	{
 		if (is_redirect(copy))
-			construct_redirect(copy, array[i] = ft_memalloc(sizeof(struct s_io_redirect)));
+			construct_redirect(copy, array[i++] =
+				ft_memalloc(sizeof(struct s_io_redirect)));
 		copy = copy->next;
 	}
 	return (array);
@@ -169,12 +175,14 @@ static char					**get_assignments(t_token *list, int length)
 	return (assignments);
 }
 
-t_bresult					*simple_command_build(const t_state *state, int size)
+t_bresult					*simple_command_build(const t_state *state,
+											struct s_result *last_build)
 {
 	t_node				*node;
 	t_token				*list;
 	t_bresult			*result;
 	struct s_command	*command;
+	const int			size = last_build->consumed;
 
 	result = ft_memalloc(sizeof(t_bresult));
 	list = offset_list(state->list_offset, -size);
@@ -182,17 +190,14 @@ t_bresult					*simple_command_build(const t_state *state, int size)
 	command->args = get_args(list, size);
 	command->assignments = get_assignments(list, size);
 	command->io_redirects = get_redirects(list, size);
-	command->is_bg = offset_list(list, size - 1) == NULL ? false :
+	// Seems like a dirty hack or simply not working solution
+	// TODO: consider removing
+	command->is_async = offset_list(list, size - 1) == NULL ? false :
 						offset_list(list, size - 1)->type == TOKEN_AMPERSAND;
 	node = ast_new_node(command, TOKEN_NOT_APPLICABLE, NODE_COMMAND);
 	result->ast_root = node;
-	result->error = NULL;
 	result->request = state->rule;
-	ft_printf("size: %d\n", size);
 	return (result);
 }
 
-//int							simple_command_execute(t_node *command_node)
-//{
-	// TODO: Remove kebab
-//}
+

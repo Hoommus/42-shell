@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/03 16:28:37 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/25 16:52:13 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/03 14:38:19 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 */
 
 #pragma clang diagnostic push
-//#pragma ide diagnostic ignored "cppcoreguidelines-interfaces-global-init"
+#pragma ide diagnostic ignored "cppcoreguidelines-interfaces-global-init"
 
 /*
 ** const t_rule g_complete_commands = {
@@ -40,7 +40,7 @@ const t_rule g_complete_command = {
 	.expands_to = {
 		{&g_list, &g_separator},
 		{&g_list},
-		{&g_newline_list}
+		{&g_linebreak}
 	},
 	.human_readable = "complete_command",
 	.tree_builder = NULL
@@ -100,7 +100,7 @@ const t_rule g_pipeline = {
 	.token = TOKEN_NOT_APPLICABLE,
 	.expands_to = {
 		{&g_pipe_sequence},
-		{&g_bang_token, &g_pipe_sequence}
+//		{&g_bang_token, &g_pipe_sequence}
 	},
 	.human_readable = "pipeline",
 	.tree_builder = NULL
@@ -112,7 +112,7 @@ const t_rule g_pipe_sequence = {
 		{&g_command, &g_pipe_sequence_dash}
 	},
 	.human_readable = "pipe_sequence_alt",
-	.tree_builder = NULL
+	.tree_builder = &pipe_sequence_finalizer
 };
 
 const t_rule g_pipe_sequence_dash = {
@@ -122,7 +122,7 @@ const t_rule g_pipe_sequence_dash = {
 		{&g_empty_token}
 	},
 	.human_readable = "pipe_sequence_dash",
-	.tree_builder = NULL
+	.tree_builder = &pipe_sequence_dash_build
 };
 
 /*
@@ -242,42 +242,30 @@ const t_rule g_term_rule_dash = {
 ** 	.human_readable = "for_clause",
 ** 	.tree_builder = NULL
 ** };
-*/
-
-/*
+**
+**
 ** const t_rule g_name = { TOKEN_NAME, {{0}}, "name", NULL };
 ** const t_rule g_in = { TOKEN_IN, {{0}}, "in", NULL };
+**
+**  const t_rule g_wordlist = {
+**  	TOKEN_NOT_APPLICABLE,
+**  	.expands_to = {
+**  		{&g_word_token, &g_wordlist_dash}
+**  	},
+**  	.human_readable = "wordlist_alt",
+**  	.tree_builder = NULL
+**  };
+**
+**  const t_rule g_wordlist_dash = {
+**  	TOKEN_NOT_APPLICABLE,
+**  	.expands_to = {
+**  		{&g_word_token, &g_wordlist_dash},
+**  		{&g_empty_token}
+**  	},
+**  	.human_readable = "wordlist_dash",
+**  	.tree_builder = NULL
+**  };
 */
-
-/*
-** const t_rule g_wordlist = {
-**	.token = TOKEN_NOT_APPLICABLE,
-** 	.expands_to = {
-** 		{&g_wordlist, &g_word_token},
-** 		{&g_word_token}
-** 	},
-** 	"wordlist"
-** };
-*/
-
-const t_rule g_wordlist = {
-	TOKEN_NOT_APPLICABLE,
-	.expands_to = {
-		{&g_word_token, &g_wordlist_dash}
-	},
-	.human_readable = "wordlist_alt",
-	.tree_builder = NULL
-};
-
-const t_rule g_wordlist_dash = {
-	TOKEN_NOT_APPLICABLE,
-	.expands_to = {
-		{&g_word_token, &g_wordlist_dash},
-		{&g_empty_token}
-	},
-	.human_readable = "wordlist_dash",
-	.tree_builder = NULL
-};
 
 const t_rule g_if_clause = {
 	.token = TOKEN_NOT_APPLICABLE,
@@ -516,13 +504,15 @@ const t_rule g_io_redirect = {
 	.expands_to = {
 		{&g_io_file},
 		{&g_io_number_token, &g_io_file},
+		{&g_word_token, &g_io_file},
 		{&g_io_here},
-		{&g_io_number_token, &g_io_here},
-		{&g_io_number_token}
+//		{&g_io_number_token, &g_io_here},
+//		{&g_io_number_token}
 	},
 	.human_readable = "io_redirect",
 	.tree_builder = NULL
 };
+
 const t_rule g_io_file = {
 	.token = TOKEN_NOT_APPLICABLE,
 	.expands_to = {

@@ -73,7 +73,7 @@ int		try_binary(char *binary, char **args)
 		free(swap);
 		i++;
 	}
-	free_array(paths);
+	free_array((void **)paths);
 	return (status);
 }
 

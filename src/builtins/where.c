@@ -69,6 +69,6 @@ int		hs_where(char **args)
 	paths = ft_strsplit(swap, ':');
 	while (*args)
 		hs_where_auxilia(paths, *args++);
-	free_array(paths);
+	free_array((void **)paths);
 	return (0);
 }

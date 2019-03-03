@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:56:01 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/25 14:27:32 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/03 16:49:30 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,20 @@ void			run_script(t_token *list_head, bool log_recursion)
 			state.list_offset->line_nbr);
 	else
 		ft_dprintf(2, "\x1b[32mSyntax valid\x1b[0m\n");
+	t_token		*swap;
+	while (state.list_head)
+	{
+		swap = state.list_head->next;
+		free_token(state.list_head);
+		state.list_head = swap;
+	}
+	if (result.ast && result.ast->ast_root)
+	{
+		ast_free_recursive(result.ast->ast_root);
+		ft_memdel((void **)&(result.ast));
+	}
+	if (result.backup_ast && result.backup_ast->ast_root)
+		ast_free_recursive(result.backup_ast->ast_root);
 //  TODO: execute(tree);
 //  TODO: free(tree);
-//  TODO: free(list_head);
 }

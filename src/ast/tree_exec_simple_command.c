@@ -1,47 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   memory.c                                           :+:      :+:    :+:   */
+/*   tree_exec_simple_command.c                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/07/31 14:45:45 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/07/31 15:20:54 by vtarasiu         ###   ########.fr       */
+/*   Created: 2019/02/27 13:22:28 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/02/27 13:29:07 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "twenty_one_sh.h"
+#include "shell_script.h"
+#include "shell_script_parser.h"
 
-void	free_array(void **array)
+int							simple_command_execute(t_node *command_node)
 {
-	int		i;
+	const struct s_command	*command = (struct s_command *)command_node->value;
 
-	i = 0;
-	while (array && array[i])
-	{
-		chfree(array[i]);
-		i++;
-	}
-	chfree(array);
-}
+	// TODO: Solve expansions and globs
+	// TODO: Remove quotes
+	// TODO: Expand environment variables
+	// TODO: Expand backqoutes intelligently
 
-void	chfree(void *obj)
-{
-	if (obj != NULL)
-		free(obj);
-}
-
-void	chfree_n(int n, ...)
-{
-	va_list		list;
-	void		*dummy;
-
-	va_start(list, n);
-	while (n)
-	{
-		if ((dummy = va_arg(list, void *)))
-			chfree(dummy);
-		n--;
-	}
-	va_end(list);
+	return (1 /* TODO: process return code */);
 }
