@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/03 16:28:37 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/03 14:38:19 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/04 17:59:50 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ const t_rule g_and_or_dash = {
 		{&g_empty_token}
 	},
 	.human_readable = "and_or_dash",
-	.tree_builder = NULL
+	.tree_builder = &and_or_build
 };
 
 const t_rule g_pipeline = {
@@ -112,7 +112,7 @@ const t_rule g_pipe_sequence = {
 		{&g_command, &g_pipe_sequence_dash}
 	},
 	.human_readable = "pipe_sequence_alt",
-	.tree_builder = &pipe_sequence_finalizer
+	.tree_builder = &pipe_sequence_finalize
 };
 
 const t_rule g_pipe_sequence_dash = {
@@ -122,7 +122,7 @@ const t_rule g_pipe_sequence_dash = {
 		{&g_empty_token}
 	},
 	.human_readable = "pipe_sequence_dash",
-	.tree_builder = &pipe_sequence_dash_build
+	.tree_builder = &pipe_sequence_build
 };
 
 /*
@@ -143,6 +143,8 @@ const t_rule g_command = {
 /*
 ** The following rule has case_clause removed.
 ** This syntax structure is completely removed from this shell
+** if_clause, while_clause and until_clause are to be implemented
+** TODO: in 42sh
 */
 
 const t_rule g_compound_command = {
@@ -150,8 +152,8 @@ const t_rule g_compound_command = {
 	.expands_to = {
 		{&g_brace_group},
 		{&g_subshell},
-		{&g_if_clause},
-		{&g_while_clause}
+//		{&g_if_clause},
+//		{&g_while_clause}
 	},
 	.human_readable = "compound_command",
 	.tree_builder = NULL
@@ -162,7 +164,7 @@ const t_rule g_subshell = {
 		{&g_lbracket_token, &g_compound_list, &g_rbracket_token}
 	},
 	.human_readable = "subshell",
-	.tree_builder = NULL
+	.tree_builder = &subshell_build
 };
 
 const t_rule g_compound_list = {
@@ -176,17 +178,6 @@ const t_rule g_compound_list = {
 	.human_readable = "compound_list",
 	.tree_builder = NULL
 };
-
-/*
-** const t_rule g_term_rule = {
-** 	.token = TOKEN_NOT_APPLICABLE,
-** 	.expands_to = {
-** 		{&g_term_rule, &g_separator, &g_and_or},
-** 		{&g_and_or}
-** 	},
-** 	"term_rule"
-** };
-*/
 
 const t_rule g_term_rule = {
 	.token = TOKEN_NOT_APPLICABLE,

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 14:44:44 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/03 16:21:05 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/04 18:55:08 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,35 +93,11 @@ enum						e_token_type
 	TOKEN_WORD_COMMAND
 };
 
-/*
-** s_parse_token is a struct that used on parsing time. Lexer uses information
-** from g_tokens table to parse char input into tokens and literals and pass
-** this new stream to syntax analyzer and then parser.
-*/
-
-struct						s_parse_token
-{
-	char				*text;
-	char				*token_name;
-	enum e_token_type	type;
-	bool				requires_single;
-};
-
-extern const struct s_parse_token	g_tokens[];
-
-typedef struct				s_token
-{
-	int					line_nbr;
-	const char			*value;
-	enum e_token_type	type;
-	struct s_token		*prev;
-	struct s_token		*next;
-}							t_token;
-
 enum						e_node_type
 {
 	NODE_GENERIC,
 	NODE_PIPE,
+	NODE_SUBSHELL,
 	NODE_SEPARATOR,
 	NODE_OR_IF,
 	NODE_AND_IF,
@@ -132,27 +108,44 @@ enum						e_node_type
 	NODE_COMMAND,
 };
 
-typedef enum				e_type
+
+/*
+** s_parse_token is a struct that used on parsing time. Lexer uses information
+** from g_tokens table to parse char input into tokens and literals and pass
+** this new stream to syntax analyzer and then parser.
+*/
+
+struct						s_parse_token
 {
-	STRING,
-	FLOAT,
-	INTEGER,
-	NOT_APPLICABLE
-}							t_datatype;
+	char					*text;
+	char					*token_name;
+	enum e_token_type		type;
+	bool					requires_single;
+};
+
+extern const struct s_parse_token	g_tokens[];
+
+typedef struct				s_token
+{
+	int						line_nbr;
+	const char				*value;
+	enum e_token_type		type;
+	struct s_token			*prev;
+	struct s_token			*next;
+}							t_token;
 
 typedef struct				s_node
 {
-	struct s_command	*value;
-	enum e_token_type	token_type;
-	enum e_node_type	node_type;
-	struct s_node		*left;
-	struct s_node		*right;
+	struct s_command		*command;
+	enum e_node_type		node_type;
+	struct s_node			*left;
+	struct s_node			*right;
 }							t_node;
 
 union						u_io_rdr_param
 {
-	char		*string;
-	int			fd;
+	char					*string;
+	int						fd;
 };
 
 struct						s_io_redirect

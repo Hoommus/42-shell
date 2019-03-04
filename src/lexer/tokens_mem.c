@@ -13,7 +13,7 @@
 #include "shell_script.h"
 
 /*
-** new_token expects value to be already malloced
+** new_token expects command to be already malloced
 */
 
 t_token			*new_token(char *value, enum e_token_type type)

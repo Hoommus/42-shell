@@ -16,7 +16,7 @@
 
 int							simple_command_execute(t_node *command_node)
 {
-	const struct s_command	*command = (struct s_command *)command_node->value;
+	const struct s_command	*command = (struct s_command *)command_node->command;
 
 	// TODO: Solve expansions and globs
 	// TODO: Remove quotes

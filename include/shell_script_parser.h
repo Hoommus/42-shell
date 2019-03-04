@@ -8,7 +8,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/10 13:17:59 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/03 14:18:01 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/04 18:48:57 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,25 +92,25 @@ typedef struct					s_syntax_rule
 
 typedef struct					s_syntax_error
 {
-	short		code;
-	char		*text;
+	short			code;
+	char			*text;
 }								t_error;
 
 struct							s_build_result
 {
 	t_error			*error;
-	t_node			*ast_root;
+	t_node			*root;
 	const t_rule	*request;
 };
 
 struct							s_result
 {
-	t_error		*error;
-	t_bresult	*ast;
-	t_bresult	*backup_ast;
-	bool		fatal;
-	int			consumed;
-	bool		valid;
+	t_error			*error;
+	t_bresult		*ast;
+	t_bresult		*backup_ast;
+	bool			fatal;
+	int				consumed;
+	bool			valid;
 };
 
 static t_error					unexpected_end =
@@ -119,22 +119,37 @@ static t_error					unexpected_end =
 t_token							*offset_list(t_token *list, int offset);
 struct s_result					is_syntax_valid(t_state const prev);
 bool							check_rule(struct s_result *result,
-		t_state *state, const t_rule *restrict const rule);
+							t_state *state, const t_rule *restrict const rule);
 
+/*
+** Rule builders
+*/
 t_bresult						*simple_command_build(const t_state *state,
-											struct s_result *last_build);
-t_bresult						*pipe_sequence_dash_build(const t_state *state,
-														   struct s_result *last_build);
-t_bresult						*pipe_sequence_finalizer(const t_state *state,
-									  struct s_result *last_build);
+												struct s_result *last_build);
+t_bresult						*subshell_build(const t_state *state,
+												struct s_result *last_build);
 
-t_node							*ast_new_node(void *value,
-	enum e_token_type token_type, enum e_node_type node_type);
+t_bresult						*pipe_sequence_build(const t_state *state,
+												struct s_result *last_build);
+t_bresult						*pipe_sequence_finalize(const t_state *state,
+												struct s_result *last_build);
+
+t_bresult						*and_or_build(const t_state *state,
+												struct s_result *last_build);
+t_bresult						*and_or_finalize(const t_state *state,
+												struct s_result *last_build);
+
+t_bresult						*pipe_andor_finalize_right(const t_state *state,
+												struct s_result *last_build);
+
+
+t_node *ast_new_node(void *value, enum e_node_type node_type);
 void							ast_free_recursive(t_node *node);
 
-int								get_tree_depth(t_node *parent);
+int								tree_get_depth(t_node *parent);
 void							print_command_node(t_node *node);
-
+t_bresult						*insert_left_recursive(t_bresult *bresult,
+									t_node *parent, t_node *insertion);
 
 extern const t_rule				g_complete_command;
 extern const t_rule				g_list;

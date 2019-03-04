@@ -6,14 +6,14 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/25 18:12:02 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/27 17:15:59 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/04 18:48:56 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell_script.h"
 #include "shell_script_parser.h"
 
-int			get_tree_depth(t_node *parent)
+int			tree_get_depth(t_node *parent)
 {
 	int		i;
 	int		left;
@@ -22,8 +22,8 @@ int			get_tree_depth(t_node *parent)
 	i = 0;
 	if (parent && (parent->left != NULL || parent->right != NULL))
 	{
-		left = get_tree_depth(parent->left);
-		right = get_tree_depth(parent->right);
+		left = tree_get_depth(parent->left);
+		right = tree_get_depth(parent->right);
 		i += left > right ? left : right;
 	}
 	if (parent && parent->left == NULL && parent->right == NULL)
@@ -38,7 +38,7 @@ void		print_command_node(t_node *node)
 
 	if (node->node_type != NODE_COMMAND)
 		return ;
-	cmd = (struct s_command *)node->value;
+	cmd = (struct s_command *)node->command;
 	ft_printf("COMMAND [ %s ] :\n", cmd->is_async ? "async" : "regular");
 	if (cmd->args && cmd->args[0])
 	{
@@ -65,3 +65,18 @@ void		print_command_node(t_node *node)
 	}
 	ft_printf("] \n");
 }
+
+t_bresult	*pipe_andor_finalize_right(const t_state *state,
+										struct s_result *last_build)
+{
+	t_node				*tmp;
+
+	if (state)
+	{
+		tmp = last_build->ast->root->right;
+		ft_memdel((void **)&(last_build->ast->root));
+		last_build->ast->root = tmp;
+	}
+	return (last_build->ast);
+}
+

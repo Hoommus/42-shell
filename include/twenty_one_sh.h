@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/03 18:04:20 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/04 19:10:08 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,8 @@
 # define CONFIG_FILE ".21shrc"
 # define LOG_FILE ".21sh.log"
 
-# define BUILD 986
-# define BUILD_DATE "03.03.19 18:04:20 EET"
+# define BUILD 1012
+# define BUILD_DATE "04.03.19 19:10:08 EET"
 
 /*
 ** Initial input of 260 is chosen because (260 * 10) % 8 == 0

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:38 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/03 16:02:57 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/04 18:48:57 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,30 +60,25 @@ struct s_result	*handle_terminal(struct s_result *result, const t_state *state)
 bool				check_rule(struct s_result *result, t_state *state,
 								const t_rule *restrict const rule)
 {
-	struct s_result		tmp;
+	struct s_result tmp;
 
 	state->rule = rule;
 	tmp = is_syntax_valid(*state);
 	result->valid = tmp.valid;
 	result->consumed += tmp.consumed;
-	if (tmp.ast != NULL && result->ast == NULL)
-		result->ast = tmp.ast;
-	else if (tmp.ast != NULL && result->ast != NULL)
-	{
+	if (tmp.ast != NULL && result->ast != NULL)
 		result->backup_ast = result->ast;
+	if (tmp.ast != NULL)
 		result->ast = tmp.ast;
-	}
 	if (tmp.valid)
-	{
 		state->list_offset = offset_list(state->list_offset, tmp.consumed);
-	}
 	else if (tmp.valid == false && result->consumed != 0)
 	{
 		state->list_offset = offset_list(state->list_offset, -result->consumed);
 		result->consumed = 0;
 		if (result->ast)
 		{
-			ast_free_recursive(result->ast->ast_root);
+			ast_free_recursive(result->ast->root);
 			ft_memdel((void **)&(result->ast));
 		}
 	}
@@ -116,7 +111,7 @@ struct s_result		is_syntax_valid(t_state const prev)
 				break ;
 	if (state.rule->tree_builder && result.valid)
 		result.ast = state.rule->tree_builder(&state, &result);
-	if (result.ast && result.ast->ast_root)
-		print_command_node(result.ast->ast_root);
+	if (result.ast && result.ast->root)
+		print_command_node(result.ast->root);
 	return (result);
 }
