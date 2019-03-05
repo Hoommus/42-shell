@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 14:44:44 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/26 15:33:24 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/04 18:55:08 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,8 @@
 
 /*
 ** Do not change order in which these entries appear. They provide easy random
-** access to a specific token entry in g_tokens[] table.
+** access to a specific token entry in recognisable by this shell token table.
+** @see g_tokens[] src/lexer/smart_split.c
 */
 
 enum						e_token_type
@@ -92,6 +93,22 @@ enum						e_token_type
 	TOKEN_WORD_COMMAND
 };
 
+enum						e_node_type
+{
+	NODE_GENERIC,
+	NODE_PIPE,
+	NODE_SUBSHELL,
+	NODE_SEPARATOR,
+	NODE_OR_IF,
+	NODE_AND_IF,
+	NODE_LOOP_WHILE,
+	NODE_LOOP_FOR,
+	NODE_LOOP_UNTIL,
+	NODE_STRING,
+	NODE_COMMAND,
+};
+
+
 /*
 ** s_parse_token is a struct that used on parsing time. Lexer uses information
 ** from g_tokens table to parse char input into tokens and literals and pass
@@ -100,55 +117,35 @@ enum						e_token_type
 
 struct						s_parse_token
 {
-	char				*text;
-	char				*token_name;
-	enum e_token_type	type;
-	bool				requires_single;
+	char					*text;
+	char					*token_name;
+	enum e_token_type		type;
+	bool					requires_single;
 };
 
 extern const struct s_parse_token	g_tokens[];
 
-/*
-** TODO: Add information about a line where specific token resides
-*/
 typedef struct				s_token
 {
-	int					line_nbr;
-	const char			*value;
-	enum e_token_type	type;
-	bool				did_builder_consume;
-	struct s_token		*prev;
-	struct s_token		*next;
+	int						line_nbr;
+	const char				*value;
+	enum e_token_type		type;
+	struct s_token			*prev;
+	struct s_token			*next;
 }							t_token;
-
-enum						e_node_type
-{
-	NODE_GENERIC,
-	NODE_STRING,
-	NODE_COMMAND,
-};
-
-typedef enum				e_type
-{
-	STRING,
-	FLOAT,
-	INTEGER,
-	NOT_APPLICABLE
-}							t_datatype;
 
 typedef struct				s_node
 {
-	void				*value;
-	enum e_token_type	token_type;
-	enum e_node_type	node_type;
-	struct s_node		*left;
-	struct s_node		*right;
+	struct s_command		*command;
+	enum e_node_type		node_type;
+	struct s_node			*left;
+	struct s_node			*right;
 }							t_node;
 
 union						u_io_rdr_param
 {
-	char		*string;
-	int			fd;
+	char					*string;
+	int						fd;
 };
 
 struct						s_io_redirect
@@ -164,7 +161,7 @@ struct						s_command
 	char					**args;
 	char					**assignments;
 	struct s_io_redirect	**io_redirects;
-	bool					is_bg;
+	bool					is_async;
 };
 
 /*
@@ -174,13 +171,14 @@ struct s_token				*tokenize(char *str, const char *delimiters);
 struct s_token				*new_token(char *value, enum e_token_type type);
 void						add_token(t_token **head, t_token **tail,
 														t_token *to_add);
+t_token						*pop_token(t_token **head, t_token **tail);
 void						free_token(struct s_token *token);
 
 enum e_token_type			token_class_contextual(const char *str,
 														enum e_token_type prev);
 char						**smart_split(char *str, char *delimiters);
 
-void						free_array(char **array);
+void						free_array(void **array);
 
 void						run_script(t_token *list_head, bool log_recursion);
 /*

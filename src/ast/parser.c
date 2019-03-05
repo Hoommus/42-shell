@@ -6,10 +6,11 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:38 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/26 18:34:55 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/04 18:48:57 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <assert.h>
 #include "shell_script_parser.h"
 #include "shell_script.h"
 
@@ -59,27 +60,33 @@ struct s_result	*handle_terminal(struct s_result *result, const t_state *state)
 bool				check_rule(struct s_result *result, t_state *state,
 								const t_rule *restrict const rule)
 {
-	struct s_result		tmp;
+	struct s_result tmp;
 
 	state->rule = rule;
 	tmp = is_syntax_valid(*state);
 	result->valid = tmp.valid;
 	result->consumed += tmp.consumed;
+	if (tmp.ast != NULL && result->ast != NULL)
+		result->backup_ast = result->ast;
+	if (tmp.ast != NULL)
+		result->ast = tmp.ast;
 	if (tmp.valid)
-	{
 		state->list_offset = offset_list(state->list_offset, tmp.consumed);
-	}
 	else if (tmp.valid == false && result->consumed != 0)
 	{
 		state->list_offset = offset_list(state->list_offset, -result->consumed);
 		result->consumed = 0;
-		ast_free_recursive(result->node->ast_root);
+		if (result->ast)
+		{
+			ast_free_recursive(result->ast->root);
+			ft_memdel((void **)&(result->ast));
+		}
 	}
 	return (tmp.valid);
 }
 
 // TODO: Remove logging
-struct s_result			is_syntax_valid(t_state const prev)
+struct s_result		is_syntax_valid(t_state const prev)
 {
 	struct s_result		result;
 	t_state				state;
@@ -103,9 +110,8 @@ struct s_result			is_syntax_valid(t_state const prev)
 			if (!check_rule(&result, &state, prev.rule->expands_to[i][j]))
 				break ;
 	if (state.rule->tree_builder && result.valid)
-		result.node = state.rule->tree_builder(&state, result.consumed);
-	if (result.node)
-		print_command_node(result.node->ast_root);
-	//ft_printf("consumed %d tokens\n", result.consumed);
+		result.ast = state.rule->tree_builder(&state, &result);
+	if (result.ast && result.ast->root)
+		print_command_node(result.ast->root);
 	return (result);
 }

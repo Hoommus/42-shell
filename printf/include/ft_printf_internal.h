@@ -40,9 +40,9 @@ int				g_error;
 /*
 ** Following chars respectively:
 ** '#' - alternate form
-** '0' - For all conversions except n, the converted value is padded on the left
+** '0' - For all conversions except n, the converted command is padded on the left
 **       with zeros rather than blanks
-** '-' - value is to be left adjusted on the field
+** '-' - command is to be left adjusted on the field
 ** ' ' - blank before positive number of signed conversion
 ** '+' - always put sign before conversion
 ** ''' - grouped and separated by thousands

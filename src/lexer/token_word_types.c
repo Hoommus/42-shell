@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/09 16:35:29 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/17 15:02:22 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/02 13:25:32 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ static bool			is_name(const char *str)
 	return (true);
 }
 
-static bool			is_io_number(const char *str)
+bool				is_io_number(const char *str)
 {
 	if (!str || (ft_strchr_any(str, "<>") == NULL))
 		return (false);
@@ -50,7 +50,7 @@ static bool			is_assignment_word(const char *str)
 		status = false;
 	else if (is_name(split[0]))
 		status = true;
-	free_array(split);
+	free_array((void **)split);
 	return (status);
 }
 
@@ -62,7 +62,7 @@ enum e_token_type	token_class_contextual(const char *str,
 
 	i = TOKEN_IF;
 	type = TOKEN_NOT_APPLICABLE;
-	while (str && g_tokens[i].token_name != NULL && type == TOKEN_NOT_APPLICABLE)
+	while (str && g_tokens[i].token_name && type == TOKEN_NOT_APPLICABLE)
 	{
 		if (ft_strcmp(g_tokens[i].text, str) == 0)
 			type = g_tokens[i].type;
@@ -73,8 +73,6 @@ enum e_token_type	token_class_contextual(const char *str,
 		if ((prev == TOKEN_ASSIGNMENT_WORD || prev == TOKEN_NEWLINE ||
 			 prev == TOKEN_SEMICOLON) && is_assignment_word(str))
 			type = TOKEN_ASSIGNMENT_WORD;
-		else if (is_io_number(str))
-			type = TOKEN_IO_NUMBER;
 		else
 			type = TOKEN_WORD;
 	}

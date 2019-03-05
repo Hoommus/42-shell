@@ -47,12 +47,15 @@ void	handle_down(union u_char key)
 {
 	extern t_history		*g_history;
 	struct s_history_entry	*entry;
+	char					*tmp;
 
 	if (key.lng == K_DOWN && history_get_entry(g_history->iterator) != NULL)
 	{
+		tmp = buff_get_part(0, UINT64_MAX);
 		while ((entry = history_get_entry(++g_history->iterator)))
-			if (ft_strcmp(entry->command, buff_get_part(0, UINT64_MAX)))
+			if (ft_strcmp(entry->command, tmp))
 				break ;
+		ft_strdel(&tmp);
 		caret_move(g_term->buffer->iterator, D_LEFT);
 		buff_clear(0);
 		tputs(tgetstr("cd", NULL), 1, &ft_putc);

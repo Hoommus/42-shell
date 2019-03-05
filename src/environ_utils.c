@@ -59,7 +59,7 @@ int		set_env(char *key, char *value)
 			swap = ft_strsplit(g_environ[i], '=');
 			free(g_environ[i]);
 			g_environ[i] = ft_strings_join(2, "=", key, value);
-			free_array(swap);
+			free_array((void **)swap);
 		}
 	return (0);
 }

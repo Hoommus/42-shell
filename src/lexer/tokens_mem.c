@@ -6,14 +6,14 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:11 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/10 13:29:28 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/02/27 13:31:38 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell_script.h"
 
 /*
-** new_token expects value to be already malloced
+** new_token expects command to be already malloced
 */
 
 t_token			*new_token(char *value, enum e_token_type type)
@@ -39,6 +39,15 @@ void			push_token(t_token **head, t_token *token)
 	token->next = *head;
 	token->prev = NULL;
 	*head = token;
+}
+
+t_token			*pop_token(t_token **head, t_token **tail)
+{
+	if (*head != NULL && *tail == NULL)
+		return (*head);
+	if (*head != NULL && *tail != NULL)
+		return (*tail);
+	return NULL;
 }
 
 void			add_token(t_token **head, t_token **tail, t_token *to_add)
@@ -67,15 +76,3 @@ void			insert_after(t_token **after_what, t_token *insertion)
 	(*after_what)->next = insertion;
 	insertion->next = next;
 }
-
-/*
-void			insert_as_child(t_token  *parent)
-{
-
-}
-
-void			insert_as_sibling(t_token  *left_brother)
-{
-
-}
- */

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:32 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/08 13:16:00 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/02 13:02:10 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 struct s_term	*g_term;
 
-int				display_normal_prompt(void)
+int					display_normal_prompt(void)
 {
 	char	host[1025];
 	char	cwd[1025];
@@ -29,13 +29,14 @@ int				display_normal_prompt(void)
 		ft_strcpy(cwd, "~");
 	host[ft_strchr(host, '.') - host] = 0;
 	size = ft_printf(SHELL_PROMPT,
-			get_env("USER"), host,
-			ft_strrchr(cwd, '/') == NULL ? cwd : ft_strrchr(cwd, '/') + !!(cwd[1] != '\0'),
-			g_term->last_cmd_status ? 31 : 32);
+		get_env("USER"), host,
+		ft_strrchr(cwd, '/') == NULL ? cwd
+									: ft_strrchr(cwd, '/') + !!(cwd[1] != '\0'),
+		g_term->last_cmd_status ? 31 : 32);
 	return (size);
 }
 
-void			execute_command(char **command)
+void				execute_command(char **command)
 {
 	int			status;
 
@@ -47,7 +48,7 @@ void			execute_command(char **command)
 		ft_dprintf(2, "21sh: command not found: %s\n", command[0]);
 }
 
-int				shell_loop(void)
+int					shell_loop(void)
 {
 	int			i;
 	int			offset;
@@ -70,7 +71,7 @@ int				shell_loop(void)
 			}
 		if (commands && *commands && offset == 0)
 			execute_command(commands + offset);
-		free_array(commands);
+		free_array((void **)commands);
 	}
 	return (0);
 }
@@ -79,7 +80,19 @@ int				shell_loop(void)
 ** TODO: Add isatty() check and if it is the case, run in non-interactive mode
 */
 
-int				main(int argc, char **argv, char **env)
+extern const char	*__asan_default_options(void);
+
+extern const char	*__asan_default_options(void)
+{
+	return ("help='0'"
+			"handle_segv='1'"
+			"handle_abort='1'"
+			"handle_sigill='1'"
+			"handle_sigfpe='1'"
+			"allow_user_segv_handler='1'");
+}
+
+int					main(int argc, char **argv, char **env)
 {
 	extern char		**environ;
 

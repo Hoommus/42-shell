@@ -1,25 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   nodes_manipulations.c                              :+:      :+:    :+:   */
+/*   tree_subshell.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/02/15 15:56:52 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/15 15:56:52 by vtarasiu         ###   ########.fr       */
+/*   Created: 2019/03/03 18:08:28 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/03/04 18:48:56 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell_script.h"
 #include "shell_script_parser.h"
 
-t_bresult	*insert_left_recursive(t_bresult *bresult,
-									t_node *parent,
-									t_node *insertion)
+#include <assert.h>
+t_bresult	*subshell_build(const t_state *state, struct s_result *last_build)
 {
-	if (parent->left == NULL)
-		parent->left = insertion;
-	else
-		insert_left_recursive(bresult, parent->left, insertion);
+	t_node				*node;
+	t_bresult			*bresult;
+
+	assert(state->rule == &g_subshell);
+	bresult = ft_memalloc(sizeof(t_bresult));
+	bresult->request = state->rule;
+	node = ast_new_node(NULL, NODE_SUBSHELL);
+	node->left = last_build->ast->root;
+	bresult->root = node;
+	ft_memdel((void **)&(last_build->ast));
 	return (bresult);
 }

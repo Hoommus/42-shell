@@ -23,17 +23,12 @@ t_bresult			pipeline_build(t_state *state, size_t length)
 
 	i = 0;
 	ft_bzero(&result, sizeof(result));
-	root = ast_new_node("|", TOKEN_PIPE, NODE_GENERIC);
+	root = ast_new_node("|", NODE_GENERIC);
 
 	return (result);
 }
 
 int					pipeline_execute(t_node *root)
 {
-	if (root->token_type != TOKEN_PIPE)
-	{
-		ft_printf("Ты втираешь мне какую-то дичь.\n");
-		return (-1);
-	}
 	return (0);
 }

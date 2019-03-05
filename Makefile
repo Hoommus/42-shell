@@ -6,14 +6,18 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/02/26 14:24:43 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/03/04 15:20:08 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = 21sh
 
 ##### Remove the -g flag #####
-FLAGS = -g -std=c99 -Wall -Wextra -Werror
+FLAGS = -g -std=c99 -Wall \
+                    -Wextra \
+                    -Werror \
+                    -Wno-unknown-pragmas \
+                    #-Og -fsanitize="address"
 
 HEADER = -I include/ -I printf/include -I libft/
 SRC_DIR = ./src/
@@ -31,8 +35,10 @@ LEXER_SRC = quotes.c smart_split.c tokenizer.c tokens_mem.c token_word_types.c
 
 AST_DIR = ast/
 AST_SRC = parser.c entry_point.c syntax_rules.c \
-          nodes_memory.c tree_auxillary.c \
-          tree_simple_command.c
+          nodes_memory.c nodes_manipulations.c \
+          tree_auxillary.c \
+          tree_simple_command.c tree_subshell.c \
+          tree_pipe_sequence.c tree_and_or.c
 
 BUILTIN_DIR = builtins/
 BUILTIN_SRC = cd.c where.c builtins.c builtins2.c hs_history.c tokenizer_test.c \
