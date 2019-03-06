@@ -99,7 +99,7 @@ struct s_result		is_syntax_valid(t_state const prev)
 		ft_printf(LOG_INSIDE, (state.depth += 2) * 2, INDENT, "└─",
 			state.rule->human_readable);
 	if (state.rule != NULL && state.list_offset == NULL)
-		result.error = &unexpected_end;
+		;
 	else if (IS_TERMINAL(state.rule))
 		return (*handle_terminal(&result, &state));
 	if (result.error != NULL)
@@ -111,7 +111,5 @@ struct s_result		is_syntax_valid(t_state const prev)
 				break ;
 	if (state.rule->tree_builder && result.valid)
 		result.ast = state.rule->tree_builder(&state, &result);
-	if (result.ast && result.ast->root)
-		print_command_node(result.ast->root);
 	return (result);
 }

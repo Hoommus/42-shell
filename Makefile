@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/03/04 15:20:08 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/03/05 15:12:33 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -38,7 +38,7 @@ AST_SRC = parser.c entry_point.c syntax_rules.c \
           nodes_memory.c nodes_manipulations.c \
           tree_auxillary.c \
           tree_simple_command.c tree_subshell.c \
-          tree_pipe_sequence.c tree_and_or.c
+          tree_pipe_sequence.c tree_and_or.c tree_list.c
 
 BUILTIN_DIR = builtins/
 BUILTIN_SRC = cd.c where.c builtins.c builtins2.c hs_history.c tokenizer_test.c \

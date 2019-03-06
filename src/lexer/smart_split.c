@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 14:44:48 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/27 18:38:01 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/05 13:34:35 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ char		*g_singles[] = {
 ** {";;",            "DSEMI",       TOKEN_DSEMI,           true },
 */
 
-const struct s_parse_token	g_tokens[] = {
+const struct s_lexer_token	g_tokens[] = {
 	{"if",            "IF",          TOKEN_IF,              false},
 	{"then",          "THEN",        TOKEN_THEN,            false},
 	{"else",          "ELSE",        TOKEN_ELSE,            false},

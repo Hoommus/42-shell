@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/03 16:28:37 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/04 17:59:50 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/05 15:13:02 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ const t_rule g_list_dash = {
 		{&g_empty_token}
 	},
 	.human_readable = "list_dash",
-	.tree_builder = NULL
+	.tree_builder = &list_build
 };
 
 const t_rule g_and_or = {
@@ -580,7 +580,7 @@ const t_rule g_separator_op = {
 	.token = TOKEN_NOT_APPLICABLE,
 	.expands_to = {
 		{&g_semicolon_token},
-		{&g_ampersand_token}
+//		{&g_ampersand_token}
 	},
 	.human_readable = "separator_op",
 	.tree_builder = NULL
