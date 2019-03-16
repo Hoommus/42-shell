@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 14:44:44 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/05 13:34:35 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/12 17:08:50 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,6 @@ enum						e_token_type
 
 enum						e_node_type
 {
-	NODE_GENERIC,
 	NODE_PIPE,
 	NODE_SUBSHELL,
 	NODE_SEPARATOR,
@@ -104,7 +103,6 @@ enum						e_node_type
 	NODE_LOOP_WHILE,
 	NODE_LOOP_FOR,
 	NODE_LOOP_UNTIL,
-	NODE_STRING,
 	NODE_COMMAND,
 };
 
@@ -161,14 +159,21 @@ struct						s_command
 	bool					is_async;
 };
 
+union						u_executer
+{
+	int		(*exec_generic)(t_node *node);
+	int		(*exec_pipe)(t_node *node, int altered_stdout);
+};
+
 struct						s_executer
 {
 	enum e_node_type	node;
-	int					(*executer)(t_node *node);
+	union u_executer	executer;
 };
 
-extern const struct s_lexer_token	g_tokens[];
 extern const struct s_executer		g_executers_table[];
+
+extern const struct s_lexer_token	g_tokens[];
 
 /*
 ** Lexer

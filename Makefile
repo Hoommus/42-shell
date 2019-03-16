@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/03/05 15:12:33 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/03/14 17:09:09 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,9 +26,11 @@ OBJ_DIR = ./obj/
 LIB_DIR = ./printf
 LIB_NAME = libftprintf.a
 
-SHELL_SRC = main.c environ_utils.c memory.c auxilia.c     \
-            variables_replacement.c errors.c init.c \
-            service_routines.c args_parsing.c\
+SHELL_SRC = main.c init.c environ_utils.c memory.c auxilia.c       \
+            variables_replacement.c errors.c \
+            service_routines.c args_parsing.c string_hash.c \
+            shell_environ.c shell_environ_tools.c shell_environ_vector.c \
+            syscall_wrappers.c
 
 LEXER_DIR = lexer/
 LEXER_SRC = quotes.c smart_split.c tokenizer.c tokens_mem.c token_word_types.c
@@ -42,7 +44,7 @@ AST_SRC = parser.c entry_point.c syntax_rules.c \
 
 BUILTIN_DIR = builtins/
 BUILTIN_SRC = cd.c where.c builtins.c builtins2.c hs_history.c tokenizer_test.c \
-              syntax_test.c
+              syntax_test.c hs_set.c
 
 INTERFACE_DIR = line_editing/
 INTERFACE_SRC = buffer_drawing.c buffer_works.c     \
@@ -54,7 +56,8 @@ INTERFACE_SRC = buffer_drawing.c buffer_works.c     \
                 write_anywhere.c
 
 JOB_CONTROL_DIR = job_control_prototype/
-JOB_CONTROL_SRC = commands_execution.c signals_manipulation.c signals_basic.c
+JOB_CONTROL_SRC = commands_execution.c signals_manipulation.c signals_basic.c \
+                  context_manipulations.c context_switch.c
 
 HISTORY_DIR = features/history/
 HISTORY_SRC = history.c history_vector.c

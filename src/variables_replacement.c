@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   input_parsing.c                                    :+:      :+:    :+:   */
+/*   variables_replacement.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:48 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/08/01 12:32:25 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/16 14:59:59 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,28 +30,11 @@ char	*ft_strinsert_range(char *str, char *insert, size_t start, size_t end)
 
 char	*replace_home(char *line)
 {
-	char	*swap;
-	char	*dummy;
 	char	*copy;
-	ssize_t	i;
 
-	dummy = get_env("HOME");
 	if (line == NULL)
 		return (NULL);
-	i = -1;
 	copy = ft_strdup(line);
-	while (dummy && copy[++i])
-	{
-		if ((copy[i] == '~' && SNWH && i == 0) ||
-			(i > 0 && copy[i] == '~' && ft_iswhsp(copy[i - 1]) && SNWH))
-		{
-			swap = ft_strinsert_range(line, dummy, i, i + 1);
-			i = 0;
-			chfree(copy);
-			line = swap;
-			copy = swap;
-		}
-	}
 	return (copy);
 }
 
@@ -65,31 +48,12 @@ int		get_variable_end(char *line)
 	return (i - 1);
 }
 
+// TODO: rewrite this routine
 char	*replace_variables(char *line)
 {
-	int		i;
-	int		len;
 	char	*new;
-	char	*var;
-	char	*swap;
 
-	i = -1;
 	new = ft_strdup(line);
-	while (new[++i])
-	{
-		if (new[i] == '$')
-		{
-			len = get_variable_end(new + i);
-			if (len == 0 || !is_valid_var((swap = ft_strsub(new, i + 1, len))))
-				continue ;
-			var = get_env(swap);
-			line = ft_strinsert_range(new, var, i, len + i + 1);
-			free(new);
-			new = line;
-			i = var == NULL ? i : i - 1;
-			chfree(swap);
-		}
-	}
 	return (new);
 }
 

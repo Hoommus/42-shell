@@ -41,4 +41,6 @@ int						hs_tokenizer(char **args);
 int						hs_syntax(char **args);
 int						hs_test(char **args);
 
+int						hs_set(char **args);
+
 #endif

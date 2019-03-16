@@ -6,11 +6,18 @@ static int		read_fd(int fd, char **result)
 	char		buffer[1025];
 	char		*data;
 	char		*swap;
+	ssize_t		status;
 
 	ft_bzero(buffer, 1025);
 	data = ft_strnew(0);
-	while (read(fd, buffer, 1024) > 0)
+	while ((status = read(fd, buffer, 1024)))
 	{
+		if (status == -1)
+		{
+			free(data);
+			*result = ft_strnew(0);
+			return (0);
+		}
 		swap = ft_strjoin(data, buffer);
 		free(data);
 		data = swap;
@@ -40,7 +47,7 @@ int				read_filename(char *file, char **data)
 		ft_dprintf(2, "tokenizer: %s: ain't a regular file.\n", file);
 		return (1);
 	}
-	fd = open(file, O_RDONLY);
+	fd = open_wrapper(file, O_RDONLY);
 	if (fd < 0)
 	{
 		ft_dprintf(2, "tokenizer: %s: could not open a file for reading.\n", file);
@@ -57,10 +64,10 @@ int				hs_tokenizer(char **args)
 	t_token	*swap;
 	char	*string;
 
-	TERM_RESTORE;
+	TERM_APPLY_CONFIG(g_term->context_original->term_config);
 	if (read_filename(args[0], &string))
 	{
-		TERM_ENFORCE;
+		TERM_APPLY_CONFIG(g_term->context_current->term_config);
 		return (OK);
 	}
 	head = tokenize(string, TOKEN_DELIMITERS);
@@ -79,6 +86,6 @@ int				hs_tokenizer(char **args)
 	}
 	ft_printf("\n");
 	free(string);
-	TERM_ENFORCE;
+	TERM_APPLY_CONFIG(g_term->context_current->term_config);
 	return (OK);
 }

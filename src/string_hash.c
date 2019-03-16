@@ -1,44 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   memory.c                                           :+:      :+:    :+:   */
+/*   string_hash.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/07/31 14:45:45 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/07/31 15:20:54 by vtarasiu         ###   ########.fr       */
+/*   Created: 2019/03/10 17:35:24 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/03/13 15:38:45 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "twenty_one_sh.h"
 
-void	free_array(void **array)
+/*
+** This is *not* a cryptographic-strong function, so collisions are not rare and
+** you must __always__ double check strings with classic strcmp
+*/
+
+u_int64_t	hash_sdbm(const char *str)
 {
-	int		i;
+	unsigned long	hash;
+	int				c;
 
-	i = 0;
-	while (array && array[i])
-		free(array[i++]);
-	free(array);
-}
-
-void	chfree(void *obj)
-{
-	if (obj != NULL)
-		free(obj);
-}
-
-void	chfree_n(int n, ...)
-{
-	va_list		list;
-	void		*dummy;
-
-	va_start(list, n);
-	while (n)
-	{
-		if ((dummy = va_arg(list, void *)))
-			free(dummy);
-		n--;
-	}
-	va_end(list);
+	hash = 0;
+	while ((c = *str++))
+		hash = c + (hash << 6) + (hash << 16) - hash;
+	return (hash);
 }

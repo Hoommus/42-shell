@@ -6,12 +6,15 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/06 15:26:57 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/16 15:13:59 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #ifndef TWENTY_ONE_SH_H
+
 # define TWENTY_ONE_SH_H
+
+# pragma clang diagnostic push
+# pragma ide diagnostic ignored "readability-avoid-const-params-in-decls"
 
 # include <fcntl.h>
 # include <string.h>
@@ -34,13 +37,17 @@
 # include "ft_printf.h"
 # include "buffer_works.h"
 # include "get_next_line.h"
+# include "shell_environ.h"
 
 # define SNWH (copy[i + 1] == '/' || copy[i + 1] == 0 || ft_iswhsp(copy[i + 1]))
 # define ABS(a) ((a) < 0 ? -(a) : (a))
-# define SHELL_PROMPT "\x1b[0m\x1b[34;1m[%s@%s] \x1b[36;1m%s\x1b[0m \x1b[%d;1m$\x1b[0m "
+# define PROMPT_HOST "\x1b[0m\x1b[34;1m[%s@%s]\x1b[0m"
+# define PROMPT_PATH " \x1b[36;1m%s\x1b[0m"
+# define PROMPT_TERMINATOR " \x1b[%d;1m$\x1b[0m "
+# define SHELL_PROMPT PROMPT_HOST PROMPT_PATH PROMPT_TERMINATOR
 
-# define TERM_RESTORE tcsetattr(g_term->tty_fd, TCSANOW, g_term->original_term)
-# define TERM_ENFORCE tcsetattr(g_term->tty_fd, TCSANOW, g_term->current_term)
+// TODO: Replace all APPLY_CONFIGs with context switches
+# define TERM_APPLY_CONFIG(term) tcsetattr(0, TCSANOW, term)
 
 # define TERM_CLR_LINES_BELOW tputs(tgetstr("cd", NULL), 1, &ft_putc)
 # define TERM_CLR_LINE tputs(tgetstr("ce", NULL), 1, &ft_putc)
@@ -50,16 +57,12 @@
 # define CONFIG_FILE ".21shrc"
 # define LOG_FILE ".21sh.log"
 
-# define BUILD 1032
-# define BUILD_DATE "06.03.19 15:26:57 EET"
-
-/*
-** Initial input of 260 is chosen because (260 * 10) % 8 == 0
-*/
+# define BUILD 1104
+# define BUILD_DATE "16.03.19 15:13:59 EET"
 
 # ifdef MAX_INPUT
 #  undef MAX_INPUT
-#  define MAX_INPUT 260
+#  define MAX_INPUT 256
 # endif
 
 /*
@@ -93,6 +96,25 @@ enum					e_input_state
 	STATE_JOB_IN_FG,
 	BREAK
 };
+
+struct					s_fd_lst
+{
+	char				*label;
+	short				original;
+	short				current;
+	struct s_fd_lst		*next;
+};
+
+/*
+ * TODO: Add info about shell config
+ */
+
+typedef struct			s_context
+{
+	t_environ_vector	*environ;
+	struct termios		*term_config;
+	struct s_fd_lst		*fd_list;
+}						t_context;
 
 /*
 ** Used to store specific caret positions. Heavy usage in cursor_positions.c
@@ -130,8 +152,6 @@ struct					s_term
 	short				ws_row;
 	short				tty_fd;
 	t_carpos			carpos_db[7];
-	struct termios		*original_term;
-	struct termios		*current_term;
 
 	short				history_file;
 	short				logfile;
@@ -141,34 +161,43 @@ struct					s_term
 	int					last_cmd_status;
 	pid_t				running_process;
 
+	struct s_context	*context_original;
+	struct s_context	*context_current;
+	struct s_context	*context_backup;
+
 	t_buffer			*buffer;
 };
 
-char					**g_environ;
 extern struct s_term	*g_term;
-
-/*
-** What is it? A design pattern? Really???
-*/
 
 int						execute(char **args);
 
 /*
 ** Init (init.c)
 */
-void					init_term(void);
+void					init_shell_context(void);
+struct termios			*init_term(void);
 void					init_files(void);
 short					init_fd_at_home(char *filename, int flags);
 
 /*
 ** Environment (environ_utils.c)
 */
+t_var					*get_env_v(t_environ_vector *vector, const char *key);
+int						set_env_v(t_environ_vector *vector, const char *key,
+	const char *value, enum e_var_scope scope);
+int						unset_env_v(t_environ_vector *vector, const char *key);
 
-char					*get_env(char *name);
-int						set_env(char *key, char *value);
-int						unset_env(char *name);
-char					**copy_env(char **argenv, char **environ);
-
+/*
+** Context management
+*/
+void					context_switch(t_context *to_which);
+t_context				*context_init(void);
+t_context				*context_duplicate(const t_context *context,
+	bool with_dup);
+void					context_add_fd(t_context *context, const int original,
+	const int actual, const char *label);
+void					context_remove_fd(t_context *context, const int fd);
 /*
 ** Main Loop (main.c, )
 */
@@ -182,7 +211,7 @@ int						display_normal_prompt(void);
 /*
 ** Auxilia (auxilia.c)
 */
-
+u_int64_t				hash_sdbm(const char *str);
 ssize_t					ponies_teleported(void);
 void					increment_shlvl(void);
 
@@ -192,7 +221,6 @@ void					increment_shlvl(void);
 
 char					*replace_variables(char *line);
 char					*replace_home(char *line);
-void					restore_variables(void);
 void					expand_variables(char **line);
 int						is_valid_var(char *var);
 
@@ -203,8 +231,6 @@ int						is_valid_var(char *var);
 void					chfree(void *obj);
 void					chfree_n(int n, ...);
 void					free_array(void **array);
-
-void					history_load(int fd);
 
 /*
 ** errors.c
@@ -226,6 +252,14 @@ bool					flag_long_present(const char **args, const char *flag);
 bool					flag_short_present(const char **args, const char flag);
 char					flag_validate_short(const char **args,
 											const char *possible_flags);
+
+/*
+ * Syscall wrappers
+ */
+int						open_wrapper(const char *path, int oflag);
+int						openm_wrapper(const char *path, int oflag, mode_t mode);
+int						close_wrapper(int filedes);
+
 /*
 ** Compatibility
 */
@@ -235,4 +269,7 @@ int						gethostname(char *arr, size_t size);
 
 # endif
 
+# pragma clang diagnostic pop
+
 #endif
+

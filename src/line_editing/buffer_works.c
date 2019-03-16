@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/14 18:43:20 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/17 14:22:04 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/16 15:12:43 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,17 @@ void			deal_with_newline(const char arr[8])
 	}
 }
 
+void			deal_with_sigint(void)
+{
+	caret_move(g_term->buffer->size - g_term->buffer->iterator, D_RIGHT);
+	buff_clear(0);
+	ft_printf("\n");
+	g_term->input_state = STATE_NORMAL;
+	if (g_term->running_process == 0)
+		display_normal_prompt();
+	context_switch(g_term->context_current);
+}
+
 /*
 ** TODO: Make this one handle long input from Command + V
 ** TODO: Memory leak at buff_get_part call
@@ -80,7 +91,12 @@ char			**read_command(void)
 	commands = NULL;
 	while (!commands)
 	{
-		read(0, ft_memset(input.arr, 0, 8), 8);
+		carpos_update(POS_CURRENT);
+		if (read(0, ft_memset(input.arr, 0, 8), 8) == -1)
+		{
+			ft_printf("\n");
+			return (NULL);
+		}
 		if (input.arr[0] == '\n')
 			deal_with_newline(input.arr);
 		else if (is_printable(input.arr) && input.arr[0] != '\n')
@@ -94,8 +110,6 @@ char			**read_command(void)
 			commands = smart_split(history_write(tmp, get_history_fd()), TOKEN_DELIMITERS);
 			free(tmp);
 		}
-		if (input.lng != 0)
-			carpos_update(POS_CURRENT);
 	}
 	return (commands);
 }

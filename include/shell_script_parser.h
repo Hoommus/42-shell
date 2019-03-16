@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/10 13:17:59 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/05 17:12:36 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/08 19:05:39 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -206,6 +206,8 @@ extern const t_rule				g_newline_list;
 extern const t_rule				g_newline_list_dash;
 extern const t_rule				g_linebreak;
 extern const t_rule				g_separator_op;
+extern const t_rule				g_semicolon_list;
+extern const t_rule				g_semicolon_list_dash;
 extern const t_rule				g_separator;
 extern const t_rule				g_sequential_sep;
 
