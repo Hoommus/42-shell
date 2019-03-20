@@ -1,27 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   tree_exec_simple_command.c                         :+:      :+:    :+:   */
+/*   string_hash.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/02/27 13:22:28 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/27 13:29:07 by vtarasiu         ###   ########.fr       */
+/*   Created: 2019/03/10 17:35:24 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/03/13 15:38:45 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "twenty_one_sh.h"
-#include "shell_script.h"
-#include "shell_script_parser.h"
 
-int							simple_command_execute(t_node *command_node)
+/*
+** This is *not* a cryptographic-strong function, so collisions are not rare and
+** you must __always__ double check strings with classic strcmp
+*/
+
+u_int64_t	hash_sdbm(const char *str)
 {
-	const struct s_command	*command = (struct s_command *)command_node->command;
+	unsigned long	hash;
+	int				c;
 
-	// TODO: Solve expansions and globs
-	// TODO: Remove quotes
-	// TODO: Expand environment variables
-	// TODO: Expand backqoutes intelligently
-
-	return (1 /* TODO: process return code */);
+	hash = 0;
+	while ((c = *str++))
+		hash = c + (hash << 6) + (hash << 16) - hash;
+	return (hash);
 }

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:36 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/08 13:13:09 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/16 14:45:09 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,27 +29,13 @@ int			is_valid_var(char *var)
 	return (1);
 }
 
-// TODO: consider removing this routine
-//  I think it is very harmful
-void		restore_variables(void)
-{
-	char	*var;
-
-	if (get_env("PWD") == NULL)
-		set_env("PWD", "");
-	if (get_env("OLDPWD") == NULL)
-		set_env("OLDPWD", (var = get_env("HOME")) == NULL ? "" : var);
-	if (get_env("PATH") == NULL)
-		set_env("PATH", "");
-}
-
 ssize_t		ponies_teleported(void)
 {
 	ssize_t			ponies;
 	static int		fd;
 
 	if (fd == 0)
-		fd = open("/dev/urandom", O_RDONLY);
+		fd = open_wrapper("/dev/urandom", O_RDONLY);
 	if (fd < 0)
 		return (1);
 	else
@@ -83,16 +69,18 @@ void	display_prompt(enum e_input_state state)
 void		increment_shlvl(void)
 {
 	char		*swap;
+	t_var		*var;
 	int			level;
 
-	swap = get_env("SHLVL");
-	if (swap == NULL || ft_strlen(swap) == 0)
-		set_env("SHLVL", "1");
+	var = get_env_v(g_term->context_current->environ, "SHLVL");
+	if (var == NULL || var->value == NULL || ft_strlen(var->value) == 0)
+		set_env_v(g_term->context_current->environ, "SHLVL", "1", VAR_EXPORTING);
 	else
 	{
-		level = ft_atoi(swap) + 1;
-		set_env("SHLVL", (swap = ft_itoa(level)));
-		chfree(swap);
+		level = ft_atoi(var->value) + 1;
+		set_env_v(g_term->context_current->environ, "SHLVL",
+			(swap = ft_itoa(level)), VAR_EXPORTING);
+		free(swap);
 	}
 }
 

@@ -1,5 +1,3 @@
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "readability-avoid-const-params-in-decls"
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
@@ -8,12 +6,15 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/10 13:17:59 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/04 18:48:57 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/08 19:05:39 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SHELL_SCRIPT_PARSER_H
 # define SHELL_SCRIPT_PARSER_H
+
+# pragma clang diagnostic push
+# pragma ide diagnostic ignored "readability-avoid-const-params-in-decls"
 
 # define INDENT_0 "│ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │"
 # define INDENT INDENT_0 INDENT_0 INDENT_0 INDENT_0 INDENT_0 INDENT_0 INDENT_0
@@ -76,18 +77,17 @@ typedef struct					s_parser_state
 ** Forward declarations
 */
 typedef struct s_build_result	t_bresult;
-struct							s_result;
+struct s_result;
 
 typedef t_bresult				*(*t_builder) (const t_state *state,
 	struct s_result *last_build);
 
-// TODO: shrink down expands_to size
 typedef struct					s_syntax_rule
 {
-	const enum e_token_type		token;
-	const struct s_syntax_rule	*restrict expands_to[8][6];
-	const char					*restrict const human_readable;
-	t_builder					tree_builder;
+	const enum e_token_type					token;
+	const struct s_syntax_rule *restrict	expands_to[8][6];
+	const char *restrict const				human_readable;
+	t_builder								tree_builder;
 }								t_rule;
 
 typedef struct					s_syntax_error
@@ -98,7 +98,6 @@ typedef struct					s_syntax_error
 
 struct							s_build_result
 {
-	t_error			*error;
 	t_node			*root;
 	const t_rule	*request;
 };
@@ -112,9 +111,6 @@ struct							s_result
 	int				consumed;
 	bool			valid;
 };
-
-static t_error					unexpected_end =
-	{1, "Unexpected end of token stream"};
 
 t_token							*offset_list(t_token *list, int offset);
 struct s_result					is_syntax_valid(t_state const prev);
@@ -141,9 +137,11 @@ t_bresult						*and_or_finalize(const t_state *state,
 
 t_bresult						*pipe_andor_finalize_right(const t_state *state,
 												struct s_result *last_build);
+t_bresult						*list_build(const t_state *state,
+												struct s_result *last_build);
 
-
-t_node *ast_new_node(void *value, enum e_node_type node_type);
+t_node							*ast_new_node(void *value,
+												enum e_node_type node_type);
 void							ast_free_recursive(t_node *node);
 
 int								tree_get_depth(t_node *parent);
@@ -208,6 +206,8 @@ extern const t_rule				g_newline_list;
 extern const t_rule				g_newline_list_dash;
 extern const t_rule				g_linebreak;
 extern const t_rule				g_separator_op;
+extern const t_rule				g_semicolon_list;
+extern const t_rule				g_semicolon_list_dash;
 extern const t_rule				g_separator;
 extern const t_rule				g_sequential_sep;
 
@@ -247,6 +247,6 @@ extern const t_rule				g_dgreat_token;
 extern const t_rule				g_lessgreat_token;
 extern const t_rule				g_clobber_token;
 
-#endif
+# pragma clang diagnostic pop
 
-#pragma clang diagnostic pop
+#endif

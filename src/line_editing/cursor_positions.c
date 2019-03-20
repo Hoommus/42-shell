@@ -28,6 +28,9 @@ t_carpos	*carpos_update(enum e_position type)
 {
 	char		response[16];
 
+//	if (g_term->context_current->term_config
+//		|| (g_term->context_current->term_config->c_lflag & ICANON))
+//		return (g_term->carpos_db + type);
 	write(2, "\x1b[6n", 4);
 	read(STDIN_FILENO, response, 16);
 	if (ft_strchr(response, '[') && ft_strchr(response, ';'))

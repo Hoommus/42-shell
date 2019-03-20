@@ -62,11 +62,11 @@ void	hs_where_auxilia(char **paths, char *arg)
 
 int		hs_where(char **args)
 {
-	char	*swap;
+	t_var	*path;
 	char	**paths;
 
-	swap = get_env("PATH");
-	paths = ft_strsplit(swap, ':');
+	path = get_env_v(NULL, "PATH");
+	paths = ft_strsplit(path->value, ':');
 	while (*args)
 		hs_where_auxilia(paths, *args++);
 	free_array((void **)paths);

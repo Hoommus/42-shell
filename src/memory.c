@@ -18,11 +18,8 @@ void	free_array(void **array)
 
 	i = 0;
 	while (array && array[i])
-	{
-		chfree(array[i]);
-		i++;
-	}
-	chfree(array);
+		free(array[i++]);
+	free(array);
 }
 
 void	chfree(void *obj)
@@ -40,7 +37,7 @@ void	chfree_n(int n, ...)
 	while (n)
 	{
 		if ((dummy = va_arg(list, void *)))
-			chfree(dummy);
+			free(dummy);
 		n--;
 	}
 	va_end(list);

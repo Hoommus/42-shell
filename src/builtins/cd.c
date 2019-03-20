@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:58 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/08/01 12:43:27 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/16 14:50:09 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,16 +27,16 @@ int				try_access_and_cd(char *path)
 	return (status);
 }
 
-int				try_cd(char *path, char *oldpwd)
+static int		try_cd(char *path, t_var *oldpwd)
 {
+	t_var	*home;
 	int		status;
-	char	*home;
 
-	home = get_env("HOME");
+	home = get_env_v(NULL, "HOME");
 	if (path == NULL || ft_strcmp(path, "--") == 0 || ft_strlen(path) == 0)
 	{
-		if (home != NULL)
-			status = try_access_and_cd(home);
+		if (home && home->value)
+			status = try_access_and_cd(home->value);
 		else
 			return (0);
 	}
@@ -44,8 +44,8 @@ int				try_cd(char *path, char *oldpwd)
 	{
 		if (oldpwd == NULL)
 			oldpwd = home;
-		ft_printf("%s\n", oldpwd);
-		status = try_access_and_cd(oldpwd);
+		ft_printf("%s\n", oldpwd->value);
+		status = try_access_and_cd(oldpwd->value);
 	}
 	else
 		status = try_access_and_cd(path);
@@ -54,19 +54,19 @@ int				try_cd(char *path, char *oldpwd)
 
 int				hs_cd(char **args)
 {
-	char		*oldpwd;
-	char		currpwd[1024];
-	char		pwd[1024];
+	t_var		*var;
+	char		currpwd[1025];
+	char		pwd[1025];
 	int			status;
 
-	oldpwd = get_env("OLDPWD");
+	var = get_env_v(NULL, "OLDPWD");
 	getcwd(currpwd, 1024);
-	status = try_cd(args[0], oldpwd);
+	status = try_cd(args[0], var);
 	if (status == 0)
 	{
 		getcwd(pwd, 1024);
-		set_env("PWD", pwd);
-		set_env("OLDPWD", currpwd);
+		set_env_v(NULL, "PWD", pwd, VAR_EXPORTING);
+		set_env_v(NULL, "OLDPWD", currpwd, VAR_EXPORTING);
 	}
 	else if (status == 1348)
 		ft_dprintf(2, "cd: permission denied: %s\n", args[0]);

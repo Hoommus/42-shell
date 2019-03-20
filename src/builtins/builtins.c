@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:42 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/11/19 14:30:52 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/14 17:07:57 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ struct s_builtin	g_builtins[] = {
 	{"history", &hs_history},
 	{"tokenizer", &hs_tokenizer},
 	{"syntax", &hs_syntax},
+	{"set", &hs_set},
 	{NULL, NULL}
 };
 
@@ -72,6 +73,6 @@ int					hs_help(char **args)
 int					hs_exit(char **args)
 {
 	*args = args[0];
-	TERM_RESTORE;
+	TERM_APPLY_CONFIG(g_term->context_original->term_config);
 	exit(0);
 }

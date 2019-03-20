@@ -6,13 +6,13 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/18 11:54:55 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/18 12:29:32 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/11 17:26:02 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "line_editing.h"
 
-static struct s_listener	g_key_listeners[] =
+static const struct s_listener	g_key_listeners[] =
 {
 	{{K_UP},        &handle_up},
 	{{K_DOWN},      &handle_down},
@@ -29,22 +29,22 @@ static struct s_listener	g_key_listeners[] =
 	{{K_CTRL_D},    &handle_eot},
 	{{K_CTRL_U},    &handle_line_kill},
 	{{K_CTRL_W},    &handle_ctrl_w},
-	{{'\t'}, &handle_ignore},
+	{{'\t'},        &handle_ignore},
 //	{9, &handle_delchar},
 	{{0}, 0}
 };
 
-int							ft_putc(int c)
+int								ft_putc(int c)
 {
 	return ((int)write(2, &c, 1));
 }
 
-void						handle_ignore(union u_char key)
+void							handle_ignore(union u_char key)
 {
 	key.lng = 1337;
 }
 
-void						handle_eot(union u_char key)
+void							handle_eot(union u_char key)
 {
 	if (key.lng == CEOT && g_term->running_process == 0 && g_term->buffer->size == 0)
 	{
@@ -53,13 +53,13 @@ void						handle_eot(union u_char key)
 	}
 }
 
-void						handle_delchar(union u_char key)
+void							handle_delchar(union u_char key)
 {
 	key.lng = 0;
 	tputs(tgetstr("dc", NULL), 1, &ft_putc);
 }
 
-void						handle_key(union u_char key)
+void							handle_key(union u_char key)
 {
 	int		i;
 

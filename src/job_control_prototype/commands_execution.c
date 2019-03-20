@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:46:00 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/18 14:06:10 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/19 18:46:14 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,12 +31,17 @@ int		try_builtin(char *builtin, char **args)
 int		forknrun(char *bin, char **args)
 {
 	int		status;
+	char	**environ;
 
-	TERM_RESTORE;
+	environ = NULL;
+	TERM_APPLY_CONFIG(g_term->context_current->term_config);
 	g_term->running_process = fork();
 	if (g_term->running_process == 0)
 	{
-		execve(bin, args, g_environ);
+		environ = environ_to_array(g_term->context_current->environ,
+			VAR_EXPORTING | VAR_COMMAND_LOCAL);
+		execve(bin, args, environ);
+		free_array((void **)environ);
 		exit(0);
 	}
 	else
@@ -46,22 +51,24 @@ int		forknrun(char *bin, char **args)
 		wait(&status);
 		g_term->last_cmd_status = WEXITSTATUS(status);
 		g_term->running_process = 0;
-		TERM_ENFORCE;
+		TERM_APPLY_CONFIG(g_term->context_current->term_config);
+		free_array((void **)environ);
 		return (0);
 	}
 }
 
 int		try_binary(char *binary, char **args)
 {
+	t_var	*var;
 	int		i;
 	int		status;
 	char	*swap;
 	char	**paths;
 
-	swap = get_env("PATH");
-	if (swap == NULL || (binary && ft_strchr(binary, '/') != NULL))
+	var = get_env_v(NULL, "PATH");
+	if (!var || !var->value || (binary && ft_strchr(binary, '/') != NULL))
 		return (1);
-	paths = ft_strsplit(swap, ':');
+	paths = ft_strsplit(var->value, ':');
 	i = 0;
 	status = 1;
 	while (paths[i] && status)

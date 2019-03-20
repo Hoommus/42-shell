@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 14:44:44 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/04 18:55:08 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/19 12:15:26 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include "libft.h"
 # include "ft_printf.h"
 # include <stdbool.h>
+# include "twenty_one_sh.h"
 
 # define TOKEN_DELIMITERS " \t\r\a"
 # define ISQT(x) (((x) == '\'' || (x) == '"' || (x) == '`') ? (1) : (0))
@@ -95,7 +96,6 @@ enum						e_token_type
 
 enum						e_node_type
 {
-	NODE_GENERIC,
 	NODE_PIPE,
 	NODE_SUBSHELL,
 	NODE_SEPARATOR,
@@ -104,26 +104,22 @@ enum						e_node_type
 	NODE_LOOP_WHILE,
 	NODE_LOOP_FOR,
 	NODE_LOOP_UNTIL,
-	NODE_STRING,
 	NODE_COMMAND,
 };
 
-
 /*
-** s_parse_token is a struct that used on parsing time. Lexer uses information
-** from g_tokens table to parse char input into tokens and literals and pass
-** this new stream to syntax analyzer and then parser.
+** s_lexer_token is a struct that used on lexical analysis stage. Lexer uses
+** information from g_tokens table to parse char input into tokens and literals
+** and pass this new stream to syntax analyzer and then parser.
 */
 
-struct						s_parse_token
+struct						s_lexer_token
 {
 	char					*text;
 	char					*token_name;
 	enum e_token_type		type;
 	bool					requires_single;
 };
-
-extern const struct s_parse_token	g_tokens[];
 
 typedef struct				s_token
 {
@@ -148,13 +144,13 @@ union						u_io_rdr_param
 	int						fd;
 };
 
-struct						s_io_redirect
+typedef struct				s_io_redirect
 {
 	union u_io_rdr_param	what;
 	union u_io_rdr_param	where;
 	enum e_token_type		type;
 	bool					append;
-};
+}							t_io_rdr;
 
 struct						s_command
 {
@@ -163,6 +159,21 @@ struct						s_command
 	struct s_io_redirect	**io_redirects;
 	bool					is_async;
 };
+
+union						u_executer
+{
+	int		(*exec)(const t_node *node);
+	int		(*exec_alt_context)(const t_node *node, struct s_context *context);
+};
+
+struct						s_executor
+{
+	enum e_node_type	node_type;
+	union u_executer	executor;
+};
+
+extern const struct s_lexer_token	g_tokens[];
+extern const struct s_executor		g_executors_table[];
 
 /*
 ** Lexer
@@ -176,11 +187,23 @@ void						free_token(struct s_token *token);
 
 enum e_token_type			token_class_contextual(const char *str,
 														enum e_token_type prev);
-char						**smart_split(char *str, char *delimiters);
+char						**smart_split(const char *str, const char *delims);
 
 void						free_array(void **array);
 
+/*
+** AST
+*/
+
 void						run_script(t_token *list_head, bool log_recursion);
+int							exec_command(const t_node *command_node,
+	struct s_context *new_context);
+int							exec_semicolon_iterative(t_node *parent);
+int							exec_semicolon_recursive(const t_node *parent);
+int							exec_and_if(const t_node *parent);
+int							exec_or_if(const t_node *parent);
+int							exec_node(const t_node *node);
+
 /*
 ** File reading and executing
 */
