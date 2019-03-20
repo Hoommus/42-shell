@@ -12,7 +12,8 @@
 
 #include "twenty_one_sh.h"
 
-//TODO: Consider adding a universal read wrapper
+// TODO: Consider adding a universal read wrapper
+// TODO: Consider adding dup and dup2 wrappers
 
 int		openm_wrapper(const char *path, int oflag, mode_t mode)
 {
@@ -32,4 +33,22 @@ int		close_wrapper(int filedes)
 {
 	context_remove_fd(g_term->context_current, filedes);
 	return (close(filedes));
+}
+
+int		closeall(t_context *context)
+{
+	struct s_fd_lst	*list;
+
+	if (context == NULL)
+		context = g_term->context_current;
+	if (context == NULL)
+		return (-1);
+	list = context->fd_list;
+	while (list)
+	{
+		close(list->current);
+		close(list->original);
+		list = list->next;
+	}
+	return (0);
 }

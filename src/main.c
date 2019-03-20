@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:32 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/16 15:05:44 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/16 15:39:17 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,7 @@ void				print_messages(void)
 	if (var && ft_atoi(var->value) > 2)
 		ft_printf("\nRabbit hole depth: %s\n", var->value);
 	var = get_env_v(NULL, "TERM");
-	if (!var || tgetent(NULL, var->value) == ERR)
+	if (!var || !var->value || tgetent(NULL, var->value) == ERR)
 		ft_printf("\x1b[41;1m%-52s\x1b[0;0m\n\x1b[41;1m%52s\x1b[0;0m\n",
 				  "Warning: TERM enviroment variable is not set.",
 				  "Terminal capabilities are somewhat limited.");
@@ -114,10 +114,6 @@ int					main(int argc, char **argv)
 	extern char		**environ;
 
 	init_shell_context();
-	g_term->context_current = context_duplicate(g_term->context_original, true);
-	ft_memdel((void **)&(g_term->context_current->term_config));
-	g_term->context_current->term_config = init_term();
-	context_switch(g_term->context_current);
 	init_files();
 	history_load(g_term->history_file);
 	increment_shlvl();

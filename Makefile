@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/03/14 17:09:09 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/03/19 17:13:54 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,7 +26,7 @@ OBJ_DIR = ./obj/
 LIB_DIR = ./printf
 LIB_NAME = libftprintf.a
 
-SHELL_SRC = main.c init.c environ_utils.c memory.c auxilia.c       \
+SHELL_SRC = main.c init.c memory.c auxilia.c       \
             variables_replacement.c errors.c \
             service_routines.c args_parsing.c string_hash.c \
             shell_environ.c shell_environ_tools.c shell_environ_vector.c \
@@ -38,6 +38,8 @@ LEXER_SRC = quotes.c smart_split.c tokenizer.c tokens_mem.c token_word_types.c
 AST_DIR = ast/
 AST_SRC = parser.c entry_point.c syntax_rules.c \
           nodes_memory.c nodes_manipulations.c \
+          execution.c \
+          exec_command.c exec_subshell.c exec_pipeline.c \
           tree_auxillary.c \
           tree_simple_command.c tree_subshell.c \
           tree_pipe_sequence.c tree_and_or.c tree_list.c

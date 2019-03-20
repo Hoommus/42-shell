@@ -28,72 +28,6 @@ char		*g_singles[] = {
 };
 
 /*
-** case syntax structure is avoided.
-** But here its tokens are, just in case (no pun intended)
-** {"case",          "case",        TOKEN_CASE,            false},
-** {"esac",          "esac",        TOKEN_ESAC,            false},
-** {";;",            "DSEMI",       TOKEN_DSEMI,           true },
-*/
-
-const struct s_lexer_token	g_tokens[] = {
-	{"if",            "IF",          TOKEN_IF,              false},
-	{"then",          "THEN",        TOKEN_THEN,            false},
-	{"else",          "ELSE",        TOKEN_ELSE,            false},
-	{"elif",          "ELIF",        TOKEN_ELIF,            false},
-	{"fi",            "FI",          TOKEN_FI,              false},
-	{"do",            "DO",          TOKEN_DO,              false},
-	{"done",          "DONE",        TOKEN_DONE,            false},
-	{"while",         "WHILE",       TOKEN_WHILE,           false},
-//	{"until",         "UNTIL",       TOKEN_UNTIL,           false},
-//	{"for",           "FOR",         TOKEN_FOR,             false},
-
-//	{"in",            "IN",          TOKEN_IN,              false},
-
-	{"{",             "LBRACE",      TOKEN_LBRACE,          true },
-	{"}",             "RBRACE",      TOKEN_RBRACE,          true },
-	{"(",             "LBRACKET",    TOKEN_LBRACKET,        true },
-	{")",             "RBRACKET",    TOKEN_RBRACKET,        true },
-//	{"[",             "LSQBRACKET",  TOKEN_LSQBRACKET,      true },
-//	{"]",             "RSQBRACKET",  TOKEN_RSQBRACKET,      true },
-
-	{";",             "SEMICOLON",   TOKEN_SEMICOLON,       true },
-	{"!",             "BANG",        TOKEN_BANG,            true },
-	{"&&",            "AND_IF",      TOKEN_AND_IF,          true },
-	{"||",            "OR_IF",       TOKEN_OR_IF,           true },
-
-	{"<<-",           "DLESSDASH",   TOKEN_DLESSDASH,       true },
-	{"<<",            "DLESS",       TOKEN_DLESS,           true },
-	{">>",            "DGREAT",      TOKEN_DGREAT,          true },
-	{"<&",            "LESSAND",     TOKEN_LESSAND,         true },
-	{">&",            "GREATAND",    TOKEN_GREATAND,        true },
-	{"<>",            "LESSGREAT",   TOKEN_LESSGREAT,       true },
-	{">|",            "CLOBBER",     TOKEN_CLOBBER,         true },
-	{"|",             "PIPE",        TOKEN_PIPE,            true },
-
-	{"<",             "LESS",        TOKEN_LESS,            true },
-	{">",             "GREAT",       TOKEN_GREAT,           true },
-	{"~",             "TILDE",       TOKEN_TILDE,           false},
-	{"&",             "AMPERSAND",   TOKEN_AMPERSAND,       true },
-
-	{"^~/?[\\/\\w]*", "WORD",        TOKEN_WORD,            false},
-	{"^\\D\\w+",      "NAME",        TOKEN_NAME,            false},
-	{"\\d*[><]\\d*",  "IO_NUMBER",   TOKEN_IO_NUMBER,       false},
-	{"^\\w+\\=",      "ASSIGNMENT",  TOKEN_ASSIGNMENT_WORD, false},
-
-	{"\n",            "NEWLINE",     TOKEN_NEWLINE,         true },
-	{"!",             "EMPTY_LOL",   TOKEN_EMPTY,           false},
-	{"!",             "literal",     TOKEN_NOT_APPLICABLE,  false},
-	{"!",             "COMMAND",     TOKEN_WORD_COMMAND,    false},
-
-	{NULL,            NULL,          TOKEN_KEYWORD,         false},
-};
-
-/*
-** WORD, NAME and ASSIGNMENT_WORD regexes contain caret because these tokens
-** must be a single string extracted from input and free from leading characters
-*/
-
-/*
 ** Returns true if char needs separate token
 */
 
@@ -115,7 +49,7 @@ static int				is_single_token(char c)
 ** There is some cringy stuff going on today
 */
 
-static int				count_substrings(char *str)
+static int				count_substrings(const char *str)
 {
 	size_t	i;
 	int		subs;
@@ -123,7 +57,7 @@ static int				count_substrings(char *str)
 
 	subs = 0;
 	i = 0;
-	size_t len = ft_strlen(str);
+	size_t len = ft_strlen((char *)str);
 	while (str && i < len)
 	{
 		c = str[i];
@@ -144,7 +78,7 @@ static int				count_substrings(char *str)
 	return (subs);
 }
 
-static long long		get_word_size(char *str)
+static long long		get_word_size(const char *str)
 {
 	long long	i;
 	char		quote;
@@ -173,7 +107,7 @@ static long long		get_word_size(char *str)
 ** TODO: Try to fix that too high memory allocation thing
  * TODO: Remove this shit
 */
-char					**smart_split(char *str, char *delimiters)
+char					**smart_split(const char *str, const char *delimiters)
 {
 	char		**array;
 	long long	j;

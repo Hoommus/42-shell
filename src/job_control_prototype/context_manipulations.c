@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/12 16:10:06 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/16 14:01:53 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/20 12:23:09 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,8 +54,24 @@ void	context_remove_fd(t_context *context, const int fd)
 		if (swap->current == fd)
 		{
 			last->next = swap->next;
+			swap = last->next;
 			ft_memdel((void **)&swap);
 		}
-		swap = swap->next;
+		else
+			swap = swap->next;
 	}
+}
+
+bool	context_is_fd_present(const t_context *context, const int original)
+{
+	struct s_fd_lst		*list;
+
+	list = context->fd_list;
+	while (list)
+	{
+		if (list->original == original)
+			return (true);
+		list = list->next;
+	}
+	return (false);
 }

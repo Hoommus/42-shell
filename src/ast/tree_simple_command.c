@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:57:06 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/04 18:48:56 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/19 18:26:52 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ static bool					is_redirect(t_token *t)
 			|| t->type == TOKEN_GREATAND
 			|| t->type == TOKEN_LESSAND
 			|| t->type == TOKEN_DLESSDASH
+			|| t->type == TOKEN_LESSGREAT
 			|| t->type == TOKEN_CLOBBER));
 }
 
@@ -39,7 +40,7 @@ static char					**get_args(t_token *list, int length)
 	while (copy && ++i < length)
 	{
 		if (copy->type == TOKEN_WORD
-			&& !(is_redirect(copy->next) || is_redirect(copy->prev)))
+			&& !(is_redirect(copy->prev) ))
 			size++;
 		copy = copy->next;
 	}
@@ -49,7 +50,7 @@ static char					**get_args(t_token *list, int length)
 	while (copy && ++i < length)
 	{
 		if (copy->type == TOKEN_WORD
-			&& !(is_redirect(copy->next) || is_redirect(copy->prev)))
+			&& !(is_redirect(copy->prev)))
 			args[i] = ft_strdup(copy->value);
 		copy = copy->next;
 	}
@@ -76,7 +77,7 @@ static void					construct_redirect(t_token *pivot,
 	{
 		rdr->what.fd = (ft_atoi(pivot->prev->value) == 0 ? 1
 											: ft_atoi(pivot->prev->value));
-		if (pivot->next->type == TOKEN_WORD)
+		if (pivot->next && pivot->next->type == TOKEN_WORD)
 			rdr->where.string = ft_strdup(pivot->next->value);
 	}
 }
@@ -99,14 +100,13 @@ static struct s_io_redirect	**get_redirects(t_token *list, int length)
 		i++;
 	}
 	array = ft_memalloc(sizeof(struct s_io_redirect *) * (size + 1));
-	copy = list;
 	i = 0;
-	while (copy && i < size && length--)
+	while (list && i < size && length--)
 	{
-		if (is_redirect(copy))
-			construct_redirect(copy, array[i++] =
+		if (is_redirect(list))
+			construct_redirect(list, array[i++] =
 				ft_memalloc(sizeof(struct s_io_redirect)));
-		copy = copy->next;
+		list = list->next;
 	}
 	return (array);
 }
@@ -155,10 +155,7 @@ t_bresult					*simple_command_build(const t_state *state,
 	command->args = get_args(list, size);
 	command->assignments = get_assignments(list, size);
 	command->io_redirects = get_redirects(list, size);
-	// Seems like a dirty hack or simply not working solution
-	// TODO: consider removing
-	command->is_async = offset_list(list, size - 1) == NULL ? false :
-						offset_list(list, size - 1)->type == TOKEN_AMPERSAND;
+	command->is_async = false;
 	node = ast_new_node(command, NODE_COMMAND);
 	result->root = node;
 	result->request = state->rule;

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/10 12:09:35 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/16 14:05:33 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/19 18:54:48 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,31 +23,50 @@ t_context		*context_init(void)
 
 void			context_deep_free(t_context **context)
 {
+	t_var				*vars;
 	struct s_fd_lst		*list;
 	struct s_fd_lst		*swap;
+	u_int32_t			i;
 
-	free_array((void **)&((*context)->environ->array));
+	vars = (*context)->environ->array;
+	i = 0;
+	while (i < (*context)->environ->size)
+	{
+		ft_memdel((void **)&(vars[i].key));
+		ft_memdel((void **)&(vars[i].value));
+		i++;
+	}
+	ft_memdel((void **)&((*context)->environ->array));
 	ft_memdel((void **)&((*context)->environ));
 	ft_memdel((void **)&((*context)->term_config));
-	list = (*context)->fd_list;;
+	list = (*context)->fd_list;
 	while (list)
 	{
 		swap = list->next;
-		ft_memdel((void **)&list);
+		close(list->current);
 		ft_memdel((void **)&(list->label));
+		ft_memdel((void **)&list);
 		list = swap;
 	}
 	ft_memdel((void **)context);
 }
 
 /*
-** Remember that dup2 does nothing, if arguments are equal
+** If to_which is NULL, restores context from backup with pretty much the same
+** algorithm
+**
+** Remember that dup2 does nothing, if arguments are equal, so there will not be
+** any excessive duplications, if context was shallow duplicated
 */
 
 void			context_switch(t_context *to_which)
 {
 	struct s_fd_lst		*list;
 
+	if (!to_which)
+		to_which = g_term->context_backup;
+	else
+		g_term->context_backup = g_term->context_current;
 	g_term->context_current = to_which;
 	list = to_which->fd_list;
 	while (list)

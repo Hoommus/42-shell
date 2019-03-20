@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:46:00 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/16 15:10:05 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/19 18:46:14 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,13 +31,17 @@ int		try_builtin(char *builtin, char **args)
 int		forknrun(char *bin, char **args)
 {
 	int		status;
+	char	**environ;
 
+	environ = NULL;
 	TERM_APPLY_CONFIG(g_term->context_current->term_config);
 	g_term->running_process = fork();
 	if (g_term->running_process == 0)
 	{
-		execve(bin, args, environ_to_array(g_term->context_current->environ,
-			VAR_EXPORTING | VAR_COMMAND_LOCAL));
+		environ = environ_to_array(g_term->context_current->environ,
+			VAR_EXPORTING | VAR_COMMAND_LOCAL);
+		execve(bin, args, environ);
+		free_array((void **)environ);
 		exit(0);
 	}
 	else
@@ -48,6 +52,7 @@ int		forknrun(char *bin, char **args)
 		g_term->last_cmd_status = WEXITSTATUS(status);
 		g_term->running_process = 0;
 		TERM_APPLY_CONFIG(g_term->context_current->term_config);
+		free_array((void **)environ);
 		return (0);
 	}
 }

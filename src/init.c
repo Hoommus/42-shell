@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/16 12:28:13 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/16 14:55:26 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/16 15:39:17 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,10 @@ void			init_shell_context(void)
 	if (fcntl(STDERR_FILENO, F_GETFD) != -1)
 		context_add_fd(g_term->context_original, 2, 2, "stderr");
 	environ_from_array(g_term->context_original->environ, environ);
+	g_term->context_current = context_duplicate(g_term->context_original, true);
+	free(g_term->context_current->term_config);
+	g_term->context_current->term_config = init_term();
+	context_switch(g_term->context_current);
 }
 
 struct termios	*init_term(void)

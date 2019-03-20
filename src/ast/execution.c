@@ -1,0 +1,100 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   execution.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/02/27 13:23:10 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/03/20 12:51:07 by vtarasiu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "twenty_one_sh.h"
+#include "shell_script.h"
+#include "shell_script_parser.h"
+
+#include <assert.h>
+const struct s_executor		g_executors_table[] = {
+	{
+		.node_type = NODE_COMMAND,
+		.executor.exec_alt_context = &exec_command
+	},
+	{NODE_SEPARATOR, {&exec_semicolon_recursive}},
+	{NODE_OR_IF, {&exec_or_if}},
+	{NODE_AND_IF, {&exec_and_if}},
+	{NODE_PIPE, {NULL}},
+	{NODE_SUBSHELL, {NULL}},
+	{0, {NULL}}
+};
+
+// TODO: add execution interruption capability
+
+int			exec_node(const t_node *node)
+{
+	int		i;
+
+	i = -1;
+	while (g_executors_table[++i].executor.exec)
+		if (node->node_type == g_executors_table[i].node_type)
+			return (g_executors_table[i].executor.exec_alt_context(node, NULL));
+	ft_printf("No executor for node of type %d\n", node->node_type);
+	return (71);
+}
+
+int			exec_and_if(const t_node *parent)
+{
+	int		status_left;
+	int		status_right;
+
+	assert(parent && parent->node_type == NODE_AND_IF);
+	status_right = 0;
+	status_left = exec_node(parent->left);
+	if (status_left == 0)
+		status_right = exec_node(parent->right);
+	return (status_left && status_right);
+}
+
+int			exec_or_if(const t_node *parent)
+{
+	int		status_left;
+	int		status_right;
+
+	assert(parent && parent->node_type == NODE_OR_IF);
+	status_right = 0;
+	status_left = exec_node(parent->left);
+	if (status_left != 0)
+		status_right = exec_node(parent->right);
+	return (status_left == 0 || status_right == 0);
+}
+
+int			exec_semicolon_recursive(const t_node *parent)
+{
+	assert(parent && parent->node_type == NODE_SEPARATOR);
+	if (parent->left)
+		exec_node(parent->left);
+	if (parent->right)
+		exec_node(parent->right);
+	return (0); // always successful
+}
+
+/*
+** Entry point in any AST
+** Because tree balancing is for virgins and crutches for real chads
+*/
+int			exec_semicolon_iterative(t_node *parent)
+{
+	t_node	*sep;
+
+	if (!parent || parent->node_type != NODE_SEPARATOR)
+		return (ft_printf("Some weird error in tree\n"));
+	sep = parent;
+	while (sep->node_type == NODE_SEPARATOR
+		&& sep->left && sep->left->node_type == NODE_COMMAND
+		&& sep->right && sep->right->node_type == NODE_SEPARATOR)
+	{
+		exec_command(sep->left, NULL);
+		sep = sep->right;
+	}
+	return (exec_semicolon_recursive(sep));
+}

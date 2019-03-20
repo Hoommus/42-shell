@@ -6,11 +6,11 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/16 15:13:59 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/20 13:00:51 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#ifndef TWENTY_ONE_SH_H
 
+#ifndef TWENTY_ONE_SH_H
 # define TWENTY_ONE_SH_H
 
 # pragma clang diagnostic push
@@ -57,8 +57,8 @@
 # define CONFIG_FILE ".21shrc"
 # define LOG_FILE ".21sh.log"
 
-# define BUILD 1104
-# define BUILD_DATE "16.03.19 15:13:59 EET"
+# define BUILD 1126
+# define BUILD_DATE "20.03.19 13:00:50 EET"
 
 # ifdef MAX_INPUT
 #  undef MAX_INPUT
@@ -106,8 +106,11 @@ struct					s_fd_lst
 };
 
 /*
- * TODO: Add info about shell config
- */
+** So context is an entity that controls used environment variables, filedes
+** table for easy duplications used in redirections and pipes and term config.
+**
+** TODO: Add info about shell config
+*/
 
 typedef struct			s_context
 {
@@ -193,11 +196,14 @@ int						unset_env_v(t_environ_vector *vector, const char *key);
 */
 void					context_switch(t_context *to_which);
 t_context				*context_init(void);
+void					context_deep_free(t_context **context);
 t_context				*context_duplicate(const t_context *context,
 	bool with_dup);
 void					context_add_fd(t_context *context, const int original,
 	const int actual, const char *label);
 void					context_remove_fd(t_context *context, const int fd);
+bool					context_is_fd_present(const t_context *context, const int original);
+
 /*
 ** Main Loop (main.c, )
 */
