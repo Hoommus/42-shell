@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:11:59 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/15 16:24:27 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/25 15:37:55 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,15 +19,15 @@
 # include <stdbool.h>
 # include "libft.h"
 
-# define VAR_VECTOR_INITIAL_SIZE 64
+# define VARIABLES_VECTOR_INITIAL_SIZE 64
 
 enum							e_var_scope
 {
-	VAR_GLOBAL = 1,
-	VAR_SHELL_LOCAL = 2,
-	VAR_SCRIPT_GLOBAL = 4,
-	VAR_EXPORTING = 8,
-	VAR_COMMAND_LOCAL = 16,
+	SCOPE_GLOBAL = 1,
+	SCOPE_SHELL_LOCAL = 2,
+	SCOPE_SCRIPT_GLOBAL = 4,
+	SCOPE_EXPORT = 8,
+	SCOPE_COMMAND_LOCAL = 16,
 };
 
 /*
@@ -55,29 +55,31 @@ struct							s_vector_generic
 	u_int32_t		size;
 };
 
-typedef struct s_vector_generic	t_environ_vector;
+typedef struct s_vector_generic	t_env_vector;
 
-t_environ_vector	*environ_create_vector(const u_int32_t capacity);
-t_environ_vector	*environ_reallocate_vector(t_environ_vector *vector);
-
-t_var				*environ_update_entry(t_environ_vector *vector,
+t_env_vector					*environ_create_vector(const u_int32_t capacity);
+t_env_vector					*environ_reallocate_vector(t_env_vector *vector);
+void							environ_deallocate_vector(t_env_vector *vector);
+t_var							*environ_update_entry(t_env_vector *vector,
 	const char *key, const char *value, const enum e_var_scope scope);
 
-t_var				*environ_push_entry(t_environ_vector *vector,
+t_var							*environ_push_entry(t_env_vector *vector,
 	const char *key, const char *value, const enum e_var_scope scope);
 
-t_var				*environ_is_entry_present(t_environ_vector *vector,
+t_var							*environ_is_entry_present(t_env_vector *vector,
 	const char *key, const char *value);
 
-int					environ_remove_entry(t_environ_vector *vector,
+int								environ_remove_entry(t_env_vector *vector,
 	const char *key);
-t_var				*environ_get_entry(t_environ_vector *vector,
-										const char *key);
+t_var							*environ_get_entry(t_env_vector *vector,
+	const char *key);
 
-void				environ_from_array(t_environ_vector *vector,
+void							environ_from_array(t_env_vector *vector,
 	const char **environ);
-char				**environ_to_array(t_environ_vector *vector,
+char							**environ_to_array(t_env_vector *vector,
 	u_int32_t scopes);
+void							environ_import(t_env_vector *dst,
+	const t_env_vector *src, const u_int32_t scopes);
 
 # pragma clang diagnostic pop
 

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:56:01 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/20 12:55:57 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/20 15:59:43 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,6 @@ void			run_script(t_token *list_head, bool log_recursion)
 {
 	t_state				state;
 	struct s_result		result;
-	int					status;
 
 	if (list_head == NULL)
 		return ;
@@ -61,12 +60,8 @@ void			run_script(t_token *list_head, bool log_recursion)
 			ft_strcmp(state.list_offset->value, "\n") == 0 ? "\\n" :
 			state.list_offset->value,
 			state.list_offset->line_nbr);
-	status = 1;
 	// TODO: solve heredocs problem
 	if (result.ast && state.list_offset == NULL)
-		status = exec_semicolon_iterative(result.ast->root);
-	else
-		ft_printf("Nothing to execute.\n");
-	ft_printf("return status: %d\n", status);
+		exec_semicolon_iterative(result.ast->root);
 	free_all(&state, &result);
 }

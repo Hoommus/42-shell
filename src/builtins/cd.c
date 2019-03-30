@@ -65,8 +65,8 @@ int				hs_cd(char **args)
 	if (status == 0)
 	{
 		getcwd(pwd, 1024);
-		set_env_v(NULL, "PWD", pwd, VAR_EXPORTING);
-		set_env_v(NULL, "OLDPWD", currpwd, VAR_EXPORTING);
+		set_env_v(NULL, "PWD", pwd, SCOPE_EXPORT);
+		set_env_v(NULL, "OLDPWD", currpwd, SCOPE_EXPORT);
 	}
 	else if (status == 1348)
 		ft_dprintf(2, "cd: permission denied: %s\n", args[0]);

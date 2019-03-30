@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:36 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/16 14:45:09 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/25 14:10:25 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,21 +66,23 @@ void	display_prompt(enum e_input_state state)
 	carpos_update(POS_PROMPT);
 }
 
-void		increment_shlvl(void)
+bool	is_string_numeric(const char *str, const int base)
 {
-	char		*swap;
-	t_var		*var;
-	int			level;
+	static char		*numbers = "0123456789ABCDEF";
+	bool			is_found;
+	int				i;
 
-	var = get_env_v(g_term->context_current->environ, "SHLVL");
-	if (var == NULL || var->value == NULL || ft_strlen(var->value) == 0)
-		set_env_v(g_term->context_current->environ, "SHLVL", "1", VAR_EXPORTING);
-	else
+	is_found = false;
+	while (*str)
 	{
-		level = ft_atoi(var->value) + 1;
-		set_env_v(g_term->context_current->environ, "SHLVL",
-			(swap = ft_itoa(level)), VAR_EXPORTING);
-		free(swap);
+		i = 0;
+		while (i < base && !is_found)
+			if (*str == numbers[i++])
+				is_found = true;
+		if (!is_found)
+			return (false);
+		str++;
 	}
+	return (true);
 }
 

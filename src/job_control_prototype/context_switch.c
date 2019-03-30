@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/10 12:09:35 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/19 18:54:48 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/29 18:16:20 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,28 +17,16 @@ t_context		*context_init(void)
 	t_context	*dummy;
 
 	dummy = ft_memalloc(sizeof(t_context));
-	dummy->environ = environ_create_vector(VAR_VECTOR_INITIAL_SIZE);
+	dummy->environ = environ_create_vector(VARIABLES_VECTOR_INITIAL_SIZE);
 	return (dummy);
 }
 
 void			context_deep_free(t_context **context)
 {
-	t_var				*vars;
 	struct s_fd_lst		*list;
 	struct s_fd_lst		*swap;
-	u_int32_t			i;
 
-	vars = (*context)->environ->array;
-	i = 0;
-	while (i < (*context)->environ->size)
-	{
-		ft_memdel((void **)&(vars[i].key));
-		ft_memdel((void **)&(vars[i].value));
-		i++;
-	}
-	ft_memdel((void **)&((*context)->environ->array));
-	ft_memdel((void **)&((*context)->environ));
-	ft_memdel((void **)&((*context)->term_config));
+	environ_deallocate_vector((*context)->environ);
 	list = (*context)->fd_list;
 	while (list)
 	{
@@ -48,6 +36,7 @@ void			context_deep_free(t_context **context)
 		ft_memdel((void **)&list);
 		list = swap;
 	}
+	ft_memdel((void **)&((*context)->term_config));
 	ft_memdel((void **)context);
 }
 
@@ -77,15 +66,16 @@ void			context_switch(t_context *to_which)
 	TERM_APPLY_CONFIG(to_which->term_config);
 }
 
-static void		duplicate_environ(t_context *new, const t_context *context)
+static void		duplicate_environ(t_context *new_context,
+	const t_context *context)
 {
 	t_var		var;
 	u_int32_t	i;
 
-	new->environ = environ_create_vector(context->environ->capacity);
-	new->environ->size = context->environ->size;
-	i = 0;
-	while (i < new->environ->size)
+	new_context->environ = environ_create_vector(context->environ->capacity);
+	i = new_context->environ->size;
+	new_context->environ->size = context->environ->size;
+	while (i < new_context->environ->size)
 	{
 		ft_bzero(&var, sizeof(t_var));
 		var.key = ft_strdup(((t_var *)context->environ->array + i)->key);
@@ -93,7 +83,7 @@ static void		duplicate_environ(t_context *new, const t_context *context)
 		var.scope = ((t_var *)context->environ->array + i)->scope;
 		var.hash = ((t_var *)context->environ->array + i)->hash;
 		var.key_hash = ((t_var *)context->environ->array + i)->key_hash;
-		((t_var *)new->environ->array)[i] = var;
+		((t_var *)new_context->environ->array)[i] = var;
 		i++;
 	}
 }
@@ -130,8 +120,10 @@ static void		duplicate_fds(t_context *new, const t_context *context,
 
 /*
 ** Creates a full copy of provided context
-** If with_dup is set to 'true', duplicates all fds with corresponding syscall.
+** If with_dup is set to 'true', duplicates all fds with corresponding syscall
+** and duplicates environ.
 ** Otherwise, new context will share same file descriptors as "parent" context
+** and the same pointer to environ (to modify shell environment without hassle).
 */
 
 t_context		*context_duplicate(const t_context *context, bool with_dup)
@@ -142,7 +134,10 @@ t_context		*context_duplicate(const t_context *context, bool with_dup)
 	new->term_config = ft_memalloc(sizeof(struct termios));
 	if (context->term_config != NULL)
 		ft_memcpy(new->term_config, context->term_config, sizeof(struct termios));
-	duplicate_environ(new, context);
+	if (with_dup)
+		duplicate_environ(new, context);
+	else
+		new->environ = context->environ;
 	duplicate_fds(new, context, with_dup);
 	return (new);
 }

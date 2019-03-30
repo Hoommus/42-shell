@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/16 12:28:13 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/16 15:39:17 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/28 19:34:30 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,13 @@ void			init_shell_context(void)
 		context_add_fd(g_term->context_original, 2, 2, "stderr");
 	environ_from_array(g_term->context_original->environ, environ);
 	g_term->context_current = context_duplicate(g_term->context_original, true);
+	ft_printf("Deallocating vector...\n");
+	environ_deallocate_vector(g_term->context_current->environ);
+	ft_printf("Deallocated!\n");
 	free(g_term->context_current->term_config);
+	g_term->context_current->environ = g_term->context_original->environ;
 	g_term->context_current->term_config = init_term();
+	ft_printf("Switching context...\n");
 	context_switch(g_term->context_current);
 }
 
@@ -57,7 +62,6 @@ struct termios	*init_term(void)
 	g_term->ws_col = window.ws_col;
 	g_term->ws_row = window.ws_row;
 	init_buffer_vector(MAX_INPUT);
-	//carpos_update(POS_CURRENT);
 	return (newterm);
 }
 
@@ -86,12 +90,46 @@ void			init_files(void)
 
 	time(&rawtime);
 	timeinfo = localtime(&rawtime);
-	if (fcntl(1, F_GETFD) == -1)
-		dup2(open("/dev/fd/1", O_WRONLY), 1);
-	if (fcntl(2, F_GETFD) == -1)
-		dup2(open("/dev/fd/2", O_WRONLY), 2);
+//	if (fcntl(1, F_GETFD) == -1)
+//		dup2(open("/dev/fd/1", O_WRONLY), 1);
+//	if (fcntl(2, F_GETFD) == -1)
+//		dup2(open("/dev/fd/2", O_WRONLY), 2);
 	g_term->logfile = init_fd_at_home(LOG_FILE, 0);
 	g_term->history_file = init_fd_at_home(HISTORY_FILE, 0);
 	ft_dprintf(g_term->logfile, "21sh log [pid %d]\nDate: %s\n", getpid(),
 				asctime(timeinfo));
+}
+
+void			init_variables(void)
+{
+	t_env_vector	*vector;
+	char			*swap;
+	t_var			*var;
+	char			host[1025];
+
+	vector = g_term->context_original->environ;
+	swap = ft_itoa(BUILD);
+	ft_bzero(host, sizeof(host));
+	gethostname(host, 1024);
+	set_env_v(vector, "HOST", host, SCOPE_SHELL_LOCAL);
+	host[ft_strchr(host, '.') - host] = 0;
+	set_env_v(vector, "SHORT_HOST", host, SCOPE_SHELL_LOCAL);
+	set_env_v(vector, "BUILD", swap, SCOPE_SHELL_LOCAL);
+	set_env_v(vector, "BUILD_DATE", BUILD_DATE, SCOPE_SHELL_LOCAL);
+	ft_memdel((void **)&swap);
+	var = get_env_v(g_term->context_current->environ, "SHLVL");
+	if (var == NULL || var->value == NULL || ft_strlen(var->value) == 0)
+		set_env_v(g_term->context_current->environ, "SHLVL", "1",
+			SCOPE_EXPORT);
+	else
+	{
+		set_env_v(g_term->context_current->environ, "SHLVL",
+				  (swap = ft_itoa(ft_atoi(var->value) + 1)), SCOPE_EXPORT);
+		free(swap);
+	}
+}
+
+void			parse_args(__unused int argc, char **argv)
+{
+	set_env_v(g_term->context_original->environ, "0", argv[0], SCOPE_SHELL_LOCAL);
 }

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/22 16:19:45 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/05/20 13:01:54 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/29 14:27:19 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,12 +41,12 @@ int		magic(char **line, char **buf)
 
 int		get_next_line(const int fd, char **line)
 {
-	static char	*buf[10];
+	static char	*buf[4864];
 	char		*b;
 	char		*swap;
 	long long	cat;
 
-	if (fd < 0 || fd >= 10 || line == NULL)
+	if (fd < 0 || fd >= 4864 || line == NULL)
 		return (-1);
 	buf[fd] = buf[fd] == NULL ? ft_strnew(0) : buf[fd];
 	b = ft_strnew(BUFF_SIZE);

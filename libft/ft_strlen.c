@@ -54,7 +54,7 @@ static size_t	consider_return(const char *original, unsigned long longword,
 	return (-1);
 }
 
-size_t			ft_strlen_unsafe(char *str)
+size_t			ft_strlen_unsafe(const char *str)
 {
 	const char			*swap;
 	unsigned long		*longswap;
@@ -78,7 +78,7 @@ size_t			ft_strlen_unsafe(char *str)
 	}
 }
 
-size_t			ft_strlen(char *str)
+size_t			ft_strlen(const char *str)
 {
 	return (str == NULL ? 0 : ft_strlen_unsafe(str));
 }

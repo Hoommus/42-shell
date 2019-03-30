@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:56:56 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/04 18:55:08 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/25 18:47:15 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,13 +32,13 @@ void	ast_free_command_node_internals(t_node *node)
 	free_array((void **)cmd->args);
 	free_array((void **)cmd->assignments);
 	i = 0;
-	while (cmd->io_redirects[i])
+	while (cmd->io_redirects[i].type != TOKEN_NOT_APPLICABLE)
 	{
-		if ((u_int64_t)cmd->io_redirects[i]->what.fd > 10)
-			ft_memdel((void **)&(cmd->io_redirects[i]->what.string));
-		if ((u_int64_t)cmd->io_redirects[i]->where.fd > 10)
-			ft_memdel((void **)&(cmd->io_redirects[i]->where.string));
-		ft_memdel((void **)&(cmd->io_redirects[i++]));
+		if (cmd->io_redirects[i].what.path)
+			ft_memdel((void **)&(cmd->io_redirects[i].what.path));
+		if (cmd->io_redirects[i].where.path)
+			ft_memdel((void **)&(cmd->io_redirects[i].where.path));
+		i++;
 	}
 	ft_memdel((void **)&(cmd->io_redirects));
 	ft_memdel((void **)&(cmd));

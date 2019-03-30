@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/20 13:00:51 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/30 17:41:27 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,12 +57,16 @@
 # define CONFIG_FILE ".21shrc"
 # define LOG_FILE ".21sh.log"
 
-# define BUILD 1126
-# define BUILD_DATE "20.03.19 13:00:50 EET"
+# define BUILD 1279
+# define BUILD_DATE "30.03.19 17:41:27 EET"
 
 # ifdef MAX_INPUT
 #  undef MAX_INPUT
 #  define MAX_INPUT 256
+# endif
+
+# ifndef MAX_FD
+#  define MAX_FD 10
 # endif
 
 /*
@@ -114,7 +118,7 @@ struct					s_fd_lst
 
 typedef struct			s_context
 {
-	t_environ_vector	*environ;
+	t_env_vector		*environ;
 	struct termios		*term_config;
 	struct s_fd_lst		*fd_list;
 }						t_context;
@@ -170,7 +174,7 @@ struct					s_term
 
 	t_buffer			*buffer;
 };
-
+extern volatile sig_atomic_t		g_is_interrupted;
 extern struct s_term	*g_term;
 
 int						execute(char **args);
@@ -182,14 +186,15 @@ void					init_shell_context(void);
 struct termios			*init_term(void);
 void					init_files(void);
 short					init_fd_at_home(char *filename, int flags);
+void					parse_args(int argc, char **argv);
 
 /*
 ** Environment (environ_utils.c)
 */
-t_var					*get_env_v(t_environ_vector *vector, const char *key);
-int						set_env_v(t_environ_vector *vector, const char *key,
+t_var					*get_env_v(t_env_vector *vector, const char *key);
+int						set_env_v(t_env_vector *vector, const char *key,
 	const char *value, enum e_var_scope scope);
-int						unset_env_v(t_environ_vector *vector, const char *key);
+int						unset_env_v(t_env_vector *vector, const char *key);
 
 /*
 ** Context management
@@ -208,8 +213,8 @@ bool					context_is_fd_present(const t_context *context, const int original);
 ** Main Loop (main.c, )
 */
 
-char					**read_command(void);
 int						shell_loop(void);
+char					*read_command(void);
 void					setup_signal_handlers(void);
 void					display_prompt(enum e_input_state state);
 int						display_normal_prompt(void);
@@ -219,11 +224,12 @@ int						display_normal_prompt(void);
 */
 u_int64_t				hash_sdbm(const char *str);
 ssize_t					ponies_teleported(void);
-void					increment_shlvl(void);
-
+bool					is_string_numeric(const char *str, const int base);
+void					init_variables(void);
 /*
 ** Final input parsing (variables_replacement.c)
 */
+char					*expand(char *string);
 
 char					*replace_variables(char *line);
 char					*replace_home(char *line);
@@ -265,6 +271,9 @@ char					flag_validate_short(const char **args,
 int						open_wrapper(const char *path, int oflag);
 int						openm_wrapper(const char *path, int oflag, mode_t mode);
 int						close_wrapper(int filedes);
+int						dup_wrapper(int fd_what);
+int						dup2_wrapper(int fd_what, int fd_where);
+
 
 /*
 ** Compatibility

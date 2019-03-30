@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 14:44:44 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/19 12:15:26 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/29 17:11:55 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,13 +77,15 @@ enum						e_token_type
 
 	TOKEN_LESS,
 	TOKEN_GREAT,
-	TOKEN_TILDE,
 	TOKEN_AMPERSAND,
 
 	TOKEN_WORD,
 	TOKEN_NAME,
 	TOKEN_IO_NUMBER,
 	TOKEN_ASSIGNMENT_WORD,
+
+	TOKEN_EXPANSION,
+	TOKEN_BEXPANSION,
 
 	TOKEN_NEWLINE,
 	TOKEN_EMPTY,
@@ -138,29 +140,28 @@ typedef struct				s_node
 	struct s_node			*right;
 }							t_node;
 
-union						u_io_rdr_param
+struct						s_io_rdr_param
 {
-	char					*string;
+	char					*path;
 	int						fd;
 };
 
 typedef struct				s_io_redirect
 {
-	union u_io_rdr_param	what;
-	union u_io_rdr_param	where;
+	struct s_io_rdr_param	what;
+	struct s_io_rdr_param	where;
 	enum e_token_type		type;
-	bool					append;
 }							t_io_rdr;
 
 struct						s_command
 {
-	char					**args;
-	char					**assignments;
-	struct s_io_redirect	**io_redirects;
-	bool					is_async;
+	char		**args;
+	char		**assignments;
+	t_io_rdr	*io_redirects;
+	bool		is_async;
 };
 
-union						u_executer
+union						u_executor
 {
 	int		(*exec)(const t_node *node);
 	int		(*exec_alt_context)(const t_node *node, struct s_context *context);
@@ -169,7 +170,7 @@ union						u_executer
 struct						s_executor
 {
 	enum e_node_type	node_type;
-	union u_executer	executor;
+	union u_executor	executor;
 };
 
 extern const struct s_lexer_token	g_tokens[];
@@ -203,6 +204,7 @@ int							exec_semicolon_recursive(const t_node *parent);
 int							exec_and_if(const t_node *parent);
 int							exec_or_if(const t_node *parent);
 int							exec_node(const t_node *node);
+int							exec_abort(int dummy);
 
 /*
 ** File reading and executing

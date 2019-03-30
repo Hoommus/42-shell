@@ -6,15 +6,13 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:46:06 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/15 16:27:45 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/22 17:12:27 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "twenty_one_sh.h"
 #include "shell_history.h"
 #include "line_editing.h"
-
-volatile sig_atomic_t	g_sigint;
 
 static void				tstp(int sig)
 {
@@ -31,7 +29,9 @@ void					ignore(int sig)
 
 void					handle_sigint(int sig)
 {
-	g_sigint = sig;
+	extern volatile sig_atomic_t	g_is_interrupted;
+
+	g_is_interrupted = sig;
 }
 
 static void				resize(int sig)
