@@ -13,7 +13,7 @@
 NAME=libft.a
 OBJ_DIR = ./obj/
 
-FLAGS = -g -std=c99 -Wall -Wextra -Werror
+FLAGS = -std=c99 -Wall -Wextra -Werror
 
 SRC = ft_atoi.c ft_bzero.c ft_isalnum.c ft_isalpha.c ft_isascii.c ft_isdigit.c \
       ft_isprint.c ft_itoa.c ft_lstadd.c ft_lstdel.c ft_lstdelone.c            \

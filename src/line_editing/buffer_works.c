@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/14 18:43:20 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/16 15:12:43 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/20 15:33:18 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ void			deal_with_printable(const char arr[8])
 		g_term->input_state = STATE_NORMAL;
 	buff_insert_single_at(g_term->buffer->iterator, arr);
 	carpos_update(POS_LAST);
-	ft_printf("%s", arr);
+	write(1, arr, ft_strlen((char *)arr));
 	if (carpos_get(POS_LAST)->col == g_term->ws_col - 1)
 	{
 		tputs(tgetstr("sf", NULL), 1, &ft_putc);
@@ -53,7 +53,7 @@ void			deal_with_newline(const char arr[8])
 		|| g_term->input_state == STATE_DQUOTE
 		|| g_term->input_state == STATE_ESCAPED_EOL)
 	{
-		ft_printf("\n");
+		write(STDOUT_FILENO, "\n", 1);
 		buff_insert_single_at(g_term->buffer->iterator, arr);
 		display_prompt(g_term->input_state);
 		if (g_term->input_state == STATE_ESCAPED_EOL)
@@ -83,18 +83,17 @@ void			deal_with_sigint(void)
 ** TODO: Make this one handle long input from Command + V
 ** TODO: Memory leak at buff_get_part call
 */
-char			**read_command(void)
+char			*read_command(void)
 {
-	char			**commands;
 	union u_char	input;
+	ssize_t			status;
 
-	commands = NULL;
-	while (!commands)
+	while (true)
 	{
 		carpos_update(POS_CURRENT);
-		if (read(0, ft_memset(input.arr, 0, 8), 8) == -1)
+		if ((status = read(0, ft_memset(input.arr, 0, 8), 8)) == -1)
 		{
-			ft_printf("\n");
+			write(1, "\n", 1);
 			return (NULL);
 		}
 		if (input.arr[0] == '\n')
@@ -104,12 +103,6 @@ char			**read_command(void)
 		else
 			handle_key(input);
 		if (g_term->input_state == STATE_COMMIT)
-		{
-			// TODO: Fix leak from buff_get_part
-			char *tmp = buff_get_part(0, UINT64_MAX);
-			commands = smart_split(history_write(tmp, get_history_fd()), TOKEN_DELIMITERS);
-			free(tmp);
-		}
+			return (history_write(buff_get_part(0, UINT64_MAX), get_history_fd()));
 	}
-	return (commands);
 }

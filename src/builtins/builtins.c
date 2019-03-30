@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:42 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/14 17:07:57 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/25 16:51:36 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ struct s_builtin	g_builtins[] = {
 	{"env", &hs_env},
 	{"setenv", &hs_setenv},
 	{"unsetenv", &hs_unsetenv},
+	{"export", &hs_export},
 	{"help", &hs_help},
 	{"exit", &hs_exit},
 	{"quit", &hs_exit},
@@ -62,7 +63,7 @@ int					hs_help(char **args)
 	int		i;
 
 	*args = args[0];
-	ft_printf("42sh/2 builtins:\n");
+	ft_printf("help: prints all existing builtins\n42sh/2 builtins:\n");
 	i = 0;
 	while (g_builtins[i + 1].name != NULL)
 		ft_printf("%s, ", g_builtins[i++].name);

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:55:49 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/28 16:07:54 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/30 15:54:15 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,10 +35,10 @@ const struct s_lexer_token	g_tokens[] = {
 
 //	{"in",            "IN",          TOKEN_IN,              false},
 
-	{"{",             "LBRACE",      TOKEN_LBRACE,          true },
-	{"}",             "RBRACE",      TOKEN_RBRACE,          true },
-	{"(",             "LBRACKET",    TOKEN_LBRACKET,        true },
-	{")",             "RBRACKET",    TOKEN_RBRACKET,        true },
+	{"{",             "LBRACE",      TOKEN_LBRACE,          false},
+	{"}",             "RBRACE",      TOKEN_RBRACE,          false},
+	{"(",             "LBRACKET",    TOKEN_LBRACKET,        false},
+	{")",             "RBRACKET",    TOKEN_RBRACKET,        false},
 //	{"[",             "LSQBRACKET",  TOKEN_LSQBRACKET,      true },
 //	{"]",             "RSQBRACKET",  TOKEN_RSQBRACKET,      true },
 
@@ -58,7 +58,6 @@ const struct s_lexer_token	g_tokens[] = {
 
 	{"<",             "LESS",        TOKEN_LESS,            true },
 	{">",             "GREAT",       TOKEN_GREAT,           true },
-	{"~",             "TILDE",       TOKEN_TILDE,           false},
 	{"&",             "AMPERSAND",   TOKEN_AMPERSAND,       true },
 
 	{"^~/?[\\/\\w]*", "WORD",        TOKEN_WORD,            false},
@@ -66,6 +65,8 @@ const struct s_lexer_token	g_tokens[] = {
 	{"\\d*[><]\\d*",  "IO_NUMBER",   TOKEN_IO_NUMBER,       false},
 	{"^\\w+\\=",      "ASSIGNMENT",  TOKEN_ASSIGNMENT_WORD, false},
 
+	{"$(",            "EXPANSION",   TOKEN_EXPANSION,       false},
+	{"${",            "EXPANSION",   TOKEN_BEXPANSION,      false},
 	{"\n",            "NEWLINE",     TOKEN_NEWLINE,         true },
 	{"!",             "EMPTY_LOL",   TOKEN_EMPTY,           false},
 	{"!",             "literal",     TOKEN_NOT_APPLICABLE,  false},
@@ -86,27 +87,6 @@ static size_t			is_separate(const char *str)
 	return (0);
 }
 
-/*
-** Awfully hardcoded solution for exceptions
-*/
-
-u_int64_t		is_exception(const char *str)
-{
-	u_int64_t	i;
-
-	if (!str)
-		return (0);
-	i = 0;
-	if ((str[0] == '>' || str[0] == '<') &&
-		(ft_isalpha(str[1]) || ft_strchr("/\\\"\'`", str[1])))
-		return (1);
-	while (ft_isdigit(str[i]))
-		i++;
-	if (i > 0 && ft_strchr("<>", str[i]) && !is_separate(str + i))
-		return (i + 1);
-	return (0);
-}
-
 static u_int64_t		get_quoted_size(const char *str, const char *delims)
 {
 	u_int64_t	i;
@@ -116,8 +96,7 @@ static u_int64_t		get_quoted_size(const char *str, const char *delims)
 	i = 0;
 	quote = str[i];
 	state = LEXER_INSIDE_QUOTE;
-	while (str[++i] && state != LEXER_OUTSIDE_QUOTE
-					&& state != LEXER_NEXT_UNQUOTED_DELIM)
+	while (str[++i] && state != LEXER_NEXT_UNQUOTED_DELIM)
 	{
 		if (ft_strchr(delims, str[i + 1]) == NULL
 			&& str[i + 1] != '\n' && state != LEXER_INSIDE_QUOTE)
@@ -151,7 +130,13 @@ static char				*next_token(const char *str, const char *delims)
 	else
 		while (str[i] && ft_strchr(delims, str[i]) == NULL
 			&& !is_separate(str + i))
-			i += str[i] == '\\' ? 2 : 1;
+			if (ISQT(str[i]))
+			{
+				i += get_quoted_size(str + i, delims);
+				break ;
+			}
+			else
+				i += str[i] == '\\' ? 2 : 1;
 	return (ft_strsub(str, 0, i));
 }
 
@@ -181,6 +166,8 @@ static char				*strip_escaped_nl(char *string)
 	size_t	length;
 	size_t	i;
 
+	if (!string)
+		return (string);
 	length = ft_strlen(string);
 	i = 0;
 	while (length && i < length - 1)
@@ -198,7 +185,7 @@ char				*strip_comments(char *string)
 	u_int64_t	i;
 
 	i = 0;
-	while (string[i])
+	while (string && string[i])
 	{
 		if (string[i] == '#')
 			while (string[i] && string[i] != '\n')

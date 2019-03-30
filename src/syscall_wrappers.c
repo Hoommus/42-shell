@@ -6,21 +6,24 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/11 13:15:51 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/15 13:51:07 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/28 16:54:15 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "twenty_one_sh.h"
 
 // TODO: Consider adding a universal read wrapper
-// TODO: Consider adding dup and dup2 wrappers
 
 int		openm_wrapper(const char *path, int oflag, mode_t mode)
 {
 	int		fd;
 
 	fd = open(path, oflag, mode);
-	context_add_fd(g_term->context_current, fd, fd, path);
+	if (fd == -1)
+		ft_dprintf(2, "21sh: some weird 'open' error\n"
+								"%s \noflag: %x mode: %x", path, oflag, mode);
+	if (fd != -1)
+		context_add_fd(g_term->context_current, fd, fd, path);
 	return (fd);
 }
 
@@ -35,20 +38,26 @@ int		close_wrapper(int filedes)
 	return (close(filedes));
 }
 
-int		closeall(t_context *context)
+int		dup2_wrapper(int fd_what, int fd_where)
 {
-	struct s_fd_lst	*list;
+	int		status;
 
-	if (context == NULL)
-		context = g_term->context_current;
-	if (context == NULL)
-		return (-1);
-	list = context->fd_list;
-	while (list)
-	{
-		close(list->current);
-		close(list->original);
-		list = list->next;
-	}
-	return (0);
+	status = dup2(fd_where, fd_what);
+	if (status == -1)
+		ft_dprintf(2, "21sh: some weird 'dup2' error"
+				"\nwhat: %d where: %d\n", fd_what, fd_where);
+	context_add_fd(g_term->context_current, fd_where, fd_what, "duped2");
+	return (status);
+}
+
+int		dup_wrapper(int fd_what)
+{
+	int		new;
+
+	new = dup(fd_what);
+	if (new == -1)
+		ft_dprintf(2, "21sh: some weird 'dup2' error"
+					  "\nwhat: %d\n", fd_what);
+	context_add_fd(g_term->context_current, fd_what, new, "duped");
+	return (new);
 }

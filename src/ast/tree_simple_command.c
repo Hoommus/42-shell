@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:57:06 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/19 18:26:52 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/29 19:17:39 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,20 @@ static bool					is_redirect(t_token *t)
 			|| t->type == TOKEN_CLOBBER));
 }
 
+static bool					is_valid_rdr_fd(const char *token_value)
+{
+	int		atoi;
+
+	atoi = ft_atoi(token_value);
+	while (*token_value)
+	{
+		if (!ft_isdigit(*token_value))
+			break ;
+		token_value++;
+	}
+	return ((atoi && !*token_value) || (!atoi && !(*token_value)));
+}
+
 static char					**get_args(t_token *list, int length)
 {
 	char	**args;
@@ -39,20 +53,19 @@ static char					**get_args(t_token *list, int length)
 	copy = list;
 	while (copy && ++i < length)
 	{
-		if (copy->type == TOKEN_WORD
-			&& !(is_redirect(copy->prev) ))
+		if ((copy->type == TOKEN_WORD) && !is_redirect(copy->prev)
+			&& !(is_redirect(copy->next) && is_valid_rdr_fd(copy->value)))
 			size++;
 		copy = copy->next;
 	}
 	args = ft_memalloc(sizeof(char *) * (size + 1));
-	i = -1;
-	copy = list;
-	while (copy && ++i < length)
+	i = 0;
+	while (list && i < length)
 	{
-		if (copy->type == TOKEN_WORD
-			&& !(is_redirect(copy->prev)))
-			args[i] = ft_strdup(copy->value);
-		copy = copy->next;
+		if ((list->type == TOKEN_WORD) && !is_redirect(list->prev)
+			&& !(is_redirect(list->next) && is_valid_rdr_fd(list->value)))
+			args[i++] = ft_strdup(list->value);
+		list = list->next;
 	}
 	return (args);
 }
@@ -65,26 +78,26 @@ static void					construct_redirect(t_token *pivot,
 	rdr->type = pivot->type;
 	is_left = rdr->type == TOKEN_DLESS || rdr->type == TOKEN_LESSAND
 			|| rdr->type == TOKEN_LESS || rdr->type == TOKEN_DLESSDASH;
-	rdr->append = rdr->type == TOKEN_DGREAT;
 	rdr->what.fd = 1;
 	rdr->where.fd = 0;
 	if (is_left)
 	{
-		rdr->where.fd = ft_atoi(pivot->prev->value);
-		rdr->what.string = ft_strdup(pivot->next->value);
+		if (is_string_numeric(pivot->prev->value, 10))
+			rdr->where.fd = ft_atoi(pivot->prev->value);
+		rdr->what.path = ft_strdup(pivot->next->value);
 	}
 	else
 	{
-		rdr->what.fd = (ft_atoi(pivot->prev->value) == 0 ? 1
-											: ft_atoi(pivot->prev->value));
+		if (is_string_numeric(pivot->prev->value, 10))
+			rdr->what.fd = ft_atoi(pivot->prev->value);
 		if (pivot->next && pivot->next->type == TOKEN_WORD)
-			rdr->where.string = ft_strdup(pivot->next->value);
+			rdr->where.path = ft_strdup(pivot->next->value);
 	}
 }
 
-static struct s_io_redirect	**get_redirects(t_token *list, int length)
+static struct s_io_redirect	*get_redirects(t_token *list, int length)
 {
-	struct s_io_redirect	**array;
+	struct s_io_redirect	*array;
 	t_token					*copy;
 	int						i;
 	int						size;
@@ -99,13 +112,13 @@ static struct s_io_redirect	**get_redirects(t_token *list, int length)
 		copy = copy->next;
 		i++;
 	}
-	array = ft_memalloc(sizeof(struct s_io_redirect *) * (size + 1));
+	array = ft_memalloc(sizeof(struct s_io_redirect) * (size + 1));
+	array[size].type = TOKEN_NOT_APPLICABLE;
 	i = 0;
 	while (list && i < size && length--)
 	{
 		if (is_redirect(list))
-			construct_redirect(list, array[i++] =
-				ft_memalloc(sizeof(struct s_io_redirect)));
+			construct_redirect(list, array + i++);
 		list = list->next;
 	}
 	return (array);

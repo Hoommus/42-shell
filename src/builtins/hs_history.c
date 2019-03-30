@@ -14,12 +14,12 @@
 #include "twenty_one_sh.h"
 #include <time.h>
 
-int		deal_with_flags(char **args)
+int			deal_with_flags(char **args)
 {
 	return ((int)args);
 }
 
-void	add_entry(char **args)
+static void	add_entry(char **args)
 {
 	char	*whole_command;
 
@@ -33,7 +33,7 @@ void	add_entry(char **args)
 ** TODO: Replace reallocation with something more clever
 */
 
-void	clear_history_hard(void)
+static void	clear_history_hard(void)
 {
 	extern t_history	*g_history;
 	u_int64_t			i;
@@ -59,7 +59,7 @@ void	clear_history_hard(void)
 ** Left place for changed entry '*' mark in that printf
 */
 
-int		hs_history(char **args)
+int			hs_history(char **args)
 {
 	char					c;
 	int						width;
@@ -67,15 +67,15 @@ int		hs_history(char **args)
 	struct s_history_entry	*entry;
 
 	*args = args[0];
-	if ((c = flag_validate_short((const char **) args, "cs")))
+	if ((c = flag_validate_short((const char **)args, "cs")))
 	{
 		ft_dprintf(2, "history: invalid argument -%c\nUsage: history -s arg\n"
 				"       history -c\n", c);
 		return (0);
 	}
-	if (flag_short_present((const char **) args, 'c'))
+	if (flag_short_present((const char **)args, 'c'))
 		clear_history_hard();
-	if (flag_short_present((const char **) args, 's'))
+	if (flag_short_present((const char **)args, 's'))
 		add_entry(args);
 	width = ft_nbrlen((u_int64_t)history_get_size()) + 1;
 	width = width >= 4 ? width : 4;
@@ -84,5 +84,3 @@ int		hs_history(char **args)
 		ft_printf("%*llu%1c %s\n", width, i++, ' ', entry->command);
 	return (0);
 }
-
-

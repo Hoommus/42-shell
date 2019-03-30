@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:46:00 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/19 18:46:14 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/22 14:56:20 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ int		forknrun(char *bin, char **args)
 	if (g_term->running_process == 0)
 	{
 		environ = environ_to_array(g_term->context_current->environ,
-			VAR_EXPORTING | VAR_COMMAND_LOCAL);
+			SCOPE_EXPORT | SCOPE_COMMAND_LOCAL | SCOPE_SCRIPT_GLOBAL);
 		execve(bin, args, environ);
 		free_array((void **)environ);
 		exit(0);
@@ -100,15 +100,17 @@ int		try_local_binary(char *bin, char **args)
 int		execute(char **args)
 {
 	g_term->last_cmd_status = 1;
-	if (args != NULL)
-		g_term->last_cmd_status = try_builtin(args[0], args + 1);
-	if (g_term->last_cmd_status == 0)
-		return (0);
-	g_term->last_cmd_status = try_binary(args[0], args);
-	if (g_term->last_cmd_status == 0)
-		return (0);
-	g_term->last_cmd_status = try_local_binary(args[0], args);
-	if (g_term->last_cmd_status == 0)
-		return (0);
-	return (1);
+	if (args== NULL)
+		return (1);
+	g_term->last_cmd_status = try_builtin(args[0], args + 1);
+	if (g_term->last_cmd_status != 0)
+		g_term->last_cmd_status = try_binary(args[0], args);
+	if (g_term->last_cmd_status != 0)
+		g_term->last_cmd_status = try_local_binary(args[0], args);
+	return (g_term->last_cmd_status);
 }
+
+//int		execute_with_context(char **args, t_context *context)
+//{
+//
+//}

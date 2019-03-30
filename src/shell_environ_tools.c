@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/10 20:37:44 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/15 17:28:53 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/25 16:43:36 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 #include "twenty_one_sh.h"
 #include "ft_printf.h"
 
-char		**environ_to_array(t_environ_vector *vector, u_int32_t scopes)
+char	**environ_to_array(t_env_vector *vector, u_int32_t scopes)
 {
 	const t_var *const	vars = (const t_var *)vector->array;
 	char				**array;
@@ -40,14 +40,14 @@ char		**environ_to_array(t_environ_vector *vector, u_int32_t scopes)
 	j = 0;
 	while (++i < vector->size)
 	{
-		assert(j < size);
+		assert(j < size + 1);
 		if (scopes & (vars[i].scope))
 			array[j++] = ft_strings_join(2, "=", vars[i].key, vars[i].value);
 	}
 	return (array);
 }
 
-void		environ_from_array(t_environ_vector *vector, const char **environ)
+void	environ_from_array(t_env_vector *vector, const char **environ)
 {
 	char	**splitted;
 	int		i;
@@ -56,7 +56,8 @@ void		environ_from_array(t_environ_vector *vector, const char **environ)
 	while (environ && environ[i])
 	{
 		splitted = ft_strsplit(environ[i], '=');
-		environ_push_entry(vector, splitted[0], splitted[1], VAR_EXPORTING);
+		environ_push_entry(vector, splitted[0],
+			splitted[1] ? splitted[1] : "", SCOPE_EXPORT);
 		free_array((void **)splitted);
 		i++;
 	}

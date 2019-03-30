@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/03/19 17:13:54 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/03/28 20:00:46 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -45,8 +45,9 @@ AST_SRC = parser.c entry_point.c syntax_rules.c \
           tree_pipe_sequence.c tree_and_or.c tree_list.c
 
 BUILTIN_DIR = builtins/
-BUILTIN_SRC = cd.c where.c builtins.c builtins2.c hs_history.c tokenizer_test.c \
-              syntax_test.c hs_set.c
+BUILTIN_SRC = cd.c where.c builtins.c hs_history.c tokenizer_test.c \
+              syntax_test.c hs_set.c hs_env.c hs_setenv.c hs_unsetenv.c \
+              hs_export.c
 
 INTERFACE_DIR = line_editing/
 INTERFACE_SRC = buffer_drawing.c buffer_works.c     \
@@ -61,6 +62,9 @@ JOB_CONTROL_DIR = job_control_prototype/
 JOB_CONTROL_SRC = commands_execution.c signals_manipulation.c signals_basic.c \
                   context_manipulations.c context_switch.c
 
+EXPANSIONS_DIR = expansions/
+EXPANSIONS_SRC = expander_engine.c
+
 HISTORY_DIR = features/history/
 HISTORY_SRC = history.c history_vector.c
 
@@ -70,7 +74,8 @@ OBJ = $(addprefix $(OBJ_DIR), $(SHELL_SRC:.c=.o))                         \
       $(addprefix $(OBJ_DIR)$(BUILTIN_DIR), $(BUILTIN_SRC:.c=.o))         \
       $(addprefix $(OBJ_DIR)$(HISTORY_DIR), $(HISTORY_SRC:.c=.o))         \
       $(addprefix $(OBJ_DIR)$(INTERFACE_DIR), $(INTERFACE_SRC:.c=.o))     \
-      $(addprefix $(OBJ_DIR)$(JOB_CONTROL_DIR), $(JOB_CONTROL_SRC:.c=.o))
+      $(addprefix $(OBJ_DIR)$(EXPANSIONS_DIR), $(EXPANSIONS_SRC:.c=.o))   \
+      $(addprefix $(OBJ_DIR)$(JOB_CONTROL_DIR), $(JOB_CONTROL_SRC:.c=.o)) \
 
 all: $(NAME)
 
@@ -97,6 +102,7 @@ prepare:
 	@mkdir -p $(OBJ_DIR)$(BUILTIN_DIR)
 	@mkdir -p $(OBJ_DIR)$(HISTORY_DIR)
 	@mkdir -p $(OBJ_DIR)$(INTERFACE_DIR)
+	@mkdir -p $(OBJ_DIR)$(EXPANSIONS_DIR)
 	@mkdir -p $(OBJ_DIR)$(JOB_CONTROL_DIR)
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c

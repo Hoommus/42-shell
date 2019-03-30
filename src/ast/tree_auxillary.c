@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/25 18:12:02 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/04 18:48:56 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/25 18:56:29 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,18 +51,6 @@ void		print_command_node(t_node *node)
 		free(tmp);
 	}
 	ft_printf("    redirects: [ ");
-	for (int i = 0; cmd->io_redirects[i] != NULL; i++)
-	{
-		if ((u_int32_t)cmd->io_redirects[i]->what.fd < 10)
-			ft_printf("%d ", cmd->io_redirects[i]->what.fd);
-		else
-			ft_printf("%s ", cmd->io_redirects[i]->what.string);
-		ft_printf("%s ", g_tokens[cmd->io_redirects[i]->type].token_name);
-		if ((u_int32_t)cmd->io_redirects[i]->where.fd < 10)
-			ft_printf("%d ", cmd->io_redirects[i]->where.fd);
-		else
-			ft_printf("%s ", cmd->io_redirects[i]->where.string);
-	}
 	ft_printf("] \n");
 }
 

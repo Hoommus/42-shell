@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/14 17:11:49 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/16 13:54:51 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/29 19:38:48 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,20 +14,38 @@
 #include "shell_builtins.h"
 #include "twenty_one_sh.h"
 
+void	print_var(const t_var *var)
+{
+	const char	*spec = "\t\a \r;\n";
+	char		*output;
+
+	if (!ft_strchr_any(var->key, spec) && !ft_strchr_any(var->value, spec)
+		&& ft_strlen(var->value))
+		output = "%s=%s\n";
+	else if ((!ft_strchr_any(var->key, spec) && ft_strchr_any(var->value, spec))
+		|| !var->value || ft_strlen(var->value) == 0)
+		output = "%s='%s'\n";
+	else if (ft_strchr_any(var->key, spec) && !ft_strchr_any(var->value, spec))
+		output = "\"%s\"=%s\n";
+	else
+		output = "\"%s\"='%s'\n";
+	ft_printf(output, var->key, var->value);
+}
+
 int		hs_set(char **args)
 {
 	const t_var *const	vars = (t_var *)g_term->context_current->environ->array;
 	struct s_fd_lst		*swap;
 	u_int32_t			i;
 
-	i = 0;
-	while (i < g_term->context_current->environ->size)
-	{
-		ft_printf("%s = %s\n",
-			vars[i].key,
-			vars[i].value);
-		i++;
-	}
+	i = -1;
+	while (++i < g_term->context_current->environ->size)
+		if (vars[i].scope & SCOPE_SHELL_LOCAL)
+			print_var(vars + i);
+	i = -1;
+	while (++i < g_term->context_current->environ->size)
+		if (!(vars[i].scope & SCOPE_SHELL_LOCAL))
+			print_var(vars + i);
 	swap = g_term->context_current->fd_list;
 	while (swap)
 	{

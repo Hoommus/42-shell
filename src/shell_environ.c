@@ -17,7 +17,7 @@
 ** if vector is null, uses current context
 */
 
-t_var	*get_env_v(t_environ_vector *vector, const char *key)
+t_var	*get_env_v(t_env_vector *vector, const char *key)
 {
 	t_var		*vars;
 	u_int64_t	hash;
@@ -36,7 +36,7 @@ t_var	*get_env_v(t_environ_vector *vector, const char *key)
 	return (NULL);
 }
 
-int		set_env_v(t_environ_vector *vector, const char *key, const char *value,
+int		set_env_v(t_env_vector *vector, const char *key, const char *value,
 	enum e_var_scope scope)
 {
 	if (vector == NULL)
@@ -46,7 +46,7 @@ int		set_env_v(t_environ_vector *vector, const char *key, const char *value,
 	return ((int)environ_push_entry(vector, key, value, scope));
 }
 
-int		unset_env_v(t_environ_vector *vector, const char *key)
+int		unset_env_v(t_env_vector *vector, const char *key)
 {
 	if (key == NULL || environ_get_entry(vector, key) == NULL)
 		return (1);
