@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:36 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/25 14:10:25 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/02 14:21:12 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ int			is_valid_var(char *var)
 	i = 0;
 	while (var[i])
 	{
-		if (!(ft_isalnum(var[i]) || var[i] == '_' || var[i] == '$'))
+		if (!(ft_isalnum(var[i]) || var[i] == '_'))
 			return (0);
 		i++;
 	}
@@ -55,7 +55,7 @@ void	display_prompt(enum e_input_state state)
 		ft_printf("dquote> ");
 	else if (state == STATE_QUOTE)
 		ft_printf("quote> ");
-	else if (state == STATE_ESCAPED_EOL)
+	else if (state == STATE_ESCAPED)
 		ft_printf("> ");
 	else if (state == STATE_HEREDOC)
 		ft_printf("heredoc> ");

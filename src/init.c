@@ -100,34 +100,6 @@ void			init_files(void)
 				asctime(timeinfo));
 }
 
-void			init_variables(void)
-{
-	t_env_vector	*vector;
-	char			*swap;
-	t_var			*var;
-	char			host[1025];
-
-	vector = g_term->context_original->environ;
-	swap = ft_itoa(BUILD);
-	ft_bzero(host, sizeof(host));
-	gethostname(host, 1024);
-	set_env_v(vector, "HOST", host, SCOPE_SHELL_LOCAL);
-	host[ft_strchr(host, '.') - host] = 0;
-	set_env_v(vector, "SHORT_HOST", host, SCOPE_SHELL_LOCAL);
-	set_env_v(vector, "BUILD", swap, SCOPE_SHELL_LOCAL);
-	set_env_v(vector, "BUILD_DATE", BUILD_DATE, SCOPE_SHELL_LOCAL);
-	ft_memdel((void **)&swap);
-	var = get_env_v(g_term->context_current->environ, "SHLVL");
-	if (var == NULL || var->value == NULL || ft_strlen(var->value) == 0)
-		set_env_v(g_term->context_current->environ, "SHLVL", "1",
-			SCOPE_EXPORT);
-	else
-	{
-		set_env_v(g_term->context_current->environ, "SHLVL",
-				  (swap = ft_itoa(ft_atoi(var->value) + 1)), SCOPE_EXPORT);
-		free(swap);
-	}
-}
 
 void			parse_args(__unused int argc, char **argv)
 {

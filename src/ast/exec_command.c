@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/05 17:50:36 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/30 13:53:35 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/05 12:01:31 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,7 +165,7 @@ void	alterate_filedes(const struct s_command *command)
 		else if (rdr->type == TOKEN_LESSAND && !ft_strcmp(rdr->what.path, "-"))
 			close_wrapper(rdr->where.fd);
 		else if (rdr->type == TOKEN_GREAT || rdr->type == TOKEN_CLOBBER
-				 || rdr->type == TOKEN_DGREAT)
+				|| rdr->type == TOKEN_DGREAT)
 			open_at_fd(rdr->what.fd, rdr->where.path, O_CREAT | O_WRONLY |
 						O_TRUNC | (rdr->type == TOKEN_DGREAT ? O_APPEND : 0));
 		else if (rdr->type == TOKEN_LESS)
@@ -182,17 +182,23 @@ void	alterate_filedes(const struct s_command *command)
 	}
 }
 
-void	expand_everything(struct s_command *command)
+void	expand_everything(const struct s_command *command)
 {
-	const struct s_command	dummy = *command;
-	char					*swap;
-	int						i;
+	char	*swap;
+	int		i;
 
 	i = -1;
-	while (dummy.args[++i])
+	while (command->args[++i])
 	{
-		swap = dummy.args[i];
-		dummy.args[i] = expand(dummy.args[i]);
+		swap = expand(command->args[i]);
+		ft_memdel((void **)&(command->args[i]));
+		command->args[i] = swap;
+	}
+	i = -1;
+	while (command->assignments[++i])
+	{
+		swap = command->assignments[i];
+		command->assignments[i] = expand(command->assignments[i]);
 		ft_memdel((void **)&swap);
 	}
 }
@@ -206,6 +212,7 @@ void	expand_everything(struct s_command *command)
 ** See alterate_filedes() function, which also must be called before pipe exec.
 */
 
+// TODO: optimise execution if no variables and fds changes are made
 int		exec_command(const t_node *command_node, t_context *new_context)
 {
 	const struct s_command	*command = command_node->command;
@@ -224,7 +231,11 @@ int		exec_command(const t_node *command_node, t_context *new_context)
 	// TODO: backup and close all existing filedes before switch
 	context_switch(context);
 	// TODO: Expand environment variables in args, assignments et cetera
-	expand_everything((struct s_command *)command);
+	expand_everything(command);
+	ft_printf("+{");
+	for (int i = 0; command->args[i] != NULL; i++)
+		ft_printf((command->args[i + 1] != NULL) ? "%s " : "%s", command->args[i]);
+	ft_printf("}\n");
 	alterate_vars(command, context);
 	if (!new_context)
 		alterate_filedes(command);

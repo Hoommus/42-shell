@@ -25,6 +25,6 @@ int				hs_unsetenv(char **args)
 		ft_printf("usage:\nunsetenv KEY [KEY ...]\n");
 	else
 		while (i < len)
-			unset_env_v(NULL, args[i++]);
+			unset_env_v(g_term->context_original->environ, args[i++]);
 	return (0);
 }

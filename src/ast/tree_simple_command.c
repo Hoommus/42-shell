@@ -58,7 +58,7 @@ static char					**get_args(t_token *list, int length)
 			size++;
 		copy = copy->next;
 	}
-	args = ft_memalloc(sizeof(char *) * (size + 1));
+	args = ft_memalloc(sizeof(char *) * (size + 2));
 	i = 0;
 	while (list && i < length)
 	{

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:55:49 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/30 15:54:15 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/02 13:58:29 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,10 +101,8 @@ static u_int64_t		get_quoted_size(const char *str, const char *delims)
 		if (ft_strchr(delims, str[i + 1]) == NULL
 			&& str[i + 1] != '\n' && state != LEXER_INSIDE_QUOTE)
 			break ;
-		else if (state == LEXER_NEXT_ESCAPED)
-			state = LEXER_INSIDE_QUOTE;
 		else if (str[i] == '\\')
-			state = LEXER_NEXT_ESCAPED;
+			i++;
 		else if (str[i] == quote)
 		{
 			if (ft_strchr(delims, str[i + 1]) == NULL && str[i + 1] != '\n')
@@ -119,16 +117,18 @@ static u_int64_t		get_quoted_size(const char *str, const char *delims)
 static char				*next_token(const char *str, const char *delims)
 {
 	u_int64_t	i;
+	size_t		len;
 	char		c;
 
 	i = 0;
 	c = str[i];
+	len = ft_strlen(str);
 	if (ISQT(c) && ++i)
 		i = get_quoted_size(str, delims);
 	else if ((i = is_separate(str)))
 		return (ft_strsub(str, 0, i));
 	else
-		while (str[i] && ft_strchr(delims, str[i]) == NULL
+		while (i < len && ft_strchr(delims, str[i]) == NULL
 			&& !is_separate(str + i))
 			if (ISQT(str[i]))
 			{
@@ -139,7 +139,6 @@ static char				*next_token(const char *str, const char *delims)
 				i += str[i] == '\\' ? 2 : 1;
 	return (ft_strsub(str, 0, i));
 }
-
 
 /*
 ** Defaults to TOKEN_SEMICOLON, because it does not affect any contextual
@@ -173,7 +172,7 @@ static char				*strip_escaped_nl(char *string)
 	while (length && i < length - 1)
 	{
 		if (string[i] == '\\' && string[i + 1] == '\n')
-			ft_memmove(string + i, string + i + 2, length - i - 2);
+			ft_memmove(string + i, string + i + 2, length - i - 1);
 		else
 			i++;
 	}

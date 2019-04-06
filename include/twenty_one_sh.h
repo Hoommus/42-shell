@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/30 17:41:27 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/06 17:48:22 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,6 @@
 # include "get_next_line.h"
 # include "shell_environ.h"
 
-# define SNWH (copy[i + 1] == '/' || copy[i + 1] == 0 || ft_iswhsp(copy[i + 1]))
-# define ABS(a) ((a) < 0 ? -(a) : (a))
 # define PROMPT_HOST "\x1b[0m\x1b[34;1m[%s@%s]\x1b[0m"
 # define PROMPT_PATH " \x1b[36;1m%s\x1b[0m"
 # define PROMPT_TERMINATOR " \x1b[%d;1m$\x1b[0m "
@@ -57,8 +55,8 @@
 # define CONFIG_FILE ".21shrc"
 # define LOG_FILE ".21sh.log"
 
-# define BUILD 1279
-# define BUILD_DATE "30.03.19 17:41:27 EET"
+# define BUILD 1371
+# define BUILD_DATE "06.04.19 17:48:22 EEST"
 
 # ifdef MAX_INPUT
 #  undef MAX_INPUT
@@ -89,7 +87,7 @@ enum					e_input_state
 	STATE_DQUOTE,
 	STATE_BQUOTE,
 	STATE_HEREDOC,
-	STATE_ESCAPED_EOL,
+	STATE_ESCAPED,
 	STATE_EMPTY_PIPE,
 	STATE_PIPE_HEREDOC,
 	STATE_NEXT_ESCAPED,
@@ -226,6 +224,8 @@ u_int64_t				hash_sdbm(const char *str);
 ssize_t					ponies_teleported(void);
 bool					is_string_numeric(const char *str, const int base);
 void					init_variables(void);
+char					**smart_split(const char *str, const char *delims);
+
 /*
 ** Final input parsing (variables_replacement.c)
 */
@@ -264,6 +264,8 @@ bool					flag_long_present(const char **args, const char *flag);
 bool					flag_short_present(const char **args, const char flag);
 char					flag_validate_short(const char **args,
 											const char *possible_flags);
+bool					flag_plus_short_present(const char **args,
+												const char flag);
 
 /*
  * Syscall wrappers

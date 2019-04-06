@@ -188,8 +188,6 @@ void						free_token(struct s_token *token);
 
 enum e_token_type			token_class_contextual(const char *str,
 														enum e_token_type prev);
-char						**smart_split(const char *str, const char *delims);
-
 void						free_array(void **array);
 
 /*

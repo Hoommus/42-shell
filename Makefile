@@ -6,18 +6,20 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/03/28 20:00:46 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/04/06 16:50:44 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = 21sh
+
+CC = clang
 
 ##### Remove the -g flag #####
 FLAGS = -g -std=c99 -Wall \
                     -Wextra \
                     -Werror \
                     -Wno-unknown-pragmas \
-                    #-Og -fsanitize="address"
+                    #-fsanitize="address"
 
 HEADER = -I include/ -I printf/include -I libft/
 SRC_DIR = ./src/
@@ -63,7 +65,8 @@ JOB_CONTROL_SRC = commands_execution.c signals_manipulation.c signals_basic.c \
                   context_manipulations.c context_switch.c
 
 EXPANSIONS_DIR = expansions/
-EXPANSIONS_SRC = expander_engine.c
+EXPANSIONS_SRC = expander_engine.c expand_escaped.c expand_quotes.c \
+                 expand_vars.c
 
 HISTORY_DIR = features/history/
 HISTORY_SRC = history.c history_vector.c
@@ -91,10 +94,10 @@ $(NAME): prepare $(OBJ)
 			%s!define BUILD_DATE .\+!define BUILD_DATE \"$$BUILD_DATE\"!g| \
 			|w|q" include/twenty_one_sh.h
 	rm -f obj/main.o
-	gcc $(FLAGS) $(HEADER) -o $(OBJ_DIR)main.o -c $(SRC_DIR)main.c
+	$(CC) $(FLAGS) $(HEADER) -o $(OBJ_DIR)main.o -c $(SRC_DIR)main.c
 	make -C $(LIB_DIR)
 	cp $(LIB_DIR)/$(LIB_NAME) ./$(LIB_NAME)
-	gcc $(FLAGS) -o $(NAME) $(OBJ) $(HEADER) $(LIB_NAME) -ltermcap
+	$(CC) $(FLAGS) -o $(NAME) $(OBJ) $(HEADER) $(LIB_NAME) -ltermcap
 
 prepare:
 	@mkdir -p $(OBJ_DIR)$(AST_DIR)
@@ -106,7 +109,7 @@ prepare:
 	@mkdir -p $(OBJ_DIR)$(JOB_CONTROL_DIR)
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
-	gcc $(FLAGS) $(HEADER) -o $@ -c $< ;
+	$(CC) $(FLAGS) $(HEADER) -o $@ -c $< ;
 
 install: all
 	@if [ grep ~/.brew/bin $PATH 2>/dev/null ] ; \

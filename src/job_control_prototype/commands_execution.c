@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:46:00 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/22 14:56:20 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/03/31 13:56:06 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,8 +109,3 @@ int		execute(char **args)
 		g_term->last_cmd_status = try_local_binary(args[0], args);
 	return (g_term->last_cmd_status);
 }
-
-//int		execute_with_context(char **args, t_context *context)
-//{
-//
-//}

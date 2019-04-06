@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/20 18:13:57 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/04/01 16:33:05 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/01 14:56:24 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,14 +20,9 @@ char		*ft_strdup(const char *src)
 
 	i = 0;
 	l = ft_strlen((char *)src);
-	copy = (char *)malloc(sizeof(char) * (l + 1));
+	copy = (char *)ft_memalloc(sizeof(char) * (l + 1));
 	if (copy == 0)
 		return (0);
-	while (src[i])
-	{
-		copy[i] = src[i];
-		i++;
-	}
-	copy[i] = '\0';
+	ft_memcpy(copy, src, l);
 	return (copy);
 }

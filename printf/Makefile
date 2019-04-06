@@ -14,6 +14,8 @@ NAME = libftprintf.a
 
 FLAGS = -std=c99 -Wall -Wextra -Werror
 
+CC = clang
+
 HEADER = include
 SRC_DIR = ./src/
 OBJ_DIR = ./obj/
@@ -37,12 +39,12 @@ $(NAME): $(OBJ)
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
 	@mkdir -p $(OBJ_DIR)
-	gcc $(FLAGS) -I $(HEADER) -o $@ -c $<
+	$(CC) $(FLAGS) -I $(HEADER) -o $@ -c $<
 
 all: $(NAME)
 
 debug: all
-	gcc -g $(FLAGS) -o $(EXEC) main.c libftprintf.a
+	$(CC) -g $(FLAGS) -o $(EXEC) main.c libftprintf.a
 
 clean:
 	make -C $(LIB_DIR) clean
@@ -62,10 +64,7 @@ fclean: clean
 
 re: fclean all
 
-check:
-	gcc -c ft_*.c -std=c99 -Wall -Wextra -Werror && norminette ft_*.c *.h
-
 love:
 	@echo "Not all."
 
-.PHONY: clean all fclean re check love debug norme
+.PHONY: clean all fclean re love debug norme

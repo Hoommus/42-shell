@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/23 17:43:19 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/18 19:15:25 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/06 17:01:14 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include <stdarg.h>
 
 # define LIBFT_WHTSP "\n\t \r\a"
+# define ABS(a) ((a) < 0 ? -(a) : (a))
 
 typedef struct	s_list
 {
@@ -62,6 +63,7 @@ char			*ft_strchr_any(const char *str, const char *needles);
 int				ft_strcmp(const char *s1, const char *s2);
 int				ft_strncmp(const char *s1, const char *s2, size_t n);
 int				ft_atoi(const char *str);
+int64_t			ft_atoi_base(const char *str, int base);
 int				ft_isalpha(int c);
 int				ft_isdigit(int c);
 int				ft_isalnum(int c);
@@ -117,5 +119,6 @@ char			*to_unicode_string(wchar_t *string);
 
 u_int64_t		ft_rand(u_int64_t limit);
 size_t			linecount(const char *str, int64_t line_width);
-
+char			*strinsert(const char *dst, const char *insertion,
+					size_t region_start, size_t region_size);
 #endif
