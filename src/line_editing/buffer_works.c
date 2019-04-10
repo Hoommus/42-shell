@@ -94,6 +94,7 @@ char			*read_command(void)
 	while (true)
 	{
 		carpos_update(POS_CURRENT);
+		status = 0;
 		if ((status = read(0, ft_memset(input.arr, 0, 8), 8)) == -1)
 		{
 			write(1, "\n", 1);

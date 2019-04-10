@@ -32,7 +32,7 @@ void	print_var(const t_var *var)
 	ft_printf(output, var->key, var->value);
 }
 
-int		hs_set(char **args)
+int		hs_set(const char **args)
 {
 	const t_var *const	vars = (t_var *)g_term->context_current->environ->array;
 	struct s_fd_lst		*swap;

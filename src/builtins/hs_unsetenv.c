@@ -12,7 +12,7 @@
 
 #include "twenty_one_sh.h"
 
-int				hs_unsetenv(char **args)
+int				hs_unsetenv(const char **args)
 {
 	int		len;
 	int		i;

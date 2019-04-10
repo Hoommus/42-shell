@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/27 13:23:10 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/22 17:18:41 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/09 14:24:19 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,16 +18,13 @@
 volatile sig_atomic_t		g_is_interrupted;
 
 const struct s_executor		g_executors_table[] = {
-	{
-		.node_type = NODE_COMMAND,
-		.executor.exec_alt_context = &exec_command
-	},
-	{NODE_SEPARATOR, {&exec_semicolon_recursive}},
-	{NODE_OR_IF, {&exec_or_if}},
-	{NODE_AND_IF, {&exec_and_if}},
-	{NODE_PIPE, {NULL}},
-	{NODE_SUBSHELL, {NULL}},
-	{0, {NULL}}
+	{ NODE_COMMAND,   {.exec_alt_context = &exec_command} },
+	{ NODE_SEPARATOR, {&exec_semicolon_recursive} },
+	{ NODE_PIPE,      {&exec_pipeline} },
+	{ NODE_OR_IF,     {&exec_or_if} },
+	{ NODE_AND_IF,    {&exec_and_if} },
+	{ NODE_SUBSHELL,  {NULL} },
+	{ 0, {NULL }}
 };
 
 int							exec_abort(int dummy)
@@ -87,8 +84,14 @@ int							exec_semicolon_recursive(const t_node *parent)
 
 /*
 ** Entry point in any AST
+**
+** This function exists solely for handling one specific yet very common AST
+** structure. It just iterates to some point and then passes control to classic
+** recursive execution.
+**
 ** Because tree balancing is for virgins and crutches are for real chads
 */
+
 int							exec_semicolon_iterative(t_node *parent)
 {
 	t_node	*sep;

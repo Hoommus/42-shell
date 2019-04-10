@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:56:22 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/15 15:56:22 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/10 17:12:16 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 struct					s_builtin
 {
 	char	*name;
-	int		(*function) (char **);
+	int		(*function) (const char **);
 };
 
 void					print_var(const t_var *var);
@@ -30,22 +30,26 @@ void					print_var(const t_var *var);
 ** Builtins (builtins/ *.c)
 */
 
-int						hs_alias(char **args);
-int						hs_cd(char **args);
-int						hs_echo(char **args);
-int						hs_export(char **args);
-int						hs_env(char **args);
-int						hs_setenv(char **args);
-int						hs_unsetenv(char **args);
-int						hs_help(char **args);
-int						hs_exit(char **args);
-int						hs_where(char **args);
-int						hs_history(char **args);
-int						hs_tokenizer(char **args);
-int						hs_syntax(char **args);
-int						hs_test(char **args);
+int						hs_alias(const char **args);
+int						hs_cd(const char **args);
+int						hs_echo(const char **args);
+int						hs_export(const char **args);
+int						hs_env(const char **args);
+int						hs_setenv(const char **args);
+int						hs_unsetenv(const char **args);
+int						hs_help(const char **args);
+int						hs_exit(const char **args);
+int						hs_where(const char **args);
+int						hs_history(const char **args);
+int						hs_tokenizer(const char **args);
+int						hs_syntax(const char **args);
+int						hs_test(const char **args);
+int						hs_jobs(const char **args);
+int						hs_fg(const char **args);
+int						hs_bg(const char **args);
 
-int						hs_set(char **args);
+
+int						hs_set(const char **args);
 
 
 #endif

@@ -6,11 +6,12 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:32 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/30 16:28:02 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/10 11:20:12 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <line_editing.h>
+#include "line_editing.h"
+#include "shell_job_control.h"
 #include "twenty_one_sh.h"
 #include "shell_history.h"
 #include "shell_script.h"
@@ -53,6 +54,9 @@ int					shell_loop(void)
 		buff_clear(0);
 		commands = read_command();
 		run_script(tokenize(commands, TOKEN_DELIMITERS), false);
+		if (commands)
+			environ_push_entry(g_term->context_current->environ, "_",
+							   commands, SCOPE_EXPORT);
 		ft_strdel(&commands);
 	}
 	return (0);
@@ -136,6 +140,8 @@ int					main(int argc, char **argv)
 	parse_args(argc, argv);
 	ft_printf("Initing variables...\n");
 	init_variables();
+	ft_printf("Initing job control...\n");
+	jc_init(g_term->context_current);
 	ft_printf("Printing messages...\n");
 	print_messages();
 	setup_signal_handlers();

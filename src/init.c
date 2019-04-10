@@ -90,10 +90,6 @@ void			init_files(void)
 
 	time(&rawtime);
 	timeinfo = localtime(&rawtime);
-//	if (fcntl(1, F_GETFD) == -1)
-//		dup2(open("/dev/fd/1", O_WRONLY), 1);
-//	if (fcntl(2, F_GETFD) == -1)
-//		dup2(open("/dev/fd/2", O_WRONLY), 2);
 	g_term->logfile = init_fd_at_home(LOG_FILE, 0);
 	g_term->history_file = init_fd_at_home(HISTORY_FILE, 0);
 	ft_dprintf(g_term->logfile, "21sh log [pid %d]\nDate: %s\n", getpid(),

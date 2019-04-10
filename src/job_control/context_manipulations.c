@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/12 16:10:06 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/20 12:23:09 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/07 18:42:56 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,27 +38,29 @@ void	context_add_fd(t_context *context,
 
 void	context_remove_fd(t_context *context, const int fd)
 {
-	struct s_fd_lst	*swap;
-	struct s_fd_lst	*last;
+	struct s_fd_lst	*ultimate;
+	struct s_fd_lst	*penultimate;
 
-	last = context->fd_list;
-	swap = context->fd_list->next;
-	if (last->current == fd)
+	penultimate = context->fd_list;
+	ultimate = context->fd_list->next;
+	if (penultimate->current == fd)
 	{
-		ft_memdel((void **)&(last));
-		context->fd_list = swap;
+		ft_memdel((void **)&(penultimate->label));
+		ft_memdel((void **)&(penultimate));
+		context->fd_list = ultimate;
 		return ;
 	}
-	while (swap)
+	while (ultimate)
 	{
-		if (swap->current == fd)
+		if (ultimate->current == fd)
 		{
-			last->next = swap->next;
-			swap = last->next;
-			ft_memdel((void **)&swap);
+			penultimate->next = ultimate->next;
+			ft_memdel((void **)&(ultimate->label));
+			ft_memdel((void **)&ultimate);
+			return ;
 		}
-		else
-			swap = swap->next;
+		penultimate = ultimate;
+		ultimate = ultimate->next;
 	}
 }
 

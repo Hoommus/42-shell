@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/06 17:48:22 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/10 20:03:07 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,8 +55,8 @@
 # define CONFIG_FILE ".21shrc"
 # define LOG_FILE ".21sh.log"
 
-# define BUILD 1371
-# define BUILD_DATE "06.04.19 17:48:22 EEST"
+# define BUILD 1443
+# define BUILD_DATE "10.04.19 20:03:07 EEST"
 
 # ifdef MAX_INPUT
 #  undef MAX_INPUT
@@ -64,17 +64,8 @@
 # endif
 
 # ifndef MAX_FD
-#  define MAX_FD 10
+#  define MAX_FD 1000
 # endif
-
-/*
-** ◦ pipe
-** ◦ dup, dup2
-** ◦ isatty, ttyname, ttyslot
-** ◦ tgetent
-** ◦ tgetflag
-** ◦ tgetnum
-*/
 
 /*
 ** Used for controlling input state
@@ -96,14 +87,15 @@ enum					e_input_state
 	STATE_PARTIAL_EXPAND,
 	STATE_NON_INTERACTIVE,
 	STATE_JOB_IN_FG,
-	BREAK
+	STATE_EXPANSION,
+	STATE_BREAK
 };
 
 struct					s_fd_lst
 {
+	int					original;
+	int					current;
 	char				*label;
-	short				original;
-	short				current;
 	struct s_fd_lst		*next;
 };
 
@@ -175,7 +167,7 @@ struct					s_term
 extern volatile sig_atomic_t		g_is_interrupted;
 extern struct s_term	*g_term;
 
-int						execute(char **args);
+int						execute(const char **args, const bool does_wait);
 
 /*
 ** Init (init.c)
@@ -225,16 +217,13 @@ ssize_t					ponies_teleported(void);
 bool					is_string_numeric(const char *str, const int base);
 void					init_variables(void);
 char					**smart_split(const char *str, const char *delims);
-
+size_t					carray_size(char **array);
 /*
 ** Final input parsing (variables_replacement.c)
 */
 char					*expand(char *string);
 
-char					*replace_variables(char *line);
-char					*replace_home(char *line);
-void					expand_variables(char **line);
-int						is_valid_var(char *var);
+int						is_valid_var(const char *var);
 
 /*
 ** Memory utils (memory.c)

@@ -27,7 +27,7 @@ static int		read_fd(int fd, char **result)
 	return (1);
 }
 
-int				read_filename(char *file, char **data)
+int				read_filename(const char *file, char **data)
 {
 	int			fd;
 	struct stat	s;
@@ -57,7 +57,7 @@ int				read_filename(char *file, char **data)
 	return (0);
 }
 
-int				hs_tokenizer(char **args)
+int				hs_tokenizer(const char **args)
 {
 	t_token	*tokens;
 	t_token	*head;

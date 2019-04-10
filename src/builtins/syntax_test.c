@@ -13,7 +13,7 @@
 #include "twenty_one_sh.h"
 #include "shell_script.h"
 
-int				hs_syntax(char **args)
+int				hs_syntax(const char **args)
 {
 	char	*string;
 	bool	logging;
