@@ -21,7 +21,7 @@ int		openm_wrapper(const char *path, int oflag, mode_t mode)
 	fd = open(path, oflag, mode);
 	if (fd == -1)
 		ft_dprintf(2, "21sh: some weird 'open' error\n"
-								"%s \noflag: %x mode: %x", path, oflag, mode);
+								"%s \noflag: %x mode: %x\n", path, oflag, mode);
 	if (fd != -1)
 		context_add_fd(g_term->context_current, fd, fd, path);
 	return (fd);
@@ -42,7 +42,7 @@ int		dup2_wrapper(int fd_what, int fd_where)
 {
 	int		status;
 
-	status = dup2(fd_where, fd_what);
+	status = dup2(fd_what, fd_where);
 	if (status == -1)
 		ft_dprintf(2, "21sh: some weird 'dup2' error"
 				"\nwhat: %d where: %d\n", fd_what, fd_where);

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/14 17:11:49 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/02 17:09:51 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/16 20:28:59 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,33 +32,38 @@ void	print_var(const t_var *var)
 	ft_printf(output, var->key, var->value);
 }
 
-int		hs_set(char **args)
+int		hs_set(const char **args)
 {
 	const t_var *const	vars = (t_var *)g_term->context_current->environ->array;
-	struct s_fd_lst		*swap;
+//	struct s_fd_lst		*swap;
 	u_int32_t			i;
+	u_int32_t			nbr;
 
-	if (args == NULL || *args == NULL)
-	{
-		i = -1;
-		while (++i < g_term->context_current->environ->size)
-			if (vars[i].scope & SCOPE_SHELL_LOCAL)
-				print_var(vars + i);
-		i = -1;
-		while (++i < g_term->context_current->environ->size)
-			if (!(vars[i].scope & SCOPE_SHELL_LOCAL))
-				print_var(vars + i);
-		swap = g_term->context_current->fd_list;
-		while (swap)
+	nbr = 1;
+	i = -1;
+	while (++i < g_term->context_current->environ->size)
+		if (vars[i].scope & SCOPE_SHELL_LOCAL)
 		{
-			ft_printf("label: %s o:%d; c:%d\n",
-					  swap->label,
-					  swap->original,
-					  swap->current);
-			swap = swap->next;
+			if (flag_short_present(args, 'l'))
+				ft_printf("%-4d ", nbr++);
+			print_var(vars + i);
 		}
-	}
-	else
-		ft_dprintf(2, "set: illegal argument(s)\n");
+	i = -1;
+	while (++i < g_term->context_current->environ->size)
+		if (!(vars[i].scope & SCOPE_SHELL_LOCAL))
+		{
+			if (flag_short_present(args, 'l'))
+				ft_printf("%-4d ", nbr++);
+			print_var(vars + i);
+		}
+//		swap = g_term->context_current->fd_list;
+//		while (swap)
+//		{
+//			ft_printf("label: %s o:%d; c:%d\n",
+//					  swap->label,
+//					  swap->original,
+//					  swap->current);
+//			swap = swap->next;
+//		}
 	return (0);
 }

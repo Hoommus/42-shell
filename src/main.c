@@ -6,11 +6,12 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:32 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/30 16:28:02 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/17 13:01:31 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <line_editing.h>
+#include "line_editing.h"
+#include "shell_job_control.h"
 #include "twenty_one_sh.h"
 #include "shell_history.h"
 #include "shell_script.h"
@@ -37,7 +38,7 @@ int					display_normal_prompt(void)
 		user ? user->value : "%username%", host,
 		ft_strrchr(cwd, '/') == NULL ? cwd
 									: ft_strrchr(cwd, '/') + !!(cwd[1] != '\0'),
-		g_term->last_cmd_status ? 31 : 32);
+		g_term->last_status ? 31 : 32, g_term->last_status);
 	return (size);
 }
 
@@ -47,31 +48,41 @@ int					shell_loop(void)
 
 	while (ponies_teleported())
 	{
-		g_is_interrupted = 0;
-		display_prompt(g_term->input_state = STATE_NORMAL);
-		g_term->last_cmd_status = 0;
-		buff_clear(0);
-		commands = read_command();
+		g_interrupt = 0;
+		g_term->last_status = 0;
+		if (g_term->tty_fd != -1 && g_term->input_state != STATE_NON_INTERACTIVE)
+		{
+			if (carpos_update(POS_CURRENT)->col > 1)
+				ft_printf("\n");
+			buff_clear(0);
+			display_prompt(g_term->input_state = STATE_NORMAL);
+			commands = read_command();
+		}
+		else
+			read_fd(0, &commands);
+		history_write(commands, get_history_fd());
 		run_script(tokenize(commands, TOKEN_DELIMITERS), false);
+//		if (commands)
+//			environ_push_entry(g_term->context_current->environ, "_",
+//							commands, SCOPE_EXPORT);
 		ft_strdel(&commands);
+		if (g_term->input_state == STATE_NON_INTERACTIVE)
+			exit(0);
 	}
 	return (0);
 }
 
-/*
-** extern const char	*__asan_default_options(void);
-**
-** extern const char	*__asan_default_options(void)
-** {
-** 	return ("help='0'"
-** 			"handle_segv='1'"
-** 			"handle_abort='1'"
-** 			"handle_sigill='1'"
-** 			"handle_sigfpe='1'"
-** 			"allow_user_segv_handler='1'");
-** }
-*/
+extern const char	*__asan_default_options(void);
 
+extern const char	*__asan_default_options(void)
+{
+	return ("help='1'"
+			"handle_segv='1'"
+			"handle_abort='1'"
+			"handle_sigill='1'"
+			"handle_sigfpe='1'"
+   			"allow_user_segv_handler='1'");
+}
 
 void			init_variables(void)
 {
@@ -125,8 +136,8 @@ int					main(int argc, char **argv)
 	extern char		**environ;
 
 	ft_printf("Initing...\n");
-	while (read(0, NULL, 1) == 0)
-		;
+//	while (read(0, NULL, 1) == 0)
+//		;
 	init_shell_context();
 	ft_printf("Initing files...\n");
 	init_files();
@@ -136,6 +147,8 @@ int					main(int argc, char **argv)
 	parse_args(argc, argv);
 	ft_printf("Initing variables...\n");
 	init_variables();
+	ft_printf("Initing job control...\n");
+	jc_init(g_term->context_current);
 	ft_printf("Printing messages...\n");
 	print_messages();
 	setup_signal_handlers();

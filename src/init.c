@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/16 12:28:13 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/28 19:34:30 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/17 12:53:20 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,11 +47,11 @@ struct termios	*init_term(void)
 
 	oldterm = (struct termios *)ft_memalloc(sizeof(struct termios));
 	newterm = (struct termios *)ft_memalloc(sizeof(struct termios));
-	if (!isatty(STDIN_FILENO))
+	g_term->tty_fd = (short)open_wrapper("/dev/tty", O_RDWR);
+	if (!isatty(STDIN_FILENO) || g_term->tty_fd == -1)
 		g_term->input_state = STATE_NON_INTERACTIVE;
 	else
 		g_term->input_state = STATE_NORMAL;
-	g_term->tty_fd = (short)open_wrapper("/dev/tty", O_RDWR);
 	g_term->context_original->term_config = oldterm;
 	tcgetattr(g_term->tty_fd, oldterm);
 	ft_memcpy(newterm, oldterm, sizeof(struct termios));
@@ -90,18 +90,14 @@ void			init_files(void)
 
 	time(&rawtime);
 	timeinfo = localtime(&rawtime);
-//	if (fcntl(1, F_GETFD) == -1)
-//		dup2(open("/dev/fd/1", O_WRONLY), 1);
-//	if (fcntl(2, F_GETFD) == -1)
-//		dup2(open("/dev/fd/2", O_WRONLY), 2);
 	g_term->logfile = init_fd_at_home(LOG_FILE, 0);
 	g_term->history_file = init_fd_at_home(HISTORY_FILE, 0);
 	ft_dprintf(g_term->logfile, "21sh log [pid %d]\nDate: %s\n", getpid(),
 				asctime(timeinfo));
 }
 
-
 void			parse_args(__unused int argc, char **argv)
 {
-	set_env_v(g_term->context_original->environ, "0", argv[0], SCOPE_SHELL_LOCAL);
+	environ_push_entry(g_term->context_original->environ, "0",
+		argv[0], SCOPE_SHELL_LOCAL);
 }

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/06 17:48:22 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/17 17:09:26 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@
 
 # define PROMPT_HOST "\x1b[0m\x1b[34;1m[%s@%s]\x1b[0m"
 # define PROMPT_PATH " \x1b[36;1m%s\x1b[0m"
-# define PROMPT_TERMINATOR " \x1b[%d;1m$\x1b[0m "
+# define PROMPT_TERMINATOR " \x1b[%d;1m(%d) $\x1b[0m "
 # define SHELL_PROMPT PROMPT_HOST PROMPT_PATH PROMPT_TERMINATOR
 
 // TODO: Replace all APPLY_CONFIGs with context switches
@@ -55,8 +55,8 @@
 # define CONFIG_FILE ".21shrc"
 # define LOG_FILE ".21sh.log"
 
-# define BUILD 1371
-# define BUILD_DATE "06.04.19 17:48:22 EEST"
+# define BUILD 1741
+# define BUILD_DATE "17.04.19 17:09:26 EEST"
 
 # ifdef MAX_INPUT
 #  undef MAX_INPUT
@@ -64,17 +64,8 @@
 # endif
 
 # ifndef MAX_FD
-#  define MAX_FD 10
+#  define MAX_FD 1000
 # endif
-
-/*
-** ◦ pipe
-** ◦ dup, dup2
-** ◦ isatty, ttyname, ttyslot
-** ◦ tgetent
-** ◦ tgetflag
-** ◦ tgetnum
-*/
 
 /*
 ** Used for controlling input state
@@ -96,14 +87,15 @@ enum					e_input_state
 	STATE_PARTIAL_EXPAND,
 	STATE_NON_INTERACTIVE,
 	STATE_JOB_IN_FG,
-	BREAK
+	STATE_EXPANSION,
+	STATE_BREAK
 };
 
 struct					s_fd_lst
 {
+	int					original;
+	int					current;
 	char				*label;
-	short				original;
-	short				current;
 	struct s_fd_lst		*next;
 };
 
@@ -163,7 +155,7 @@ struct					s_term
 
 	short				flags;
 
-	int					last_cmd_status;
+	int					last_status;
 	pid_t				running_process;
 
 	struct s_context	*context_original;
@@ -171,18 +163,20 @@ struct					s_term
 	struct s_context	*context_backup;
 
 	t_buffer			*buffer;
+	struct s_symbol		*paste_board;
 };
-extern volatile sig_atomic_t		g_is_interrupted;
-extern struct s_term	*g_term;
+extern volatile sig_atomic_t	g_interrupt;
+extern struct s_term			*g_term;
 
-int						execute(char **args);
+int						execute(const char **args, const bool does_wait);
 
 /*
 ** Init (init.c)
 */
-void					init_shell_context(void);
 struct termios			*init_term(void);
+void					init_shell_context(void);
 void					init_files(void);
+void					init_variables(void);
 short					init_fd_at_home(char *filename, int flags);
 void					parse_args(int argc, char **argv);
 
@@ -205,8 +199,9 @@ t_context				*context_duplicate(const t_context *context,
 void					context_add_fd(t_context *context, const int original,
 	const int actual, const char *label);
 void					context_remove_fd(t_context *context, const int fd);
+void					context_remove_ofd(t_context *context, const int original);
 bool					context_is_fd_present(const t_context *context, const int original);
-
+void					context_mark_fd_closed(t_context *context, const int fd, bool is_orig);
 /*
 ** Main Loop (main.c, )
 */
@@ -223,18 +218,16 @@ int						display_normal_prompt(void);
 u_int64_t				hash_sdbm(const char *str);
 ssize_t					ponies_teleported(void);
 bool					is_string_numeric(const char *str, const int base);
-void					init_variables(void);
 char					**smart_split(const char *str, const char *delims);
+size_t					carray_size(char **array);
+int						read_fd(const int fd, char **result);
 
 /*
 ** Final input parsing (variables_replacement.c)
 */
 char					*expand(char *string);
 
-char					*replace_variables(char *line);
-char					*replace_home(char *line);
-void					expand_variables(char **line);
-int						is_valid_var(char *var);
+int						is_valid_var(const char *var);
 
 /*
 ** Memory utils (memory.c)

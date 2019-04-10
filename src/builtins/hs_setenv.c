@@ -12,7 +12,7 @@
 
 #include "twenty_one_sh.h"
 
-int				hs_setenv(char **args)
+int				hs_setenv(const char **args)
 {
 	const t_env_vector	*vector = g_term->context_original->environ;
 	int					l;

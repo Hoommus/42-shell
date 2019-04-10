@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/14 18:43:20 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/02 16:33:50 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/16 18:49:16 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,6 +85,7 @@ void			deal_with_sigint(void)
 /*
 ** TODO: Make this one handle long input from Command + V
 ** TODO: Memory leak at buff_get_part call
+** TODO: Make this work in non-tty environment
 */
 char			*read_command(void)
 {
@@ -94,6 +95,7 @@ char			*read_command(void)
 	while (true)
 	{
 		carpos_update(POS_CURRENT);
+		status = 0;
 		if ((status = read(0, ft_memset(input.arr, 0, 8), 8)) == -1)
 		{
 			write(1, "\n", 1);
@@ -106,6 +108,6 @@ char			*read_command(void)
 		else
 			handle_key(input);
 		if (g_term->input_state == STATE_COMMIT)
-			return (history_write(buff_get_part(0, UINT64_MAX), get_history_fd()));
+			return (buff_get_part(0, UINT64_MAX));
 	}
 }

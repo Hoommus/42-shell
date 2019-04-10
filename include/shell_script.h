@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 14:44:44 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/29 17:11:55 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/09 15:52:56 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -203,10 +203,13 @@ int							exec_and_if(const t_node *parent);
 int							exec_or_if(const t_node *parent);
 int							exec_node(const t_node *node);
 int							exec_abort(int dummy);
-
+int							exec_pipeline(const t_node *node);
 /*
 ** File reading and executing
 */
-int							read_filename(char *file, char **data);
+int							read_filename(const char *file, char **data);
+bool						alterate_filedes(const struct s_command *command,
+	t_context *context);
+
 
 #endif

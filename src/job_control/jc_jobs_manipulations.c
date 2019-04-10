@@ -1,14 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   exec_command_filedes_alterations.c                 :+:      :+:    :+:   */
+/*   jc_jobs_manipulations.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/03/17 18:32:24 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/17 18:32:24 by vtarasiu         ###   ########.fr       */
+/*   Created: 2019/04/09 15:23:46 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/04/11 12:00:01 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "shell_job_control.h"
 
-
+//pid_t		jc_job_to_bg(t_job *job)
+//{
+//
+//}
+//
+//pid_t		jc_job_to_fg(t_job *job)
+//{
+//
+//}

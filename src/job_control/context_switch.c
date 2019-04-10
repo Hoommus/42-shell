@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/10 12:09:35 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/29 18:16:20 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/07 16:36:48 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,8 @@ void			context_deep_free(t_context **context)
 	{
 		swap = list->next;
 		close(list->current);
-		ft_memdel((void **)&(list->label));
-		ft_memdel((void **)&list);
+		free(list->label);
+		free(list);
 		list = swap;
 	}
 	ft_memdel((void **)&((*context)->term_config));
@@ -60,7 +60,10 @@ void			context_switch(t_context *to_which)
 	list = to_which->fd_list;
 	while (list)
 	{
-		dup2(list->current, list->original);
+		if (list->current == -1)
+			close(list->original);
+		else
+			dup2(list->current, list->original);
 		list = list->next;
 	}
 	TERM_APPLY_CONFIG(to_which->term_config);
@@ -103,7 +106,7 @@ static void		duplicate_fds(t_context *new, const t_context *context,
 		if (list->label)
 			tmp->label = ft_strdup(list->label);
 		tmp->original = list->original;
-		tmp->current = with_dup ? (short)dup(list->current) : list->current;
+		tmp->current = with_dup ? dup(list->current) : list->current;
 		if (!new->fd_list && !new_list)
 		{
 			new->fd_list = tmp;

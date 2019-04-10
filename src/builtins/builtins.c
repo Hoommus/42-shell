@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:42 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/25 16:51:36 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/10 17:14:33 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,51 +18,44 @@ struct s_builtin	g_builtins[] = {
 	{"cd", &hs_cd},
 	{"echo", &hs_echo},
 	{"env", &hs_env},
-	{"setenv", &hs_setenv},
-	{"unsetenv", &hs_unsetenv},
 	{"export", &hs_export},
-	{"help", &hs_help},
 	{"exit", &hs_exit},
-	{"quit", &hs_exit},
-	{"where", &hs_where},
 	{"history", &hs_history},
-	{"tokenizer", &hs_tokenizer},
-	{"syntax", &hs_syntax},
+	{"help", &hs_help},
+	{"jobs", &hs_jobs},
+	{"quit", &hs_exit},
 	{"set", &hs_set},
+	{"setenv", &hs_setenv},
+	{"syntax", &hs_syntax},
+	{"tokenizer", &hs_tokenizer},
+	{"unsetenv", &hs_unsetenv},
+	{"where", &hs_where},
 	{NULL, NULL}
 };
 
-int					hs_echo(char **args)
+int					hs_echo(const char **args)
 {
 	char	*str;
-	char	*swap;
 
 	if (args == NULL || args[0] == NULL)
 	{
 		ft_printf("\n");
 		return (0);
 	}
-	str = ft_strarr_join(" ", args);
-	swap = replace_variables(str);
-	chfree(str);
-	if (swap == NULL)
-		return (1);
-	ft_printf("%s\n", swap);
-	chfree(swap);
+	str = ft_strarr_join(" ", (char **)args);
+	ft_printf("%s\n", str);
 	return (0);
 }
 
-int					hs_alias(char **args)
+int					hs_alias(__unused const char **args)
 {
-	*args = args[0];
 	return (0);
 }
 
-int					hs_help(char **args)
+int					hs_help(__unused const char **args)
 {
 	int		i;
 
-	*args = args[0];
 	ft_printf("help: prints all existing builtins\n42sh/2 builtins:\n");
 	i = 0;
 	while (g_builtins[i + 1].name != NULL)
@@ -71,9 +64,8 @@ int					hs_help(char **args)
 	return (0);
 }
 
-int					hs_exit(char **args)
+int					hs_exit(__unused const char **args)
 {
-	*args = args[0];
 	TERM_APPLY_CONFIG(g_term->context_original->term_config);
 	exit(0);
 }

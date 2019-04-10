@@ -13,7 +13,7 @@
 #include "twenty_one_sh.h"
 #include "line_editing.h"
 
-int			is_valid_var(char *var)
+int			is_valid_var(const char *var)
 {
 	int		i;
 
@@ -84,5 +84,15 @@ bool	is_string_numeric(const char *str, const int base)
 		str++;
 	}
 	return (true);
+}
+
+size_t	carray_size(char **array)
+{
+	size_t	i;
+
+	i = 0;
+	while (array && array[i])
+		i++;
+	return (i);
 }
 

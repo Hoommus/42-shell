@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:56:56 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/25 18:47:15 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/16 13:21:57 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,14 +23,29 @@ t_node	*ast_new_node(void *value, enum e_node_type node_type)
 	return (node);
 }
 
+void	free_arr(void **arr)
+{
+	int		i;
+
+	i = 0;
+	while (arr && arr[i])
+	{
+		ft_memdel((void **)&(arr[i]));
+		i++;
+	}
+	ft_memdel(arr);
+}
+
 void	ast_free_command_node_internals(t_node *node)
 {
 	struct s_command	*cmd;
 	int					i;
 
 	cmd = node->command;
-	free_array((void **)cmd->args);
-	free_array((void **)cmd->assignments);
+	free_arr((void **)cmd->args);
+	free_arr((void **)cmd->assignments);
+	ft_memdel((void **)&(cmd->args));
+	ft_memdel((void **)&(cmd->assignments));
 	i = 0;
 	while (cmd->io_redirects[i].type != TOKEN_NOT_APPLICABLE)
 	{

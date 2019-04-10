@@ -1,8 +1,19 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   hs_export.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/04/08 13:19:29 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/04/08 13:19:29 by vtarasiu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "twenty_one_sh.h"
 #include "shell_builtins.h"
 
-int		hs_export(char **args)
+int		hs_export(const char **args)
 {
 	const t_var		*vars = (t_var *)g_term->context_current->environ->array;
 	u_int32_t		i;

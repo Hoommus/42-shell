@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/10 17:26:29 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/25 15:38:25 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/17 13:55:53 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ t_env_vector	*environ_create_vector(const u_int32_t capacity)
 	vector->capacity = capacity;
 	vector->size = 0;
 	vector->array = (t_var *)ft_memalloc(capacity * sizeof(t_var));
+	ft_bzero(vector->array, sizeof(t_var) * vector->capacity);
 	environ_push_entry(vector, "env_vector_capacity", swap = ft_itoa(capacity),
 						 SCOPE_SHELL_LOCAL);
 	free(swap);
@@ -69,11 +70,16 @@ t_env_vector	*environ_reallocate_vector(t_env_vector *vector)
 	return (vector);
 }
 
+/*
+** The difference between this function and set_env_v is that set_env_v
+** checks if name is good.
+*/
+
 t_var				*environ_update_entry(t_env_vector *vector,
 	const char *key, const char *value, const enum e_var_scope scope)
 {
-	t_var	*entry;
-	char	*tmp;
+	t_var *entry;
+	char *tmp;
 
 	entry = environ_get_entry(vector, key);
 	ft_memdel((void **)&(entry->value));
@@ -83,6 +89,27 @@ t_var				*environ_update_entry(t_env_vector *vector,
 	entry->hash = hash_sdbm(tmp) + entry->scope;
 	free(tmp);
 	return (entry);
+}
+
+// TODO: FIX: Sort loses some entries
+void				insert_with_sort(t_env_vector *vector, t_var *var)
+{
+	t_var			*array;
+	u_int32_t		i;
+
+	array = vector->array;
+	i = 0;
+	while (i < vector->size && array[i].key)
+	{
+		if (ft_strcmp(array[i].key, var->key) > 0)
+		{
+			ft_memmove(array + i + 1, array + i,
+				sizeof(t_var) * (vector->size - i));
+			break ;
+		}
+		i++;
+	}
+	array[i] = *var;
 }
 
 t_var				*environ_push_entry(t_env_vector *vector,
@@ -96,7 +123,7 @@ t_var				*environ_push_entry(t_env_vector *vector,
 		environ_reallocate_vector(vector);
 	if (environ_get_entry(vector, key))
 		entry = environ_update_entry(vector, key, value, scope);
-	else if (is_valid_var((char *)key))
+	else if (is_valid_var((char *)key) || scope == SCOPE_SHELL_LOCAL)
 	{
 		entry = ft_memalloc(sizeof(t_var));
 		entry->key = ft_strdup(key);
@@ -105,7 +132,7 @@ t_var				*environ_push_entry(t_env_vector *vector,
 		entry->key_hash = hash_sdbm(key);
 		tmp = ft_strjoin(key, value);
 		entry->hash = hash_sdbm(tmp) + entry->scope;
-		((t_var *)vector->array)[vector->size] = *entry;
+		insert_with_sort(vector, entry);
 		vector->size++;
 		free(entry);
 		free(tmp);

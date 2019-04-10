@@ -16,7 +16,8 @@ t_carpos	*carpos_save_as(enum e_position type)
 */
 t_carpos	*carpos_load(enum e_position type)
 {
-	tputs(tgoto(tgetstr("cm", NULL), g_term->carpos_db[type].col,
+	if (g_term->input_state != STATE_NON_INTERACTIVE)
+		tputs(tgoto(tgetstr("cm", NULL), g_term->carpos_db[type].col,
 				g_term->carpos_db[type].row), 1, &ft_putc);
 	return (g_term->carpos_db + type);
 }
@@ -31,14 +32,17 @@ t_carpos	*carpos_update(enum e_position type)
 //	if (g_term->context_current->term_config
 //		|| (g_term->context_current->term_config->c_lflag & ICANON))
 //		return (g_term->carpos_db + type);
-	write(2, "\x1b[6n", 4);
-	read(STDIN_FILENO, response, 16);
-	if (ft_strchr(response, '[') && ft_strchr(response, ';'))
+	if (g_term->tty_fd != -1 && g_term->input_state != STATE_NON_INTERACTIVE)
 	{
-		g_term->carpos_db[type].row =
-				(short)(ft_atoi(ft_strchr(response, '[') + 1) - 1);
-		g_term->carpos_db[type].col =
-				(short)(ft_atoi(ft_strchr(response, ';') + 1) - 1);
+		write(2, "\x1b[6n", 4);
+		read(STDIN_FILENO, response, 16);
+		if (ft_strchr(response, '[') && ft_strchr(response, ';'))
+		{
+			g_term->carpos_db[type].row =
+				(short) (ft_atoi(ft_strchr(response, '[') + 1) - 1);
+			g_term->carpos_db[type].col =
+				(short) (ft_atoi(ft_strchr(response, ';') + 1) - 1);
+		}
 	}
 	return (g_term->carpos_db + type);
 }

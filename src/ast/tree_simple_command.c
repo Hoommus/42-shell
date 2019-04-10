@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:57:06 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/29 19:17:39 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/16 11:16:56 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ static char					**get_args(t_token *list, int length)
 			size++;
 		copy = copy->next;
 	}
-	args = ft_memalloc(sizeof(char *) * (size + 2));
+	args = ft_memalloc(sizeof(char *) * (size + 1));
 	i = 0;
 	while (list && i < length)
 	{
@@ -67,6 +67,7 @@ static char					**get_args(t_token *list, int length)
 			args[i++] = ft_strdup(list->value);
 		list = list->next;
 	}
+	args[size] = NULL;
 	return (args);
 }
 
@@ -142,14 +143,14 @@ static char					**get_assignments(t_token *list, int length)
 		i++;
 	}
 	assignments = (char **)ft_memalloc(sizeof(char *) * (size + 1));
-	copy = list;
 	i = 0;
-	while (copy && i < size)
+	while (list && i < size)
 	{
-		if (copy->type == TOKEN_ASSIGNMENT_WORD)
-			assignments[i++] = ft_strdup(copy->value);
-		copy = copy->next;
+		if (list->type == TOKEN_ASSIGNMENT_WORD)
+			assignments[i++] = ft_strdup(list->value);
+		list = list->next;
 	}
+	assignments[size] = NULL;
 	return (assignments);
 }
 

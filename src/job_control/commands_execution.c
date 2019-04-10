@@ -6,14 +6,15 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:46:00 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/31 13:56:06 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/10 15:26:38 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "shell_job_control.h"
 #include "twenty_one_sh.h"
 #include "shell_builtins.h"
 
-int		try_builtin(char *builtin, char **args)
+int		try_builtin(const char *builtin, const char **args)
 {
 	extern struct s_builtin	g_builtins[];
 	int						i;
@@ -28,36 +29,42 @@ int		try_builtin(char *builtin, char **args)
 	return (1);
 }
 
-int		forknrun(char *bin, char **args)
+int		forknrun_(const char *bin, const char **args, bool is_async)
 {
 	int		status;
 	char	**environ;
+	pid_t	pid;
 
 	environ = NULL;
 	TERM_APPLY_CONFIG(g_term->context_current->term_config);
-	g_term->running_process = fork();
-	if (g_term->running_process == 0)
+	pid = fork();
+	if (pid == 0)
 	{
 		environ = environ_to_array(g_term->context_current->environ,
 			SCOPE_EXPORT | SCOPE_COMMAND_LOCAL | SCOPE_SCRIPT_GLOBAL);
-		execve(bin, args, environ);
+		execve(bin, (char **)args, environ);
 		free_array((void **)environ);
 		exit(0);
 	}
 	else
 	{
-		//TODO: Replace with waitpid() with WUNTRACED to make Ctrl+Z work
-		//waitpid(g_term->running_process, &status, WNOHANG | WUNTRACED);
-		wait(&status);
-		g_term->last_cmd_status = WEXITSTATUS(status);
-		g_term->running_process = 0;
+		if (is_async)
+			ft_printf("Waiting for process %d...\n", pid);
+		else
+			ft_printf("Launched %d and passing control\n", pid);
+		//add_job(pid, g_term->context_current, is_async);
+		//waitpid(pid, &status, is_async ? WNOHANG : 0);
+		ft_printf("Finished waiting for %d, status %d\n", pid, WEXITSTATUS(status));
+		// TODO: Do something with these lines
+		  if (!is_async)
+		  	g_term->last_status = WEXITSTATUS(status);
 		TERM_APPLY_CONFIG(g_term->context_current->term_config);
 		free_array((void **)environ);
 		return (0);
 	}
 }
 
-int		try_binary(char *binary, char **args)
+int		try_binary(const char *binary, const char **args, bool does_wait)
 {
 	t_var	*var;
 	int		i;
@@ -75,7 +82,7 @@ int		try_binary(char *binary, char **args)
 	{
 		swap = ft_strings_join(2, "/", paths[i], binary, NULL);
 		if (access(swap, X_OK) == 0)
-			if (!forknrun(swap, args))
+			if (!forknrun_(swap, args, does_wait))
 				status = 0;
 		free(swap);
 		i++;
@@ -84,28 +91,25 @@ int		try_binary(char *binary, char **args)
 	return (status);
 }
 
-int		try_local_binary(char *bin, char **args)
+int		try_local_binary(const char *bin, const char **args, bool does_wait)
 {
 	int		status;
-	char	*swap;
 
 	status = 1;
-	swap = replace_home(bin);
-	if (access(swap, X_OK) == 0 && !forknrun(swap, args))
+	if (access(bin, X_OK) == 0 && !forknrun_(bin, args, does_wait))
 		status = 0;
-	chfree(swap);
 	return (status);
 }
 
-int		execute(char **args)
+int		execute(const char **args, const bool does_wait)
 {
-	g_term->last_cmd_status = 1;
+	g_term->last_status = 1;
 	if (args== NULL)
 		return (1);
-	g_term->last_cmd_status = try_builtin(args[0], args + 1);
-	if (g_term->last_cmd_status != 0)
-		g_term->last_cmd_status = try_binary(args[0], args);
-	if (g_term->last_cmd_status != 0)
-		g_term->last_cmd_status = try_local_binary(args[0], args);
-	return (g_term->last_cmd_status);
+	g_term->last_status = try_builtin(args[0], args + 1);
+	if (g_term->last_status != 0)
+		g_term->last_status = try_binary(args[0], args, does_wait);
+	if (g_term->last_status != 0)
+		g_term->last_status = try_local_binary(args[0], args, does_wait);
+	return (g_term->last_status);
 }
