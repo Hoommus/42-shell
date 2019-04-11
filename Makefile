@@ -6,18 +6,22 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/03/28 20:00:46 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/04/10 19:38:03 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = 21sh
 
+CC = clang
+
+FDS = shell(ulimit -n)
+
 ##### Remove the -g flag #####
-FLAGS = -g -std=c99 -Wall \
+FLAGS =  -std=c99 -Wall \
                     -Wextra \
                     -Werror \
                     -Wno-unknown-pragmas \
-                    #-Og -fsanitize="address"
+                    #-fsanitize="address"
 
 HEADER = -I include/ -I printf/include -I libft/
 SRC_DIR = ./src/
@@ -27,7 +31,7 @@ LIB_DIR = ./printf
 LIB_NAME = libftprintf.a
 
 SHELL_SRC = main.c init.c memory.c auxilia.c       \
-            variables_replacement.c errors.c \
+            errors.c \
             service_routines.c args_parsing.c string_hash.c \
             shell_environ.c shell_environ_tools.c shell_environ_vector.c \
             syscall_wrappers.c
@@ -39,7 +43,8 @@ AST_DIR = ast/
 AST_SRC = parser.c entry_point.c syntax_rules.c \
           nodes_memory.c nodes_manipulations.c \
           execution.c \
-          exec_command.c exec_subshell.c exec_pipeline.c \
+          exec_command.c exec_command_alterators.c exec_subshell.c \
+          exec_pipeline.c \
           tree_auxillary.c \
           tree_simple_command.c tree_subshell.c \
           tree_pipe_sequence.c tree_and_or.c tree_list.c
@@ -47,7 +52,7 @@ AST_SRC = parser.c entry_point.c syntax_rules.c \
 BUILTIN_DIR = builtins/
 BUILTIN_SRC = cd.c where.c builtins.c hs_history.c tokenizer_test.c \
               syntax_test.c hs_set.c hs_env.c hs_setenv.c hs_unsetenv.c \
-              hs_export.c
+              hs_export.c hs_jobs.c
 
 INTERFACE_DIR = line_editing/
 INTERFACE_SRC = buffer_drawing.c buffer_works.c     \
@@ -58,12 +63,16 @@ INTERFACE_SRC = buffer_drawing.c buffer_works.c     \
                 handlers_arrows_mods.c handlers_arrows_vertical.c \
                 write_anywhere.c
 
-JOB_CONTROL_DIR = job_control_prototype/
-JOB_CONTROL_SRC = commands_execution.c signals_manipulation.c signals_basic.c \
-                  context_manipulations.c context_switch.c
+JOB_CONTROL_DIR = job_control/
+JOB_CONTROL_SRC = signals_manipulation.c signals_basic.c \
+                  context_manipulations.c context_switch.c command_lookup.c \
+                  jc_jobs_manipulations.c \
+                  jc_children_cleanup.c jc_headquaters.c  \
+                  jc_queue_execution.c jc_queue_interface.c
 
 EXPANSIONS_DIR = expansions/
-EXPANSIONS_SRC = expander_engine.c
+EXPANSIONS_SRC = expander_engine.c expand_escaped.c expand_quotes.c \
+                 expand_vars.c
 
 HISTORY_DIR = features/history/
 HISTORY_SRC = history.c history_vector.c
@@ -91,10 +100,10 @@ $(NAME): prepare $(OBJ)
 			%s!define BUILD_DATE .\+!define BUILD_DATE \"$$BUILD_DATE\"!g| \
 			|w|q" include/twenty_one_sh.h
 	rm -f obj/main.o
-	gcc $(FLAGS) $(HEADER) -o $(OBJ_DIR)main.o -c $(SRC_DIR)main.c
+	$(CC) $(FLAGS) $(HEADER) -o $(OBJ_DIR)main.o -c $(SRC_DIR)main.c
 	make -C $(LIB_DIR)
 	cp $(LIB_DIR)/$(LIB_NAME) ./$(LIB_NAME)
-	gcc $(FLAGS) -o $(NAME) $(OBJ) $(HEADER) $(LIB_NAME) -ltermcap
+	$(CC) $(FLAGS) -o $(NAME) $(OBJ) $(HEADER) $(LIB_NAME) -ltermcap
 
 prepare:
 	@mkdir -p $(OBJ_DIR)$(AST_DIR)
@@ -106,7 +115,7 @@ prepare:
 	@mkdir -p $(OBJ_DIR)$(JOB_CONTROL_DIR)
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
-	gcc $(FLAGS) $(HEADER) -o $@ -c $< ;
+	$(CC) $(FLAGS) $(HEADER) -o $@ -c $< ;
 
 install: all
 	@if [ grep ~/.brew/bin $PATH 2>/dev/null ] ; \

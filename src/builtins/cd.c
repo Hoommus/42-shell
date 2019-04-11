@@ -12,7 +12,7 @@
 
 #include "twenty_one_sh.h"
 
-int				try_access_and_cd(char *path)
+static int		try_access_and_cd(const char *path)
 {
 	int		status;
 
@@ -27,7 +27,7 @@ int				try_access_and_cd(char *path)
 	return (status);
 }
 
-static int		try_cd(char *path, t_var *oldpwd)
+static int		try_cd(const char *path, t_var *oldpwd)
 {
 	t_var	*home;
 	int		status;
@@ -52,7 +52,7 @@ static int		try_cd(char *path, t_var *oldpwd)
 	return (status);
 }
 
-int				hs_cd(char **args)
+int				hs_cd(const char **args)
 {
 	t_var		*var;
 	char		currpwd[1025];

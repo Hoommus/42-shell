@@ -13,7 +13,9 @@
 NAME=libft.a
 OBJ_DIR = ./obj/
 
-FLAGS = -std=c99 -Wall -Wextra -Werror
+CC=clang
+
+FLAGS = -g -std=c99 -Wall -Wextra -Werror
 
 SRC = ft_atoi.c ft_bzero.c ft_isalnum.c ft_isalpha.c ft_isascii.c ft_isdigit.c \
       ft_isprint.c ft_itoa.c ft_lstadd.c ft_lstdel.c ft_lstdelone.c            \
@@ -28,7 +30,7 @@ SRC = ft_atoi.c ft_bzero.c ft_isalnum.c ft_isalpha.c ft_isascii.c ft_isdigit.c \
       ft_strrchr.c ft_strsplit.c ft_strstr.c ft_strsub.c ft_strtrim.c          \
       ft_strulen.c ft_tolower.c ft_toupper.c ft_utf_strlen.c ft_wchar_strlen.c \
       get_next_line.c ft_strsplit_wht.c ft_strings_join.c ft_iswhsp.c          \
-      ft_unicode.c ft_rand.c ft_linecount.c  
+      ft_unicode.c ft_rand.c ft_linecount.c strinsert.c
 
 OBJ = $(addprefix $(OBJ_DIR), $(SRC:.c=.o))
 
@@ -39,7 +41,7 @@ $(NAME): $(OBJ)
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
 	@mkdir -p $(OBJ_DIR)
-	gcc $(FLAGS) -o $@ -c $<
+	$(CC) $(FLAGS) -o $@ -c $<
 
 all: $(NAME)
 
@@ -54,7 +56,7 @@ fclean: clean
 re: fclean all
 
 check:
-	gcc -c ft_*.c -std=c99 -Wall -Wextra -Werror && norminette ft_*.c *.h
+	$(CC) -c ft_*.c -std=c99 -Wall -Wextra -Werror && norminette ft_*.c *.h
 
 love:
 	@echo "Not war."

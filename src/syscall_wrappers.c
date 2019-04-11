@@ -42,7 +42,7 @@ int		dup2_wrapper(int fd_what, int fd_where)
 {
 	int		status;
 
-	status = dup2(fd_where, fd_what);
+	status = dup2(fd_what, fd_where);
 	if (status == -1)
 		ft_dprintf(2, "21sh: some weird 'dup2' error"
 				"\nwhat: %d where: %d\n", fd_what, fd_where);

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/14 18:43:20 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/20 15:33:18 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/02 16:33:50 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,9 +27,12 @@ bool			is_printable(const char c[8])
 		return (false);
 }
 
+// TODO: Toggle state intelligently if user escapes some special symbol
 void			deal_with_printable(const char arr[8])
 {
-	if (!toggle_state(arr) && g_term->input_state == STATE_ESCAPED_EOL)
+	if (g_term->input_state == STATE_ESCAPED)
+		toggle_state("\\");
+	else if (!toggle_state(arr) && g_term->input_state == STATE_ESCAPED)
 		g_term->input_state = STATE_NORMAL;
 	buff_insert_single_at(g_term->buffer->iterator, arr);
 	carpos_update(POS_LAST);
@@ -51,12 +54,12 @@ void			deal_with_newline(const char arr[8])
 {
 	if (g_term->input_state == STATE_QUOTE
 		|| g_term->input_state == STATE_DQUOTE
-		|| g_term->input_state == STATE_ESCAPED_EOL)
+		|| g_term->input_state == STATE_ESCAPED)
 	{
 		write(STDOUT_FILENO, "\n", 1);
 		buff_insert_single_at(g_term->buffer->iterator, arr);
 		display_prompt(g_term->input_state);
-		if (g_term->input_state == STATE_ESCAPED_EOL)
+		if (g_term->input_state == STATE_ESCAPED)
 			g_term->input_state = STATE_NORMAL;
 		buffer_redraw();
 	}
@@ -91,6 +94,7 @@ char			*read_command(void)
 	while (true)
 	{
 		carpos_update(POS_CURRENT);
+		status = 0;
 		if ((status = read(0, ft_memset(input.arr, 0, 8), 8)) == -1)
 		{
 			write(1, "\n", 1);

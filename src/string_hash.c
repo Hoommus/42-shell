@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/10 17:35:24 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/13 15:38:45 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/10 15:45:19 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,11 +19,11 @@
 
 u_int64_t	hash_sdbm(const char *str)
 {
-	unsigned long	hash;
-	int				c;
+	u_int64_t		hash;
+	u_int32_t		c;
 
 	hash = 0;
-	while ((c = *str++))
+	while ((c = (u_int32_t)(*str++)))
 		hash = c + (hash << 6) + (hash << 16) - hash;
 	return (hash);
 }

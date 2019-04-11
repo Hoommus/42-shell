@@ -1,14 +1,15 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   exec_command_filedes_alterations.c                 :+:      :+:    :+:   */
+/*   command_lookup.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/03/17 18:32:24 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/17 18:32:24 by vtarasiu         ###   ########.fr       */
+/*   Created: 2019/04/10 11:57:36 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/04/10 16:03:49 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-
-
+#include "twenty_one_sh.h"
+#include "shell_job_control.h"
+#include "shell_builtins.h"

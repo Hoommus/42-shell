@@ -28,7 +28,6 @@
 # define FLOATING "aAeEfFgG"
 # define ITOA_UPPER "0123456789ABCDEF"
 # define ITOA_LOWER "0123456789abcdef"
-# define ABS(a) (a < 0 ? -(a) : a)
 
 # define BUFFER_SIZE 512
 

@@ -118,8 +118,9 @@ t_var				*environ_get_entry(t_env_vector *vector,
 {
 	const t_var *const	vars = (const t_var *)vector->array;
 	u_int32_t			i;
-	u_int64_t			hash = hash_sdbm(key);
+	u_int64_t			hash;
 
+	hash = hash_sdbm(key);
 	i = -1;
 	while (++i < vector->size)
 		if (vars[i].key_hash == hash && ft_strcmp(key, vars[i].key) == 0)
@@ -156,6 +157,7 @@ int					environ_remove_entry(t_env_vector *vector,
 			if (i < vector->size - 1)
 				ft_memmove((t_var *)vars + i, vars + i + 1,
 					sizeof(t_var) * (vector->size - i));
+			vector->size--;
 			return (0);
 		}
 	return (1);

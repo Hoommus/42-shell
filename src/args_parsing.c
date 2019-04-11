@@ -65,3 +65,21 @@ bool	flag_short_present(const char **args, const char flag)
 	}
 	return (status);
 }
+
+bool	flag_plus_short_present(const char **args, const char flag)
+{
+	char	*copy;
+	int		i;
+
+	i = 0;
+	while (args && args[i] && ft_strncmp(args[i], "+", 1) == 0)
+	{
+		copy = (char *)args[i++];
+		while (*copy)
+			if (*copy == flag)
+				return (true);
+			else
+				copy++;
+	}
+	return (false);
+}

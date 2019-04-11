@@ -24,6 +24,7 @@
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "cppcoreguidelines-interfaces-global-init"
 
+
 /*
 ** const t_rule g_complete_commands = {
 ** 	.token = TOKEN_NOT_APPLICABLE,
@@ -35,7 +36,7 @@
 ** };
 */
 
-const t_rule g_complete_command = {
+const t_rule g_complete_command __attribute__((visibility("hidden"))) = {
 	.token = TOKEN_NOT_APPLICABLE,
 	.expands_to = {
 		{&g_list, &g_separator},

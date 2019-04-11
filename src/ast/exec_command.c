@@ -6,28 +6,16 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/05 17:50:36 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/30 13:53:35 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/10 19:35:41 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "twenty_one_sh.h"
 #include "shell_script.h"
 #include "shell_script_parser.h"
+#include "shell_job_control.h"
 
-int		open_at_fd(int what_fd, const char *path, int oflag)
-{
-	int		fd;
-
-	fd = open_wrapper(path, oflag);
-	if (fd != what_fd)
-	{
-		dup2_wrapper(fd, what_fd);
-		close_wrapper(fd);
-		return (what_fd);
-	}
-	return (fd);
-}
-
+#include <assert.h>
 char	**split_to_var(const char *str)
 {
 	t_token		*swap;
@@ -50,82 +38,7 @@ char	**split_to_var(const char *str)
 	return (splitted);
 }
 
-/*
-** Saves resources by closing unnecessary fds, which are already duplicated;
-*/
-void	close_redundant_filedes(t_context *context)
-{
-	struct s_fd_lst	*list;
-
-	list = context->fd_list;
-	while (list)
-	{
-		if (list->original != list->current)
-		{
-			close(list->current);
-			list->current = list->original;
-		}
-		list = list->next;
-	}
-}
-
-bool	is_fd_valid(int fd)
-{
-	struct s_fd_lst	*list;
-	bool			is_valid;
-
-	if (fd > MAX_FD)
-		return (false);
-	is_valid = false;
-	list = g_term->context_current->fd_list;
-	while (list && !is_valid)
-	{
-		if (list->original == fd)
-			is_valid = true;
-		list = list->next;
-	}
-	return (is_valid);
-}
-
-
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wuninitialized"
-
-// TODO: Find a way of improving this repetitive code
-
-void	rdr_dup_into(const t_io_rdr *rdr, enum e_token_type type)
-{
-	int		which_fd;
-	int		whereto_fd;
-
-	if (type == TOKEN_GREATAND)
-	{
-		if (rdr->where.path != NULL)
-			whereto_fd = open_wrapper(rdr->where.path, O_CREAT | O_TRUNC | O_WRONLY);
-		else if (is_fd_valid(rdr->where.fd))
-			whereto_fd = rdr->where.fd;
-		else
-			exec_abort(ft_dprintf(2, "21sh: Bad file descriptor: %d\n", rdr->where.fd));
-		which_fd = rdr->what.fd;
-	}
-	else if (type == TOKEN_LESSAND)
-	{
-		if (rdr->what.path != NULL)
-			which_fd = open_wrapper(rdr->what.path,  O_RDONLY);
-		else if (is_fd_valid(rdr->what.fd))
-			which_fd = rdr->what.fd;
-		else
-			exec_abort(ft_dprintf(2, "21sh: Bad file descriptor: %d\n", rdr->what.fd));
-		whereto_fd = rdr->where.fd;
-	}
-	else
-		abort();
-	dup2_wrapper(which_fd, whereto_fd);
-}
-
-#pragma clang diagnostic pop
-
-void	alterate_vars(const struct s_command *command, t_context *context)
+bool	alterate_vars(const struct s_command *command, t_context *context)
 {
 	const char	**assignments = (const char **)command->assignments;
 	char		**splitted;
@@ -144,104 +57,90 @@ void	alterate_vars(const struct s_command *command, t_context *context)
 		free_array((void **)splitted);
 		i++;
 	}
+	return (assignments && assignments[0]);
 }
 
-//void	resolve_heredoc(t_io_rdr *rdr)
-//{
-//	int		pipe_fds[2];
-//
-//	pipe(pipe_fds);
-//
-//}
-// TODO: Add access() checks
-void	alterate_filedes(const struct s_command *command)
+/*
+** TODO: Expand backqoutes and $()
+*/
+void	expand_everything(const struct s_command *command)
 {
-	const t_io_rdr	*rdr = (const t_io_rdr *)command->io_redirects;
-
-	while (rdr && rdr->type != TOKEN_IF && rdr->type != TOKEN_NOT_APPLICABLE)
-	{
-		if (rdr->type == TOKEN_GREATAND && !ft_strcmp(rdr->where.path, "-"))
-			close_wrapper(rdr->what.fd);
-		else if (rdr->type == TOKEN_LESSAND && !ft_strcmp(rdr->what.path, "-"))
-			close_wrapper(rdr->where.fd);
-		else if (rdr->type == TOKEN_GREAT || rdr->type == TOKEN_CLOBBER
-				 || rdr->type == TOKEN_DGREAT)
-			open_at_fd(rdr->what.fd, rdr->where.path, O_CREAT | O_WRONLY |
-						O_TRUNC | (rdr->type == TOKEN_DGREAT ? O_APPEND : 0));
-		else if (rdr->type == TOKEN_LESS)
-			open_at_fd(rdr->where.fd, rdr->what.path, O_RDONLY);
-		else if (rdr->type == TOKEN_LESSGREAT)
-			open_at_fd(rdr->where.fd, rdr->what.path, O_CREAT | O_RDWR);
-		else if (rdr->type == TOKEN_DLESS || rdr->type == TOKEN_DLESSDASH)
-			/* TODO */ ;
-		else if (rdr->type == TOKEN_LESSAND)
-			rdr_dup_into(rdr, TOKEN_LESSAND);
-		else if (rdr->type == TOKEN_GREATAND)
-			rdr_dup_into(rdr, TOKEN_GREATAND);
-		rdr++;
-	}
-}
-
-void	expand_everything(struct s_command *command)
-{
-	const struct s_command	dummy = *command;
-	char					*swap;
-	int						i;
+	char	*swap;
+	int		i;
 
 	i = -1;
-	while (dummy.args[++i])
+	while (command->args[++i])
 	{
-		swap = dummy.args[i];
-		dummy.args[i] = expand(dummy.args[i]);
+		swap = expand(command->args[i]);
+		ft_memdel((void **)&(command->args[i]));
+		command->args[i] = swap;
+	}
+	i = -1;
+	while (command->assignments[++i])
+	{
+		swap = command->assignments[i];
+		command->assignments[i] = expand(command->assignments[i]);
 		ft_memdel((void **)&swap);
 	}
+//	i = 0;
+//	while (command->io_redirects + i)
+//	{
+// 		swap = ((command->io_redirects) + i)->what.path;
+// 		if (swap)
+//			((command->io_redirects) + i)->what.path =
+//				expand(((command->io_redirects) + i)->what.path);
+//		ft_memdel((void **)&swap);
+// 		swap = ((command->io_redirects) + i)->where.path;
+// 		if (swap)
+//			((command->io_redirects) + i)->where.path =
+//				expand(((command->io_redirects) + i)->where.path);
+//		ft_memdel((void **)&swap);
+//		i++;
+//	}
 }
 
 /*
 ** If new_context is not NULL, it must have altered stdin and / or stdout,
-** if it was called from pipeline executor
+** if it was called from pipeline executor. In this case, forknrun routine
+** starts processes without waiting them in any way and shell blocks only
+** when the last process in the pipeline is passed for execution.
 **
 ** The incapsulation of command execution is fucked while inside pipe, because
 ** Bash script is stupid as fuck and I wish there was better script language.
 ** See alterate_filedes() function, which also must be called before pipe exec.
 */
 
+// TODO: optimise execution if no variables and fds changes are made
 int		exec_command(const t_node *command_node, t_context *new_context)
 {
 	const struct s_command	*command = command_node->command;
 	t_context				*context;
 	int						status;
 
-	if (command_node->node_type != NODE_COMMAND)
-	{
-		ft_printf("assumed command_node is not actually command\n");
-		abort();
-	}
-	if (new_context)
-		context = new_context;
-	else
-		context = context_duplicate(g_term->context_original, true);
-	// TODO: backup and close all existing filedes before switch
-	context_switch(context);
+	context = new_context ? new_context
+							: context_duplicate(g_term->context_original, true);
 	// TODO: Expand environment variables in args, assignments et cetera
-	expand_everything((struct s_command *)command);
-	alterate_vars(command, context);
+	expand_everything(command);
+	ft_printf("+{");
+	for (int i = 0; command->assignments[i] != NULL; i++)
+		ft_printf("%s ", command->assignments[i]);
+	for (int i = 0; command->args[i] != NULL; i++)
+		ft_printf((command->args[i + 1] != NULL) ? "%s " : "%s", command->args[i]);
+	ft_printf("}\n");
 	if (!new_context)
-		alterate_filedes(command);
-
-	// TODO: do something with bare assignments in command
+		alterate_filedes(command, context);
+	alterate_vars(command, context);
 	if (!g_is_interrupted)
-		status = execute(command->args);
+	{
+		jc_enqueue_job(jc_create_job(command->args, context, (bool)new_context));
+		status = !new_context ? jc_execute_queue() : 0;
+		if (!new_context)
+			jc_destroy_queue();
+	}
 	else
 		status = 0;
-	if (status != 0)
-		ft_dprintf(2, "21sh: exec: command not found: %s\n", command->args[0]);
-	// TODO: Create string transformations pipeline framework
-	// TODO: Remove quotes
-	// TODO: Expand backqoutes and $()
-	// TODO: Remove backslashes from escaped symbols
-
-	context_deep_free(&context);
-	context_switch(NULL);
+	// context should be switched back and freed on job destruction
+	// context_deep_free(&context);
+	// context_switch(NULL);
 	return (status);
 }

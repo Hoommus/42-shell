@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/16 12:28:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/21 16:12:34 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/10 18:41:13 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,18 +14,18 @@
 #include "twenty_one_sh.h"
 #include <time.h>
 
-int			deal_with_flags(char **args)
+int			deal_with_flags(const char **args)
 {
 	return ((int)args);
 }
 
-static void	add_entry(char **args)
+static void	add_entry(const char **args)
 {
 	char	*whole_command;
 
 	while (*args[0] == '-')
 		args++;
-	whole_command = ft_strarr_join(" ", args);
+	whole_command = ft_strarr_join(" ", (char **)args);
 	history_write(whole_command, get_history_fd());
 }
 
@@ -59,14 +59,13 @@ static void	clear_history_hard(void)
 ** Left place for changed entry '*' mark in that printf
 */
 
-int			hs_history(char **args)
+int			hs_history(const char **args)
 {
 	char					c;
 	int						width;
 	u_int64_t				i;
 	struct s_history_entry	*entry;
 
-	*args = args[0];
 	if ((c = flag_validate_short((const char **)args, "cs")))
 	{
 		ft_dprintf(2, "history: invalid argument -%c\nUsage: history -s arg\n"
