@@ -6,22 +6,13 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/09 15:45:40 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/25 15:29:41 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/25 17:04:06 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell_script.h"
 
 static int		g_access_error;
-
-static bool		is_dir(const char *path)
-{
-	struct stat		s;
-
-	if (stat(path, &s) == -1)
-		return (false);
-	return (S_ISDIR(s.st_mode));
-}
 
 static int		open_at_fd(int what_fd, const char *path, int oflag,
 	t_context *context)
@@ -73,16 +64,20 @@ static void		rdr_greatand(t_context *context, const t_io_rdr *rdr)
 	if (rdr->where.path != NULL)
 	{
 		if (access(rdr->where.path, W_OK) != 0)
-			return ((void)(g_access_error = (ft_dprintf(2,
-				ERR_PERMISSION_DENIED, rdr->what.path) & 0) | 1));
+		{
+			g_access_error = 1;
+			return ((void)ft_dprintf(2, ERR_PERMISSION_DENIED, rdr->what.path));
+		}
 		else
 			whereto_fd = open(rdr->where.path, O_CREAT | O_TRUNC | O_WRONLY);
 	}
 	else if (is_fd_valid(rdr->where.fd))
 		whereto_fd = rdr->where.fd;
 	else
-		return ((void)(g_access_error = (ft_dprintf(2,
-			ERR_BAD_FD, rdr->where.fd) & 0) | 1));
+	{
+		g_access_error = 1;
+		return ((void)ft_dprintf(2, ERR_BAD_FD, rdr->where.fd));
+	}
 	which_fd = rdr->what.fd;
 	context_add_fd(context, whereto_fd, which_fd, "rdr_duped");
 }
@@ -94,26 +89,28 @@ static void		rdr_lessand(t_context *context, const t_io_rdr *rdr)
 
 	if (rdr->what.path != NULL)
 	{
+		if (access(rdr->what.path, F_OK) || access(rdr->what.path, R_OK))
+			g_access_error = 1;
 		if (access(rdr->what.path, F_OK) != 0)
-			return ((void)(g_access_error = (ft_dprintf(2,
-					ERR_NO_SUCH_FILE, rdr->what.path) & 0) | 1));
+			return ((void)ft_dprintf(2, ERR_NO_SUCH_FILE, rdr->what.path));
 		if (access(rdr->what.path, R_OK) != 0)
-			return ((void)(g_access_error = (ft_dprintf(2,
-					ERR_PERMISSION_DENIED, rdr->what.path) & 0) | 1));
+			return ((void)ft_dprintf(2, ERR_PERMISSION_DENIED, rdr->what.path));
 		else
 			which_fd = open(rdr->what.path, O_RDONLY);
 	}
 	else if (is_fd_valid(rdr->what.fd))
 		which_fd = rdr->what.fd;
 	else
-		return ((void)(g_access_error = (ft_dprintf(2,
-			ERR_BAD_FD, rdr->what.fd) & 0) | 1));
+	{
+		g_access_error = 1;
+		return ((void)ft_dprintf(2, ERR_BAD_FD, rdr->where.fd));
+	}
 	whereto_fd = rdr->where.fd;
 	context_add_fd(context, which_fd, whereto_fd, "rdr_duped");
 }
 
 int				alterate_filedes(const struct s_command *command,
-	t_context *context)
+	t_context *contxt)
 {
 	const t_io_rdr	*rdr = (const t_io_rdr *)command->io_redirects;
 
@@ -121,23 +118,23 @@ int				alterate_filedes(const struct s_command *command,
 	while (rdr && rdr->type != TOKEN_IF && rdr->type != TOKEN_NOT_APPLICABLE)
 	{
 		if (rdr->type == TOKEN_GREATAND && !ft_strcmp(rdr->where.path, "-"))
-			context_mark_fd_closed(context, rdr->what.fd, true);
+			context_mark_fd_closed(contxt, rdr->what.fd, true);
 		else if (rdr->type == TOKEN_LESSAND && !ft_strcmp(rdr->what.path, "-"))
-			context_mark_fd_closed(context, rdr->where.fd, true);
+			context_mark_fd_closed(contxt, rdr->where.fd, true);
 		else if (rdr->type == TOKEN_GREAT || rdr->type == TOKEN_CLOBBER ||
 				rdr->type == TOKEN_DGREAT)
 			open_at_fd(rdr->what.fd, rdr->where.path, O_CREAT | O_WRONLY |
-				 (rdr->type == TOKEN_DGREAT ? O_APPEND : O_TRUNC), context);
+				(rdr->type == TOKEN_DGREAT ? O_APPEND : O_TRUNC), contxt);
 		else if (rdr->type == TOKEN_LESS)
-			open_at_fd(rdr->where.fd, rdr->what.path, O_RDONLY, context);
+			open_at_fd(rdr->where.fd, rdr->what.path, O_RDONLY, contxt);
 		else if (rdr->type == TOKEN_LESSGREAT)
-			open_at_fd(rdr->where.fd, rdr->what.path, O_CREAT | O_RDWR, context);
+			open_at_fd(rdr->where.fd, rdr->what.path, O_CREAT | O_RDWR, contxt);
 		else if (rdr->type == TOKEN_LESSAND)
-			rdr_greatand(context, rdr);
+			rdr_greatand(contxt, rdr);
 		else if (rdr->type == TOKEN_GREATAND)
-			rdr_lessand(context, rdr);
+			rdr_lessand(contxt, rdr);
 		rdr++;
 	}
-	rdr_heredocs(context, command->io_redirects);
+	rdr_heredocs(contxt, command->io_redirects);
 	return (g_access_error);
 }

@@ -12,15 +12,6 @@
 
 #include "twenty_one_sh.h"
 
-t_context		*context_init(void)
-{
-	t_context	*dummy;
-
-	dummy = ft_memalloc(sizeof(t_context));
-	dummy->environ = environ_create_vector(VARIABLES_VECTOR_INITIAL_SIZE);
-	return (dummy);
-}
-
 void			context_deep_free(t_context **context)
 {
 	struct s_fd_lst		*list;
@@ -136,7 +127,8 @@ t_context		*context_duplicate(const t_context *context, bool with_dup)
 	new = ft_memalloc(sizeof(t_context));
 	new->term_config = ft_memalloc(sizeof(struct termios));
 	if (context->term_config != NULL)
-		ft_memcpy(new->term_config, context->term_config, sizeof(struct termios));
+		ft_memcpy(new->term_config, context->term_config,
+			sizeof(struct termios));
 	if (with_dup)
 		duplicate_environ(new, context);
 	else

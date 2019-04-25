@@ -6,22 +6,21 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/27 13:23:10 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/09 14:24:19 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/25 16:30:56 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell_script.h"
 
-#include <assert.h>
 volatile sig_atomic_t		g_interrupt;
 
 const struct s_executor		g_executors_table[] = {
-	{ NODE_COMMAND,   {.exec_alt_context = &exec_command} },
+	{ NODE_COMMAND, {.exec_alt_context = &exec_command} },
 	{ NODE_SEPARATOR, {&exec_semicolon_recursive} },
-	{ NODE_PIPE,      {&exec_pipeline} },
-	{ NODE_OR_IF,     {&exec_or_if} },
-	{ NODE_AND_IF,    {&exec_and_if} },
-	{ NODE_SUBSHELL,  {NULL} },
+	{ NODE_PIPE, {&exec_pipeline} },
+	{ NODE_OR_IF, {&exec_or_if} },
+	{ NODE_AND_IF, {&exec_and_if} },
+	{ NODE_SUBSHELL, {NULL} },
 	{ 0, {NULL }}
 };
 
@@ -46,12 +45,11 @@ int							exec_node(const t_node *node)
 
 int							exec_semicolon_recursive(const t_node *parent)
 {
-	assert(parent && parent->node_type == NODE_SEPARATOR);
 	if (parent->left)
 		exec_node(parent->left);
 	if (parent->right)
 		exec_node(parent->right);
-	return (0); // always successful
+	return (0);
 }
 
 /*

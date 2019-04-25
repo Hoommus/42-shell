@@ -17,9 +17,9 @@ t_bresult	*and_or_build(const t_state *state, struct s_result *last_build)
 {
 	t_node			*node;
 	t_bresult		*bresult;
-	const t_token	*start = offset_list(state->list_offset,
-		-last_build->consumed);
+	t_token			*start;
 
+	start = offset_list(state->list_offset, -last_build->consumed);
 	if (start->type == TOKEN_OR_IF || start->type == NODE_AND_IF)
 		node = ast_new_node(NULL, start->type == TOKEN_OR_IF ? NODE_OR_IF
 															: NODE_AND_IF);

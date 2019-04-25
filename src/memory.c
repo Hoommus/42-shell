@@ -22,12 +22,6 @@ void	free_array(void **array)
 	free(array);
 }
 
-void	chfree(void *obj)
-{
-	if (obj != NULL)
-		free(obj);
-}
-
 void	chfree_n(int n, ...)
 {
 	va_list		list;

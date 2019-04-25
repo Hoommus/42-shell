@@ -100,7 +100,6 @@ const t_rule g_pipeline = {
 	.token = TOKEN_NOT_APPLICABLE,
 	.expands_to = {
 		{&g_pipe_sequence},
-//		{&g_bang_token, &g_pipe_sequence}
 	},
 	.human_readable = "pipeline",
 	.tree_builder = NULL
@@ -152,8 +151,6 @@ const t_rule g_compound_command = {
 	.expands_to = {
 		{&g_brace_group},
 		{&g_subshell},
-//		{&g_if_clause},
-//		{&g_while_clause}
 	},
 	.human_readable = "compound_command",
 	.tree_builder = NULL
@@ -497,8 +494,6 @@ const t_rule g_io_redirect = {
 		{&g_io_number_token, &g_io_file},
 		{&g_word_token, &g_io_file},
 		{&g_io_here},
-//		{&g_io_number_token, &g_io_here},
-//		{&g_io_number_token}
 	},
 	.human_readable = "io_redirect",
 	.tree_builder = NULL

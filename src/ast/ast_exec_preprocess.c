@@ -12,24 +12,6 @@
 
 #include "shell_script.h"
 
-// TODO: write replace_all function
-char				*postprocess_dlessdash(char *input)
-{
-	char	*swap;
-	int		i;
-
-	while ((swap = ft_strchr(input, '\t')))
-	{
-		if (swap != input && *(swap - 1) != '\n')
-			continue ;
-		i = 0;
-		while (swap[i] == '\t')
-			i++;
-		ft_memmove(swap, swap + i, ft_strlen(swap) - i + 1);
-	}
-	return (swap);
-}
-
 void				run_heredocs(t_node *node)
 {
 	struct s_io_redirect	*io_rdr;

@@ -87,3 +87,12 @@ bool		is_string_numeric(const char *str, const int base)
 	}
 	return (true);
 }
+
+bool		is_dir(const char *path)
+{
+	struct stat		s;
+
+	if (stat(path, &s) == -1)
+		return (false);
+	return (S_ISDIR(s.st_mode));
+}

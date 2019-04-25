@@ -28,13 +28,13 @@ bool						is_redirect(t_token *t)
 }
 
 static void					construct_redirect(t_token *pivot,
-												  struct s_io_redirect *rdr)
+												struct s_io_redirect *rdr)
 {
 	bool	is_left;
 
 	rdr->type = pivot->type;
 	is_left = rdr->type == TOKEN_DLESS || rdr->type == TOKEN_LESSAND
-			  || rdr->type == TOKEN_LESS || rdr->type == TOKEN_DLESSDASH;
+			|| rdr->type == TOKEN_LESS || rdr->type == TOKEN_DLESSDASH;
 	rdr->what.fd = 1;
 	rdr->where.fd = 0;
 	if (is_left)

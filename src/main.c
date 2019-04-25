@@ -50,7 +50,8 @@ int					shell_loop(void)
 	{
 		g_interrupt = 0;
 		g_term->last_status = 0;
-		if (g_term->tty_fd != -1 && g_term->input_state != STATE_NON_INTERACTIVE)
+		if (g_term->tty_fd != -1 && g_term->input_state
+			!= STATE_NON_INTERACTIVE)
 		{
 			if (carpos_update(POS_CURRENT)->col > 1)
 				ft_printf("\n");
@@ -69,19 +70,7 @@ int					shell_loop(void)
 	return (0);
 }
 
-extern const char	*__asan_default_options(void);
-
-extern const char	*__asan_default_options(void)
-{
-	return ("help='1'"
-			"handle_segv='1'"
-			"handle_abort='1'"
-			"handle_sigill='1'"
-			"handle_sigfpe='1'"
-   			"allow_user_segv_handler='1'");
-}
-
-void			init_variables(void)
+void				init_variables(void)
 {
 	t_env_vector	*vector;
 	char			*swap;
@@ -104,13 +93,11 @@ void			init_variables(void)
 	var = get_env_v(g_term->context_current->environ, "SHLVL");
 	if (var == NULL || var->value == NULL || ft_strlen(var->value) == 0)
 		set_env_v(g_term->context_current->environ, "SHLVL", "1",
-				  SCOPE_EXPORT);
+				SCOPE_EXPORT);
 	else
-	{
 		set_env_v(g_term->context_current->environ, "SHLVL",
-				  (swap = ft_itoa(ft_atoi(var->value) + 1)), SCOPE_EXPORT);
-		free(swap);
-	}
+				(swap = ft_itoa(ft_atoi(var->value) + 1)), SCOPE_EXPORT);
+	ft_memdel((void **)&swap);
 }
 
 void				print_messages(void)
@@ -139,8 +126,6 @@ int					main(int argc, char **argv)
 	extern char		**environ;
 
 	ft_printf("Initing...\n");
-//	while (read(0, NULL, 1) == 0)
-//		;
 	init_shell_context();
 	ft_printf("Initing files...\n");
 	init_files();

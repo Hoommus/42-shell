@@ -43,14 +43,14 @@ void	hs_where_auxilia(const char **paths, const char *arg)
 		swap = ft_strings_join(2, "/", paths[i], arg, NULL);
 		if (access(swap, X_OK) == 0)
 			where = ft_strdup(swap);
-		chfree(swap);
+		free(swap);
 	}
 	if (is_builtin(arg))
 		ft_printf("%s: shell built-in command\n", arg);
 	if (where)
 	{
 		ft_printf("%s\n", where);
-		chfree(where);
+		free(where);
 	}
 	else if (!is_builtin(arg))
 		ft_dprintf(2, "where: %s: not found\n", arg);

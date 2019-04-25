@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:38 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/04 18:48:57 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/25 16:30:56 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include "shell_script_parser.h"
 #include "shell_script.h"
 
-t_token					*offset_list(t_token *list, int offset)
+t_token			*offset_list(t_token *list, int offset)
 {
 	int		i;
 
@@ -57,7 +57,7 @@ struct s_result	*handle_terminal(struct s_result *result, const t_state *state)
 	return (result);
 }
 
-bool				check_rule(struct s_result *result, t_state *state,
+bool			check_rule(struct s_result *result, t_state *state,
 								const t_rule *restrict const rule)
 {
 	struct s_result tmp;
@@ -86,7 +86,7 @@ bool				check_rule(struct s_result *result, t_state *state,
 }
 
 // TODO: Remove logging
-struct s_result		is_syntax_valid(t_state const prev)
+struct s_result	is_syntax_valid(t_state const prev)
 {
 	struct s_result		result;
 	t_state				state;

@@ -22,7 +22,7 @@ static char		*extract_var(const char *str, u_int32_t *off)
 	char		*swap;
 
 	swap = ft_strdup(str);
-	array = smart_split(str + *off + 1, "\n\t $!#%&()*+,-./:;<=>?@[\\]^`{|}~");
+	array = smart_split(str + *off + 1, "\n\t $&()*+,-./:;<=>[\\]^`{|}~");
 	if (array && array[0] && is_valid_var(array[0]))
 	{
 		var = environ_get_entry(g_term->context_current->environ, array[0]);

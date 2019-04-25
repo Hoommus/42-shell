@@ -13,6 +13,10 @@
 #include "expansions_internal.h"
 #include "twenty_one_sh.h"
 
+/*
+** Leave .starting_point empty to enforce running such expansion on any string
+*/
+
 static const struct s_expansion		g_expansions[] =
 {
 	{"$", expand_vars},
@@ -50,10 +54,6 @@ char								*expand_tilde(char *str)
 	}
 	return (str);
 }
-
-/*
-** Leave .starting_point empty to enforce running such expansion on any string
-*/
 
 char								*expand(char *string)
 {

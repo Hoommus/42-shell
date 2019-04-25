@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/16 17:42:11 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/16 17:42:11 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/25 17:56:42 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,10 +45,7 @@ int				read_filename(const char *file, char **data)
 	struct stat	s;
 
 	if (file == NULL)
-	{
-		read_fd(STDIN_FILENO, data);
-		return (0);
-	}
+		return (read_fd(STDIN_FILENO, data) & 0);
 	else if (stat(file, &s) != 0)
 	{
 		ft_dprintf(2, "tokenizer: %s: does not exist.\n", file);
@@ -62,7 +59,7 @@ int				read_filename(const char *file, char **data)
 	fd = open_wrapper(file, O_RDONLY);
 	if (fd < 0)
 	{
-		ft_dprintf(2, "tokenizer: %s: could not open a file for reading.\n", file);
+		ft_dprintf(2, "tokenizer: %s: permission denied.\n", file);
 		return (1);
 	}
 	read_fd(fd, data);
@@ -72,33 +69,26 @@ int				read_filename(const char *file, char **data)
 
 int				hs_tokenizer(const char **args)
 {
-	t_token	*tokens;
-	t_token	*head;
+	t_token	*tkns;
 	t_token	*swap;
 	char	*string;
 
-	TERM_APPLY_CONFIG(g_term->context_original->term_config);
 	if (read_filename(args[0], &string))
-	{
-		TERM_APPLY_CONFIG(g_term->context_current->term_config);
 		return (OK);
-	}
-	head = tokenize(string, TOKEN_DELIMITERS);
-	tokens = head;
-	while (tokens)
+	tkns = tokenize(string, TOKEN_DELIMITERS);
+	while (tkns)
 	{
-		if (tokens->type >= TOKEN_WORD && tokens->type <= TOKEN_ASSIGNMENT_WORD)
-			ft_printf("(%s %s) ", g_tokens[tokens->type].token_name, tokens->value);
+		if (tkns->type >= TOKEN_WORD && tkns->type <= TOKEN_ASSIGNMENT_WORD)
+			ft_printf("(%s %s) ", g_tokens[tkns->type].token_name, tkns->value);
 		else
-			ft_printf("(%s) ", g_tokens[tokens->type].token_name);
-		if (tokens->type == TOKEN_NEWLINE)
+			ft_printf("(%s) ", g_tokens[tkns->type].token_name);
+		if (tkns->type == TOKEN_NEWLINE)
 			ft_printf("\n");
-		swap = tokens;
-		tokens = tokens->next;
+		swap = tkns;
+		tkns = tkns->next;
 		free_token(swap);
 	}
 	ft_printf("\n");
 	free(string);
-	TERM_APPLY_CONFIG(g_term->context_current->term_config);
 	return (OK);
 }

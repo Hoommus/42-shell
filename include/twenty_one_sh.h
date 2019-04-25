@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/25 15:59:10 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/25 18:27:50 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,6 +125,7 @@ typedef struct			s_context
 ** Used to store specific caret positions. Heavy usage in cursor_positions.c
 ** Also, see line_editing.h
 */
+
 enum					e_position
 {
 	POS_CURRENT,
@@ -140,17 +141,18 @@ enum					e_position
 ** CArPOS. Got it? Like Carbon-Argentum-Phosphorus-Oxygen-Sulfur
 ** Alright, it's carpos for 'caret position'
 */
+
 typedef struct			s_position
 {
 	short				col;
 	short				row;
 } __attribute__((packed))						t_carpos;
 
-typedef struct s_position	t_dimensions;
 /*
 ** g_term stores terminal parameters as well as cursor position and input buffer
 ** TODO: extract buffer variable to separate global var and create normal API
 */
+
 struct					s_term
 {
 	enum e_input_state	input_state;
@@ -202,7 +204,6 @@ int						unset_env_v(t_env_vector *vector, const char *key);
 ** Context management
 */
 void					context_switch(t_context *to_which);
-t_context				*context_init(void);
 void					context_deep_free(t_context **context);
 t_context				*context_duplicate(const t_context *context,
 	bool with_dup);
@@ -212,6 +213,7 @@ void					context_remove_fd(t_context *context, const int fd);
 void					context_remove_ofd(t_context *context, const int original);
 bool					context_is_fd_present(const t_context *context, const int original);
 void					context_mark_fd_closed(t_context *context, const int fd, bool is_orig);
+
 /*
 ** Main Loop (main.c, )
 */
@@ -227,30 +229,22 @@ int						display_normal_prompt(void);
 */
 u_int64_t				hash_sdbm(const char *str);
 ssize_t					ponies_teleported(void);
-bool					is_string_numeric(const char *str, const int base);
 char					**smart_split(const char *str, const char *delims);
 int						read_fd(const int fd, char **result);
+bool					is_dir(const char *path);
+bool					is_string_numeric(const char *str, const int base);
 
 /*
 ** Final input parsing (variables_replacement.c)
 */
-char					*expand(char *string);
-
 int						is_valid_var(const char *var);
 
 /*
 ** Memory utils (memory.c)
 */
 
-void					chfree(void *obj);
 void					chfree_n(int n, ...);
 void					free_array(void **array);
-
-/*
-** errors.c
-*/
-
-void					throw_fatal(char *cause);
 
 /*
 ** service_routines.c
@@ -275,8 +269,6 @@ bool					flag_plus_short_present(const char **args,
 int						open_wrapper(const char *path, int oflag);
 int						openm_wrapper(const char *path, int oflag, mode_t mode);
 int						close_wrapper(int filedes);
-int						dup_wrapper(int fd_what);
-int						dup2_wrapper(int fd_what, int fd_where);
 
 
 /*

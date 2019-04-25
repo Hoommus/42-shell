@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:46:06 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/22 20:47:50 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/25 18:36:38 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@
 
 static void				tstp(int sig)
 {
-	ft_printf("\n21sh: job control is not enabled.");
 	sig = 0;
 }
 
@@ -39,10 +38,8 @@ static void				resize(int sig)
 	}
 }
 
-extern void				sigpipe_kill_left(t_job *pivot);
-
-static void				sigchild_alt(__unused int sig, siginfo_t *info,
-	__unused void *smthng)
+static void				sigchild_alt(int sig, siginfo_t *info,
+	void *smthng)
 {
 	t_job	*list;
 	int		status;
@@ -61,12 +58,7 @@ static void				sigchild_alt(__unused int sig, siginfo_t *info,
 		list = list->next;
 	}
 	sig = 0;
-}
-
-static void				sigpipe(int sig)
-{
-	ft_printf("Fuck, sigpipe (%d)!\n", sig);
-	abort();
+	smthng = 0;
 }
 
 void					setup_signal_handlers(void)
@@ -74,7 +66,7 @@ void					setup_signal_handlers(void)
 	struct sigaction	action;
 	sigset_t			mask;
 
- 	ft_bzero(&action, sizeof(struct sigaction));
+	ft_bzero(&action, sizeof(struct sigaction));
 	action.__sigaction_u.__sa_handler = &tstp;
 	sigaction(SIGTSTP, &action, NULL);
 	action.__sigaction_u.__sa_handler = &handle_sigint;
@@ -86,5 +78,5 @@ void					setup_signal_handlers(void)
 	action.sa_mask = mask;
 	sigaction(SIGCHLD, &action, NULL);
 	signal(SIGWINCH, &resize);
-	signal(SIGPIPE, &sigpipe);
+	signal(SIGPIPE, &tstp);
 }

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/12 16:10:06 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/13 13:14:11 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/25 18:27:50 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,18 +83,12 @@ void	context_remove_ofd(t_context *context, const int original)
 			close(ultimate->current);
 			penultimate->next = ultimate->next;
 			ft_memdel((void **)&(ultimate->label));
-			ft_memdel((void **)&ultimate);
-			return ;
+			return (ft_memdel((void **)&ultimate));
 		}
 		penultimate = ultimate;
 		ultimate = ultimate->next;
 	}
 }
-
-//void	context_replace_fd(t_context *context, const int which, const int with)
-//{
-//
-//}
 
 void	context_remove_fd(t_context *context, const int fd)
 {

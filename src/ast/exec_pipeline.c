@@ -15,7 +15,6 @@
 #include "shell_script_parser.h"
 #include "shell_job_control.h"
 
-#include <assert.h>
 int					exec_pipeline_terminator(const t_node *node,
 	t_context *context_right)
 {
@@ -23,8 +22,6 @@ int					exec_pipeline_terminator(const t_node *node,
 	t_context	*context_left;
 	int			status;
 
-	assert(node->left->node_type == NODE_COMMAND
-		&& node->right->node_type == NODE_COMMAND);
 	if (context_right == NULL)
 		context_right = context_duplicate(g_term->context_original, true);
 	pipe(pp);
@@ -44,10 +41,9 @@ int					exec_pipeline_inner(const t_node *node,
 	int			pp[2];
 	t_context	*context_left;
 
-	assert(node->right->node_type != NODE_PIPE);
-	if (node->left->node_type == NODE_COMMAND && node->right->node_type == NODE_COMMAND)
+	if (node->left->node_type == NODE_COMMAND &&
+		node->right->node_type == NODE_COMMAND)
 		return (exec_pipeline_terminator(node, context_right));
-	assert(node->left->node_type == NODE_PIPE);
 	if (context_right == NULL)
 		context_right = context_duplicate(g_term->context_original, true);
 	pipe(pp);
@@ -66,7 +62,6 @@ int					exec_pipeline(const t_node *node)
 	char	*swap;
 	int		status;
 
-	assert(node->right->node_type != NODE_PIPE);
 	if (node->left->node_type == NODE_PIPE)
 		status = exec_pipeline_inner(node, NULL);
 	else

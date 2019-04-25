@@ -51,7 +51,8 @@ void			handle_alt_right(union u_char key)
 		return ;
 	i = g_term->buffer->iterator;
 	if (is_buffer_symbol_at_index_wsp(g_term->buffer->iterator))
-		while (i < (int64_t)g_term->buffer->size && is_buffer_symbol_at_index_wsp(i))
+		while (i < (int64_t)g_term->buffer->size
+			&& is_buffer_symbol_at_index_wsp(i))
 			i++;
 	while (i < (int64_t)g_term->buffer->size)
 	{
@@ -64,6 +65,7 @@ void			handle_alt_right(union u_char key)
 }
 
 // TODO: add word to paste_board
+
 void			handle_ctrl_w(union u_char key)
 {
 	int64_t				i;

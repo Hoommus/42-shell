@@ -43,7 +43,6 @@ bool	flag_long_present(const char **args, const char *flag)
 	while (args && args[i] && !status && ft_strncmp(args[i], "--", 2) == 0)
 		status = (ft_strcmp(args[i++] + 2, flag) == 0);
 	return (status);
-
 }
 
 bool	flag_short_present(const char **args, const char flag)

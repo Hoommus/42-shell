@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:55:49 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/02 13:58:29 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/25 17:26:02 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,63 +19,61 @@
 ** {"case",          "case",        TOKEN_CASE,            false},
 ** {"esac",          "esac",        TOKEN_ESAC,            false},
 ** {";;",            "DSEMI",       TOKEN_DSEMI,           true },
+** {"if", "IF", TOKEN_IF, false},
+** {"then", "THEN", TOKEN_THEN, false},
+** {"else", "ELSE", TOKEN_ELSE, false},
+** {"elif", "ELIF", TOKEN_ELIF, false},
+** {"fi", "FI", TOKEN_FI, false},
+** {"do", "DO", TOKEN_DO, false},
+** {"done", "DONE", TOKEN_DONE, false},
+** {"while", "WHILE", TOKEN_WHILE, false},
+** {"until", "UNTIL", TOKEN_UNTIL, false},
+** {"for", "FOR", TOKEN_FOR, false},
+** {"in", "IN", TOKEN_IN, false},
+** {"[", "LSQBRACKET", TOKEN_LSQBRACKET, true },
+** {"]", "RSQBRACKET", TOKEN_RSQBRACKET, true },
+** {"!", "BANG", TOKEN_BANG, true },
 */
 
 const struct s_lexer_token	g_tokens[] = {
-	{"if",            "IF",          TOKEN_IF,              false},
-	{"then",          "THEN",        TOKEN_THEN,            false},
-	{"else",          "ELSE",        TOKEN_ELSE,            false},
-	{"elif",          "ELIF",        TOKEN_ELIF,            false},
-	{"fi",            "FI",          TOKEN_FI,              false},
-	{"do",            "DO",          TOKEN_DO,              false},
-	{"done",          "DONE",        TOKEN_DONE,            false},
-	{"while",         "WHILE",       TOKEN_WHILE,           false},
-//	{"until",         "UNTIL",       TOKEN_UNTIL,           false},
-//	{"for",           "FOR",         TOKEN_FOR,             false},
+	{"{", "LBRACE", TOKEN_LBRACE, false},
+	{"}", "RBRACE", TOKEN_RBRACE, false},
+	{"(", "LBRACKET", TOKEN_LBRACKET, false},
+	{")", "RBRACKET", TOKEN_RBRACKET, false},
 
-//	{"in",            "IN",          TOKEN_IN,              false},
+	{";", "SEMICOLON", TOKEN_SEMICOLON, true },
+	{"&&", "AND_IF", TOKEN_AND_IF, true },
+	{"||", "OR_IF", TOKEN_OR_IF, true },
 
-	{"{",             "LBRACE",      TOKEN_LBRACE,          false},
-	{"}",             "RBRACE",      TOKEN_RBRACE,          false},
-	{"(",             "LBRACKET",    TOKEN_LBRACKET,        false},
-	{")",             "RBRACKET",    TOKEN_RBRACKET,        false},
-//	{"[",             "LSQBRACKET",  TOKEN_LSQBRACKET,      true },
-//	{"]",             "RSQBRACKET",  TOKEN_RSQBRACKET,      true },
+	{"<<-", "DLESSDASH", TOKEN_DLESSDASH, true },
+	{"<<", "DLESS", TOKEN_DLESS, true },
+	{">>", "DGREAT", TOKEN_DGREAT, true },
+	{"<&", "LESSAND", TOKEN_LESSAND, true },
+	{">&", "GREATAND", TOKEN_GREATAND, true },
+	{"<>", "LESSGREAT", TOKEN_LESSGREAT, true },
+	{">|", "CLOBBER", TOKEN_CLOBBER, true },
+	{"|", "PIPE", TOKEN_PIPE, true },
 
-	{";",             "SEMICOLON",   TOKEN_SEMICOLON,       true },
-	{"!",             "BANG",        TOKEN_BANG,            true },
-	{"&&",            "AND_IF",      TOKEN_AND_IF,          true },
-	{"||",            "OR_IF",       TOKEN_OR_IF,           true },
+	{"<", "LESS", TOKEN_LESS, true },
+	{">", "GREAT", TOKEN_GREAT, true },
+	{"&", "AMPERSAND", TOKEN_AMPERSAND, true },
 
-	{"<<-",           "DLESSDASH",   TOKEN_DLESSDASH,       true },
-	{"<<",            "DLESS",       TOKEN_DLESS,           true },
-	{">>",            "DGREAT",      TOKEN_DGREAT,          true },
-	{"<&",            "LESSAND",     TOKEN_LESSAND,         true },
-	{">&",            "GREATAND",    TOKEN_GREATAND,        true },
-	{"<>",            "LESSGREAT",   TOKEN_LESSGREAT,       true },
-	{">|",            "CLOBBER",     TOKEN_CLOBBER,         true },
-	{"|",             "PIPE",        TOKEN_PIPE,            true },
+	{"^~/?[\\/\\w]*", "WORD", TOKEN_WORD, false},
+	{"^\\D\\w+", "NAME", TOKEN_NAME, false},
+	{"\\d*[><]\\d*", "IO_NUMBER", TOKEN_IO_NUMBER, false},
+	{"^\\w+\\=", "ASSIGNMENT", TOKEN_ASSIGNMENT_WORD, false},
 
-	{"<",             "LESS",        TOKEN_LESS,            true },
-	{">",             "GREAT",       TOKEN_GREAT,           true },
-	{"&",             "AMPERSAND",   TOKEN_AMPERSAND,       true },
+	{"$(", "EXPANSION", TOKEN_EXPANSION, false},
+	{"${", "EXPANSION", TOKEN_BEXPANSION, false},
+	{"\n", "NEWLINE", TOKEN_NEWLINE, true },
+	{"!", "EMPTY_LOL", TOKEN_EMPTY, false},
+	{"!", "literal", TOKEN_NOT_APPLICABLE, false},
+	{"!", "COMMAND", TOKEN_WORD_COMMAND, false},
 
-	{"^~/?[\\/\\w]*", "WORD",        TOKEN_WORD,            false},
-	{"^\\D\\w+",      "NAME",        TOKEN_NAME,            false},
-	{"\\d*[><]\\d*",  "IO_NUMBER",   TOKEN_IO_NUMBER,       false},
-	{"^\\w+\\=",      "ASSIGNMENT",  TOKEN_ASSIGNMENT_WORD, false},
-
-	{"$(",            "EXPANSION",   TOKEN_EXPANSION,       false},
-	{"${",            "EXPANSION",   TOKEN_BEXPANSION,      false},
-	{"\n",            "NEWLINE",     TOKEN_NEWLINE,         true },
-	{"!",             "EMPTY_LOL",   TOKEN_EMPTY,           false},
-	{"!",             "literal",     TOKEN_NOT_APPLICABLE,  false},
-	{"!",             "COMMAND",     TOKEN_WORD_COMMAND,    false},
-
-	{NULL,            NULL,          TOKEN_KEYWORD,         false},
+	{NULL, NULL, TOKEN_KEYWORD, false},
 };
 
-static size_t			is_separate(const char *str)
+static size_t				is_separate(const char *str)
 {
 	int		i;
 
@@ -87,7 +85,7 @@ static size_t			is_separate(const char *str)
 	return (0);
 }
 
-static u_int64_t		get_quoted_size(const char *str, const char *delims)
+static u_int64_t			get_quoted_size(const char *str, const char *delims)
 {
 	u_int64_t	i;
 	int			state;
@@ -114,7 +112,7 @@ static u_int64_t		get_quoted_size(const char *str, const char *delims)
 	return (i);
 }
 
-static char				*next_token(const char *str, const char *delims)
+static char					*next_token(const char *str, const char *delims)
 {
 	u_int64_t	i;
 	size_t		len;
@@ -144,7 +142,9 @@ static char				*next_token(const char *str, const char *delims)
 ** Defaults to TOKEN_SEMICOLON, because it does not affect any contextual
 ** classification
 */
-static struct s_token	*create_token(const char *str, t_token *last, int line)
+
+static struct s_token		*create_token(const char *str, t_token *last,
+	int line)
 {
 	enum e_token_type	type;
 	t_token				*token;
@@ -157,54 +157,10 @@ static struct s_token	*create_token(const char *str, t_token *last, int line)
 }
 
 /*
-** Only moves characters around, no memory reallocation bullshit.
-*/
-
-static char				*strip_escaped_nl(char *string)
-{
-	size_t	length;
-	size_t	i;
-
-	if (!string)
-		return (string);
-	length = ft_strlen(string);
-	i = 0;
-	while (length && i < length - 1)
-	{
-		if (string[i] == '\\' && string[i + 1] == '\n')
-			ft_memmove(string + i, string + i + 2, length - i - 1);
-		else
-			i++;
-	}
-	return (string);
-}
-
-char				*strip_comments(char *string)
-{
-	u_int64_t	i;
-
-	i = 0;
-	while (string && string[i])
-	{
-		if (string[i] == '#')
-			while (string[i] && string[i] != '\n')
-				string[i++] = ' ';
-		i++;
-	}
-	return (string);
-}
-
-char				*strip_non_printable(char *string)
-{
-	// TODO
-	return (string);
-}
-
-/*
 ** Splits string into token list and updates corresponding global state.
 */
 
-struct s_token		*tokenize(char *string, const char *delimiters)
+struct s_token				*tokenize(char *string, const char *delimiters)
 {
 	struct s_token	*head;
 	struct s_token	*tail;
@@ -216,7 +172,7 @@ struct s_token		*tokenize(char *string, const char *delimiters)
 	tail = NULL;
 	line = 1;
 	i = -1;
-	strip_escaped_nl(strip_comments(string));
+	strip_escaped_nl_and_comments(string);
 	while (string && string[++i])
 	{
 		if (ft_strchr(delimiters, string[i]) != NULL)

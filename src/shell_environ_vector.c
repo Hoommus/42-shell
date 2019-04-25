@@ -18,7 +18,7 @@
 **       For this sort entries in the table by their hash
 */
 
-t_env_vector	*environ_create_vector(const u_int32_t capacity)
+t_env_vector		*environ_create_vector(const u_int32_t capacity)
 {
 	t_env_vector	*vector;
 	char			*swap;
@@ -34,7 +34,7 @@ t_env_vector	*environ_create_vector(const u_int32_t capacity)
 	return (vector);
 }
 
-void			environ_deallocate_vector(t_env_vector *vector)
+void				environ_deallocate_vector(t_env_vector *vector)
 {
 	t_var		*vars;
 	u_int32_t	i;
@@ -51,7 +51,7 @@ void			environ_deallocate_vector(t_env_vector *vector)
 	ft_memdel((void **)&(vector));
 }
 
-t_env_vector	*environ_reallocate_vector(t_env_vector *vector)
+t_env_vector		*environ_reallocate_vector(t_env_vector *vector)
 {
 	t_var			*array;
 	size_t			array_size;
@@ -90,27 +90,6 @@ t_var				*environ_update_entry(t_env_vector *vector,
 	free(tmp);
 	return (entry);
 }
-
-// TODO: FIX: Sort loses some entries
-//void				insert_with_sort(t_env_vector *vector, t_var *var)
-//{
-//	t_var			*array;
-//	u_int32_t		i;
-//
-//	array = vector->array;
-//	i = 0;
-//	while (i < vector->size && array[i].key)
-//	{
-//		if (ft_strcmp(array[i].key, var->key) > 0)
-//		{
-//			ft_memmove(array + i + 1, array + i,
-//				sizeof(t_var) * (vector->size - i));
-//			break ;
-//		}
-//		i++;
-//	}
-//	array[i] = *var;
-//}
 
 t_var				*environ_push_entry(t_env_vector *vector,
 	const char *key, const char *value, const enum e_var_scope scope)

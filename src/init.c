@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/16 12:28:13 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/18 19:09:08 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/25 18:31:54 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,9 @@ void			init_shell_context(void)
 	extern const char	**environ;
 
 	g_term = (struct s_term *)ft_memalloc(sizeof(struct s_term));
-	g_term->context_original = context_init();
+	g_term->context_original = ft_memalloc(sizeof(t_context));
+	g_term->context_original->environ =
+		environ_create_vector(VARIABLES_VECTOR_INITIAL_SIZE);
 	if (fcntl(STDIN_FILENO, F_GETFD) != -1)
 		context_add_fd(g_term->context_original, 0, 0, "stdin");
 	if (fcntl(STDOUT_FILENO, F_GETFD) != -1)
@@ -96,8 +98,9 @@ void			init_files(void)
 				asctime(timeinfo));
 }
 
-void			parse_args(__unused int argc, char **argv)
+void			parse_args(int argc, char **argv)
 {
 	environ_push_entry(g_term->context_original->environ, "0",
 		argv[0], SCOPE_SHELL_LOCAL);
+	argc = 0;
 }

@@ -47,7 +47,7 @@ t_token			*pop_token(t_token **head, t_token **tail)
 		return (*head);
 	if (*head != NULL && *tail != NULL)
 		return (*tail);
-	return NULL;
+	return (NULL);
 }
 
 void			add_token(t_token **head, t_token **tail, t_token *to_add)
@@ -66,13 +66,4 @@ void			add_token(t_token **head, t_token **tail, t_token *to_add)
 		to_add->prev = *tail;
 		*tail = to_add;
 	}
-}
-
-void			insert_after(t_token **after_what, t_token *insertion)
-{
-	t_token		*next;
-
-	next = (*after_what)->next;
-	(*after_what)->next = insertion;
-	insertion->next = next;
 }

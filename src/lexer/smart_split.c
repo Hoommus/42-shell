@@ -6,22 +6,23 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 14:44:48 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/08 12:10:44 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/25 17:17:26 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell_script.h"
 
-#include <assert.h>
-static int32_t	count_substrings(const char *const str, const char *const delims)
+static int32_t	count_substrings(const char *const str,
+	const char *const delims)
 {
+	size_t	len;
 	size_t	i;
 	int		subs;
 	char	c;
 
 	subs = 0;
 	i = 0;
-	size_t len = ft_strlen((char *)str);
+	len = ft_strlen((char *)str);
 	while (str && i < len)
 	{
 		c = str[i];
@@ -55,7 +56,6 @@ static int64_t	get_word_size(const char *const str, const char *const delims)
 	else
 		while (str[i] && !ft_strchr(delims, str[i]))
 			i += (str[i] == '\\') ? 2 : 1;
-	assert(i > 0);
 	return (i);
 }
 
@@ -65,6 +65,7 @@ static int64_t	get_word_size(const char *const str, const char *const delims)
 ** TODO: Try to fix that too high memory allocation thing
 ** TODO: Remove this shit
 */
+
 char			**smart_split(const char *const str, const char *const delims)
 {
 	char		**array;

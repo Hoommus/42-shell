@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/09 15:39:07 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/17 17:05:53 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/25 18:22:50 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ void						jc_enqueue_job(t_job *job)
 ** Function searches for a job using either pid or job->pid value, so no need
 ** for supplying both.
 */
+
 t_job						*jc_dequeue_job(pid_t pid, t_job *job)
 {
 	t_job		*list;
@@ -88,4 +89,3 @@ void						jc_destroy_queue(void)
 	}
 	jc_get()->job_queue = NULL;
 }
-

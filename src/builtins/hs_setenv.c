@@ -6,28 +6,30 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/25 15:35:53 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/18 12:31:06 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/25 17:54:19 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "twenty_one_sh.h"
 
-//static int		set_tricky(const char *str)
-//{
-//	size_t		len;
-//	int			i;
-//	char		*first;
-//	char		*second;
-//
-//	second = ft_strchr(str, '=');
-//	if (second == NULL || (first = ft_strsub(str, 0, second - str))
-//		|| ft_strlen(first) == 0 || )
-//	{
-//		ft_dprintf(2, "setenv: arguments are not valid in this context.\n");
-//	}
-//	free(first);
-//	return (0);
-//}
+/*
+** static int		set_tricky(const char *str)
+** {
+**     size_t	len;
+**     int		i;
+**     char		*first;
+**     char		*second;
+**
+**     second = ft_strchr(str, '=');
+**     if (second != NULL && (first = ft_strsub(str, 0, second - str))
+**         && ft_strlen(first) == 0 && is_valid_var(first))
+**         ;
+**     else
+**     	ft_dprintf(2, "setenv: arguments are not valid in this context.\n");
+**     free(first);
+**     return (0);
+** }
+*/
 
 int				hs_setenv(const char **args)
 {
