@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/16 17:42:29 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/22 15:37:10 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/19 16:17:47 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ union				u_char
 	char			arr[8];
 };
 
-typedef struct		s_symbol
+typedef struct __attribute__((packed))	s_symbol
 {
 	char			s[9];
 	u_int8_t		visual_size : 2;
@@ -46,11 +46,11 @@ t_symbol			*buff_symbol_at(u_int64_t index);
 char				*buff_char_at(u_int64_t index);
 int					buff_char_at_equals(u_int64_t index, const char *c);
 int					buff_char_at_equals_any(u_int64_t index, const char *c);
-int					buff_chroff(t_buffer *buffer, const char *c, int i);
+int64_t				buff_rchr(const char *c, int64_t i);
 
 int					buff_insert_single_at(u_int64_t index, const char *str);
 int					buff_insert_symbol_at(u_int64_t index, t_symbol *symbol);
 int					buff_insert_string_at(u_int64_t index, const char *string);
-u_int64_t			utf_body_size(char first);
+u_int32_t			utf_body_size(char first);
 
 #endif

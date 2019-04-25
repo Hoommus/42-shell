@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 14:44:44 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/09 15:52:56 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/23 18:14:54 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,7 +158,7 @@ struct						s_command
 	char		**args;
 	char		**assignments;
 	t_io_rdr	*io_redirects;
-	bool		is_async;
+	bool		is_async; // TODO: Cut this out
 };
 
 union						u_executor
@@ -191,8 +191,14 @@ enum e_token_type			token_class_contextual(const char *str,
 void						free_array(void **array);
 
 /*
-** AST
+** AST Preprocess
 */
+void						run_heredocs(t_node *node);
+
+/*
+** AST Main
+*/
+
 
 void						run_script(t_token *list_head, bool log_recursion);
 int							exec_command(const t_node *command_node,
@@ -208,8 +214,9 @@ int							exec_pipeline(const t_node *node);
 ** File reading and executing
 */
 int							read_filename(const char *file, char **data);
-bool						alterate_filedes(const struct s_command *command,
-	t_context *context);
 
+void						rdr_heredocs(t_context *context, t_io_rdr *rdrs);
+int							alterate_filedes(const struct s_command *command,
+	t_context *context);
 
 #endif

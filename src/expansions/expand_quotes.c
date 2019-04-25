@@ -6,14 +6,14 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/06 16:42:04 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/06 16:42:04 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/22 18:49:09 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "expansions_internal.h"
 #include "twenty_one_sh.h"
 
-char								*expand_quote(char *string)
+char	*expand_quote(char *string)
 {
 	u_int32_t	i;
 	const char	q = '\'';
@@ -31,7 +31,7 @@ char								*expand_quote(char *string)
 	return (string);
 }
 
-char								*expand_dquote(char *string)
+char	*expand_dquote(char *string)
 {
 	char		*swap;
 	char		*tmp;
@@ -48,6 +48,8 @@ char								*expand_dquote(char *string)
 	k = i + 1;
 	while (string[k] && string[k] != q)
 		k += string[k] == '\\' ? 2 : 1;
+	if (string[k] == '\0')
+		return (ft_strdup(string));
 	swap = ft_strsub(string + i + 1, 0, k - i - 1);
 	tmp = expand_vars(swap);
 	ft_memdel((void **)&swap);

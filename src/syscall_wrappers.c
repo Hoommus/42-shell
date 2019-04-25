@@ -20,7 +20,7 @@ int		openm_wrapper(const char *path, int oflag, mode_t mode)
 
 	fd = open(path, oflag, mode);
 	if (fd == -1)
-		ft_dprintf(2, "21sh: some weird 'open' error\n"
+		ft_dprintf(2, "21sh: some weird 'open' error for"
 								"%s \noflag: %x mode: %x\n", path, oflag, mode);
 	if (fd != -1)
 		context_add_fd(g_term->context_current, fd, fd, path);

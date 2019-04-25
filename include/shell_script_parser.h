@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/10 13:17:59 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/08 19:05:39 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/23 16:16:56 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ typedef struct					s_syntax_rule
 	const struct s_syntax_rule *restrict	expands_to[8][6];
 	const char *restrict const				human_readable;
 	t_builder								tree_builder;
-}								t_rule;
+} __attribute__((packed))								t_rule;
 
 typedef struct					s_syntax_error
 {
@@ -107,8 +107,8 @@ struct							s_result
 	t_error			*error;
 	t_bresult		*ast;
 	t_bresult		*backup_ast;
-	bool			fatal;
 	int				consumed;
+	bool			fatal;
 	bool			valid;
 };
 
@@ -140,12 +140,18 @@ t_bresult						*pipe_andor_finalize_right(const t_state *state,
 t_bresult						*list_build(const t_state *state,
 												struct s_result *last_build);
 
+/*
+** Simple command builder auxiliary
+*/
+bool							is_redirect(t_token *t);
+struct s_io_redirect			*get_redirects(t_token *list, int length);
+
+
 t_node							*ast_new_node(void *value,
 												enum e_node_type node_type);
 void							ast_free_recursive(t_node *node);
 
 int								tree_get_depth(t_node *parent);
-void							print_command_node(t_node *node);
 t_bresult						*insert_left_recursive(t_bresult *bresult,
 									t_node *parent, t_node *insertion);
 

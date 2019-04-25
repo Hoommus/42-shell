@@ -13,7 +13,7 @@
 #include "twenty_one_sh.h"
 #include "shell_builtins.h"
 
-int			hs_env(__unused const char **args)
+int			hs_env(const char **args)
 {
 	const t_var		*vars = (t_var *)g_term->context_current->environ->array;
 	u_int32_t		i;
@@ -25,5 +25,6 @@ int			hs_env(__unused const char **args)
 			print_var(vars + i);
 		i++;
 	}
+	*args = args[0];
 	return (0);
 }

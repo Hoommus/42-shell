@@ -14,7 +14,6 @@
 #include "shell_builtins.h"
 
 struct s_builtin	g_builtins[] = {
-	{"alias", &hs_alias},
 	{"cd", &hs_cd},
 	{"echo", &hs_echo},
 	{"env", &hs_env},
@@ -26,7 +25,6 @@ struct s_builtin	g_builtins[] = {
 	{"quit", &hs_exit},
 	{"set", &hs_set},
 	{"setenv", &hs_setenv},
-	{"syntax", &hs_syntax},
 	{"tokenizer", &hs_tokenizer},
 	{"unsetenv", &hs_unsetenv},
 	{"where", &hs_where},
@@ -47,12 +45,7 @@ int					hs_echo(const char **args)
 	return (0);
 }
 
-int					hs_alias(__unused const char **args)
-{
-	return (0);
-}
-
-int					hs_help(__unused const char **args)
+int					hs_help(const char **args)
 {
 	int		i;
 
@@ -61,11 +54,13 @@ int					hs_help(__unused const char **args)
 	while (g_builtins[i + 1].name != NULL)
 		ft_printf("%s, ", g_builtins[i++].name);
 	ft_printf("%s\n", g_builtins[i].name);
+	*args = args[0];
 	return (0);
 }
 
-int					hs_exit(__unused const char **args)
+int					hs_exit(const char **args)
 {
 	TERM_APPLY_CONFIG(g_term->context_original->term_config);
 	exit(0);
+	*args = args[0];
 }

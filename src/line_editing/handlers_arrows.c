@@ -12,6 +12,7 @@
 
 #include "line_editing.h"
 #include "shell_history.h"
+#include "twenty_one_sh.h"
 
 // TODO: add partial command completion from history
 

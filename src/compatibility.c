@@ -16,7 +16,7 @@
 
 int				gethostname(char *arr, size_t size)
 {
-	ft_memcpy(arr, "(null)\0", size);
+	ft_memcpy(arr, "linux\0", size);
 	return (0);
 }
 

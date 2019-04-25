@@ -35,7 +35,6 @@ void	print_var(const t_var *var)
 int		hs_set(const char **args)
 {
 	const t_var *const	vars = (t_var *)g_term->context_current->environ->array;
-//	struct s_fd_lst		*swap;
 	u_int32_t			i;
 	u_int32_t			nbr;
 
@@ -56,14 +55,5 @@ int		hs_set(const char **args)
 				ft_printf("%-4d ", nbr++);
 			print_var(vars + i);
 		}
-//		swap = g_term->context_current->fd_list;
-//		while (swap)
-//		{
-//			ft_printf("label: %s o:%d; c:%d\n",
-//					  swap->label,
-//					  swap->original,
-//					  swap->current);
-//			swap = swap->next;
-//		}
 	return (0);
 }

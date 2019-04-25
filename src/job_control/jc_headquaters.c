@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/08 15:49:38 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/11 17:47:22 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/19 17:50:45 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,19 +38,15 @@ struct s_job_control		*jc_get(void)
 	return (&g_jc);
 }
 
-t_job						*jc_create_job(char **args, t_context *context,
-											enum e_job_state job_class)
+t_job						*jc_create_job(const struct s_command *cmd,
+	t_context *context, enum e_job_state job_class)
 {
 	t_job		*job;
-	size_t		array_size;
 
-	array_size = carray_size(args);
 	job = ft_memalloc(sizeof(t_job));
 	job->context = context;
 	job->state = job_class;
-	job->args = ft_memalloc(sizeof(char *) * (array_size + 1));
-	while (array_size-- > 0)
-		job->args[array_size] = ft_strdup(args[array_size]);
+	job->cmd = cmd;
 	return (job);
 }
 
@@ -79,8 +75,6 @@ void						jc_register_job(t_job *job)
 	job->prev = list;
 }
 
-//mkdir test ; cd test ; ls -a ; ls | cat | wc -c > fifi ; cat fifi
-
 void						jc_unregister_job(pid_t id)
 {
 	t_job		*list;
@@ -95,7 +89,6 @@ void						jc_unregister_job(pid_t id)
 			else
 				jc_get()->jobs = list->next;
 			context_deep_free(&(list->context));
-			free_array((void **)list->args);
 			ft_memdel((void **)&list);
 			return ;
 		}

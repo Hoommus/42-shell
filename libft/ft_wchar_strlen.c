@@ -18,7 +18,7 @@
 ** char string
 */
 
-size_t	ft_wchar_strlen(wchar_t *str)
+size_t	ft_wchar_strlen(const wchar_t *str)
 {
 	size_t	i;
 	size_t	size;

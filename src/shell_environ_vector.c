@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/10 17:26:29 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/17 13:55:53 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/17 15:35:34 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 #include "shell_environ.h"
 
 /*
-** TODO: make use of hashes
-** seems like I did it, but in a very limited way
+** TODO: Add binary search instead of classic iteration
+**       For this sort entries in the table by their hash
 */
 
 t_env_vector	*environ_create_vector(const u_int32_t capacity)
@@ -92,25 +92,25 @@ t_var				*environ_update_entry(t_env_vector *vector,
 }
 
 // TODO: FIX: Sort loses some entries
-void				insert_with_sort(t_env_vector *vector, t_var *var)
-{
-	t_var			*array;
-	u_int32_t		i;
-
-	array = vector->array;
-	i = 0;
-	while (i < vector->size && array[i].key)
-	{
-		if (ft_strcmp(array[i].key, var->key) > 0)
-		{
-			ft_memmove(array + i + 1, array + i,
-				sizeof(t_var) * (vector->size - i));
-			break ;
-		}
-		i++;
-	}
-	array[i] = *var;
-}
+//void				insert_with_sort(t_env_vector *vector, t_var *var)
+//{
+//	t_var			*array;
+//	u_int32_t		i;
+//
+//	array = vector->array;
+//	i = 0;
+//	while (i < vector->size && array[i].key)
+//	{
+//		if (ft_strcmp(array[i].key, var->key) > 0)
+//		{
+//			ft_memmove(array + i + 1, array + i,
+//				sizeof(t_var) * (vector->size - i));
+//			break ;
+//		}
+//		i++;
+//	}
+//	array[i] = *var;
+//}
 
 t_var				*environ_push_entry(t_env_vector *vector,
 	const char *key, const char *value, const enum e_var_scope scope)
@@ -132,7 +132,7 @@ t_var				*environ_push_entry(t_env_vector *vector,
 		entry->key_hash = hash_sdbm(key);
 		tmp = ft_strjoin(key, value);
 		entry->hash = hash_sdbm(tmp) + entry->scope;
-		insert_with_sort(vector, entry);
+		((t_var *)vector->array)[vector->size] = *entry;
 		vector->size++;
 		free(entry);
 		free(tmp);

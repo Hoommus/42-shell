@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "line_editing.h"
+#include "twenty_one_sh.h"
 
 #include <assert.h>
 void	handle_alt_up(union u_char key)
@@ -32,7 +33,7 @@ void	handle_alt_up(union u_char key)
 			break ;
 	}
 	g_term->buffer->iterator -= i;
-//	nl = buff_chroff(g_term->buffer, "\n", g_term->buffer->iterator);
+//	nl = buff_rchr(g_term->buffer, "\n", g_term->buffer->iterator);
 //	if (g_term->buffer->iterator - nl < start.col)
 //	caret_move(start.col + 1, D_LEFT);
 //	i = start.col + 1;

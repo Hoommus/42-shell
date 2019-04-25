@@ -29,10 +29,7 @@ void	free_arr(void **arr)
 
 	i = 0;
 	while (arr && arr[i])
-	{
-		ft_memdel((void **)&(arr[i]));
-		i++;
-	}
+		ft_memdel(&(arr[i++]));
 	ft_memdel(arr);
 }
 

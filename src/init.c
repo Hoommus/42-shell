@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/16 12:28:13 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/17 12:53:20 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/18 19:09:08 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ struct termios	*init_term(void)
 	g_term->context_original->term_config = oldterm;
 	tcgetattr(g_term->tty_fd, oldterm);
 	ft_memcpy(newterm, oldterm, sizeof(struct termios));
-	newterm->c_lflag &= ~(ECHO | ICANON | IEXTEN) | ECHOE | ECHOCTL | ECHONL;
+	newterm->c_lflag &= ~(ECHO | ICANON | IEXTEN) | ECHOE | ECHONL;
 	newterm->c_iflag &= ~(IXOFF);
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &window);
 	tputs(tgetstr("ei", NULL), 1, &ft_putc);

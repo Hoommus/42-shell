@@ -6,14 +6,14 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/10 16:42:51 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/17 17:06:59 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/25 15:29:41 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell_job_control.h"
 #include "shell_builtins.h"
 
-static char					*g_sigs[31] =
+static char				*g_sigs[31] =
 {
 	"hangup",
 	"interrupted",
@@ -48,29 +48,30 @@ static char					*g_sigs[31] =
 	"user-defined signal 2"
 };
 
-static void					close_pipe_fds(t_context *context)
+static void				close_redundant_fds(t_context *context)
 {
 	struct s_fd_lst		*list;
 
 	list = context->fd_list;
 	while (list)
 	{
-		if (ft_strcmp(list->label, "pipe") == 0)
+		if (ft_strcmp(list->label, "pipe") == 0 ||
+			ft_strcmp(list->label, "heredoc") == 0 )
 			close(list->current);
 		list = list->next;
 	}
 }
 
-static char					*path_to_target(t_job *job)
+char					*path_to_target(t_job *job)
 {
-	const char	**args = (const char **)job->args;
+	const char	**args = (const char **)job->cmd->args;
 	t_var		*var;
 	int			i;
 	char		*swap;
 	char		**paths;
 
 	if (ft_strchr(args[0], '/') != NULL)
-		return (ft_strdup(args[0]));
+		return (access(args[0], F_OK) == -1 ? NULL : ft_strdup(args[0]));
 	var = get_env_v(NULL, "PATH");
 	if (!var || !var->value)
 		return (NULL);
@@ -89,10 +90,10 @@ static char					*path_to_target(t_job *job)
 	return (swap);
 }
 
-static int					run_builtin(t_job *job)
+static int				run_builtin(t_job *job)
 {
 	extern struct s_builtin	g_builtins[];
-	const char				*builtin = job->args ? job->args[0] : NULL;
+	const char				*builtin = job->cmd->args ? job->cmd->args[0] : NULL;
 	int						i;
 
 	i = 0;
@@ -101,8 +102,9 @@ static int					run_builtin(t_job *job)
 		if (ft_strcmp(builtin, g_builtins[i].name) == 0)
 		{
 			context_switch(job->context);
-			job->exit_status = g_builtins[i].function((const char **)job->args + 1);
-			close_pipe_fds(job->context);
+			job->exit_status = g_builtins[i]
+				.function((const char **)job->cmd->args + 1);
+			close_redundant_fds(job->context);
 			context_switch(jc_get()->shell_context);
 			return (job->exit_status);
 		}
@@ -111,7 +113,7 @@ static int					run_builtin(t_job *job)
 	return (-512);
 }
 
-static void					handle_signaled(t_job *job, int status)
+static void				handle_signaled(t_job *job, int status)
 {
 	char		*swap;
 	t_job		*list;
@@ -121,7 +123,7 @@ static void					handle_signaled(t_job *job, int status)
 	list = jc_get()->jobs;
 	while (list && ++i)
 		list = list->next;
-	swap = ft_strarr_join(" ", job->args);
+	swap = ft_strarr_join(" ", job->cmd->args);
 	if (ft_strlen(swap) < 45)
 		ft_printf("\n[%d]    %d %s   %s\n", i, job->pid,
 			g_sigs[WTERMSIG(status) - 1], swap);
@@ -131,23 +133,42 @@ static void					handle_signaled(t_job *job, int status)
 	ft_memdel((void **)&swap);
 }
 
-void						sigpipe_kill_left(t_job *pivot)
+// TODO: move somewhere else
+void					sigpipe_kill_left(t_job *pivot)
 {
-	int					status;
+	int		status;
 
 	pivot = pivot->prev;
-	ft_printf("%p\n", pivot);
 	while (pivot)
 	{
-		kill(pivot->pid, SIGPIPE);
-		waitpid(pivot->pid, &status, 0);
-		pivot->exit_status = WEXITSTATUS(status);
+		if (pivot->pid != 0)
+		{
+			kill(pivot->pid, SIGPIPE);
+			waitpid(pivot->pid, &status, 0);
+			pivot->exit_status = WEXITSTATUS(status);
+		}
 		pivot->state = JOB_TERMINATED;
 		pivot = pivot->prev;
 	}
 }
 
-static void					waitnclaim(t_job *job)
+void					write_heredocs(t_job *job)
+{
+	const t_io_rdr		*io_rdrs = job->cmd->io_redirects;
+
+	while (io_rdrs->type != TOKEN_NOT_APPLICABLE)
+	{
+		if ((io_rdrs->type == TOKEN_DLESS || io_rdrs->type == TOKEN_DLESSDASH))
+		{
+			write(io_rdrs->what.fd, io_rdrs->what.path,
+						ft_strlen(io_rdrs->what.path));
+			close(io_rdrs->what.fd);
+		}
+		io_rdrs++;
+	}
+}
+
+void					waitnclaim(t_job *job)
 {
 	int			status;
 	int			wait_status;
@@ -155,11 +176,6 @@ static void					waitnclaim(t_job *job)
 	wait_status = waitpid(job->pid, &status, 0);
 	tcsetpgrp(0, jc_get()->shell_pid);
 	TERM_APPLY_CONFIG(g_term->context_current->term_config);
-//	ft_printf("wait_status = %d\nexit_status = %d\nWIFSIGNALED = %s ; "
-//				"WIFEXITED = %s\nWTERMSIG = %d\n",
-//				wait_status, job->exit_status,
-//				WIFSIGNALED(status) ? "true" : "false",
-//				WIFEXITED(status) ? "true" : "false", WTERMSIG(status));
 	if (job->exit_status == 0
 		&& WIFSIGNALED(status) && !WIFEXITED(status)
 		&& WTERMSIG(status) != 1 && WTERMSIG(status) <= 31)
@@ -168,37 +184,47 @@ static void					waitnclaim(t_job *job)
 		g_term->last_status = WEXITSTATUS(status);
 	jc_collect_zombies();
 }
-// TODO: think about what happens if queue has multiple FG jobs even though it shouldn't
-static int					forknrun(t_job *job, char *path)
+
+int						forknrun(t_job *job, char *path)
 {
 	job->pid = fork();
 	if (job->pid == 0)
 	{
 		context_switch(job->context);
-		execve(path, job->args, environ_to_array(job->context->environ,
+		execve(path, job->cmd->args, environ_to_array(job->context->environ,
 			SCOPE_EXPORT | SCOPE_COMMAND_LOCAL | SCOPE_SCRIPT_GLOBAL));
 		context_switch(jc_get()->shell_context);
-		ft_dprintf(2, "21sh: execve error: %s\n", job->args[0]);
+		ft_dprintf(2, "21sh: execve error: %s\n", job->cmd->args[0]);
 	}
 	else if (job->pid == -1)
-		ft_dprintf(2, "21sh: fork error: %s\n", job->args[0]);
+		ft_dprintf(2, "21sh: fork error: %s\n", job->cmd->args[0]);
 	else
 	{
-		close_pipe_fds(job->context);
+		write_heredocs(job);
+		close_redundant_fds(job->context);
 		if (job->next == NULL)
 		{
 			waitnclaim(job);
 			ft_memdel((void **)&path);
 			return (g_term->last_status);
 		}
-//		else
-//			jc_register_job(job);
 		ft_memdel((void **)&path);
 	}
-	return (-1024); // error indicator
+	return (-1024);
 }
 
-int							jc_execute_pipeline_queue(void)
+static bool				is_dir(const char *path)
+{
+	struct stat		s;
+
+	if (stat(path, &s) == -1)
+		return (false);
+	return (S_ISDIR(s.st_mode));
+}
+
+#define DIRTY_HACK(err) (ft_dprintf(2, err, list->cmd->args[0]) & 0) & -1024
+
+int						jc_execute_pipeline_queue(void)
 {
 	int			status;
 	t_job		*list;
@@ -207,24 +233,22 @@ int							jc_execute_pipeline_queue(void)
 	list = jc_get()->job_queue;
 	while (list)
 	{
-		if ((g_term->last_status = run_builtin(list)) != -512)
+		if ((g_term->last_status = run_builtin(list)) != -512 && !list->next)
+			return (g_term->last_status);
+		else if (g_term->last_status == -512)
 		{
-			if (!list->next)
-				return (g_term->last_status);
-		}
-		else
-		{
-			bin = path_to_target(list);
-			if (bin != NULL && access(bin, X_OK) == -1)
-				ft_dprintf(2, "21sh: permission denied: %s\n", list->args[0]);
+			if ((bin = path_to_target(list)) != NULL && access(bin, F_OK) == -1)
+				return (DIRTY_HACK(ERR_NO_SUCH_FILE));
+			else if (bin != NULL && is_dir(bin))
+				return (DIRTY_HACK(ERR_IS_A_DIRECTORY));
+			else if (bin != NULL && access(bin, X_OK) == -1)
+				return (DIRTY_HACK(ERR_PERMISSION_DENIED));
 			else if (bin == NULL)
-				ft_dprintf(2, "21sh: command not found: %s\n", list->args[0]);
+				return (DIRTY_HACK(ERR_COMMAND_NOT_FOUND));
 			else if (!g_interrupt && (status = forknrun(list, bin)) != -1024)
 				return (status);
-			if (bin == NULL || access(bin, X_OK) == -1)
-				return (-1024);
 		}
 		list = list->next;
 	}
-	return (-1024); // error
+	return (-1024);
 }

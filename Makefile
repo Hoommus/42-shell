@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/04/16 18:49:36 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/04/23 17:51:41 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -40,14 +40,17 @@ LEXER_DIR = lexer/
 LEXER_SRC = quotes.c smart_split.c tokenizer.c tokens_mem.c token_word_types.c
 
 AST_DIR = ast/
-AST_SRC = parser.c entry_point.c syntax_rules.c \
+AST_SRC = ast_exec_main.c ast_exec_preprocess.c \
+          parser.c syntax_rules.c \
           nodes_memory.c nodes_manipulations.c \
           execution.c \
-          exec_command.c exec_command_alterators.c exec_subshell.c \
+          exec_command.c exec_command_alterators.c exec_command_heredocs.c \
+          exec_subshell.c \
           exec_pipeline.c exec_andor_if.c\
           tree_auxillary.c \
-          tree_simple_command.c tree_subshell.c \
-          tree_pipe_sequence.c tree_and_or.c tree_list.c
+          tree_simple_command.c tree_simple_command_rdrs.c tree_subshell.c \
+          tree_pipe_sequence.c tree_and_or.c tree_list.c \
+          auxiliary_cmd_rdrs.c
 
 BUILTIN_DIR = builtins/
 BUILTIN_SRC = cd.c where.c builtins.c hs_history.c tokenizer_test.c \
@@ -55,20 +58,22 @@ BUILTIN_SRC = cd.c where.c builtins.c hs_history.c tokenizer_test.c \
               hs_export.c hs_jobs.c
 
 INTERFACE_DIR = line_editing/
-INTERFACE_SRC = buffer_drawing.c buffer_works.c     \
+INTERFACE_SRC = buffer_drawing.c buffer_input.c  \
                 cursor_control.c cursor_positions.c \
                 buffer_vector.c buffer_vector_tools1.c buffer_vector_tools2.c  \
-                state_machine.c \
+                state_toggles.c state_updates.c \
                 handlers_arrows.c handlers_editing.c handlers_engine.c \
                 handlers_arrows_mods.c handlers_arrows_vertical.c \
-                write_anywhere.c
+                handlers_clipboard.c \
+                auxiliary_buffer.c auxiliary_le.c
 
 JOB_CONTROL_DIR = job_control/
 JOB_CONTROL_SRC = signals_manipulation.c signals_basic.c \
                   context_manipulations.c context_switch.c command_lookup.c \
                   jc_jobs_manipulations.c \
                   jc_children_cleanup.c jc_headquaters.c  \
-                  jc_queue_execution.c jc_queue_interface.c
+                  jc_queue_execution.c jc_queue_interface.c \
+                  auxiliary_access_checks.c
 
 EXPANSIONS_DIR = expansions/
 EXPANSIONS_SRC = expander_engine.c expand_escaped.c expand_quotes.c \

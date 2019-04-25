@@ -14,6 +14,7 @@
 #include "twenty_one_sh.h"
 
 // TODO: replace smart_split with function that returns first found token
+// TODO: Make this one extract some tricky vars like `?', `@', `%', `$', etc.
 static char		*extract_var(const char *str, u_int32_t *off)
 {
 	t_var		*var;

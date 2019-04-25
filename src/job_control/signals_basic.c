@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:46:06 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/17 17:06:59 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/22 20:47:50 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,14 +17,7 @@
 
 static void				tstp(int sig)
 {
-	TERM_APPLY_CONFIG(g_term->context_current->term_config);
-	buff_clear(0);
-	ft_printf("Received SIGTSTP (%d)\n", sig);
-	write(0, "\4", 1);
-}
-
-void					ignore(int sig)
-{
+	ft_printf("\n21sh: job control is not enabled.");
 	sig = 0;
 }
 
@@ -46,22 +39,20 @@ static void				resize(int sig)
 	}
 }
 
-extern void sigpipe_kill_left(t_job *pivot);
+extern void				sigpipe_kill_left(t_job *pivot);
 
-static void					sigchild_alt(__unused int sig, siginfo_t *info,
+static void				sigchild_alt(__unused int sig, siginfo_t *info,
 	__unused void *smthng)
 {
 	t_job	*list;
 	int		status;
 
 	list = jc_get()->job_queue;
-	while (list->next) // never kill last process and claim its status in queue execution
+	while (list->next)
 	{
 		if (list->pid == info->si_pid &&
 			(WIFEXITED(info->si_status) || WIFSIGNALED(info->si_status)))
 		{
-			ft_printf("Waiting for [%d] %s\n", list->pid, list->args[0]);
-			//waitpid(list->pid, &status, 0);
 			list->exit_status = WEXITSTATUS(status);
 			list->state = JOB_TERMINATED;
 			sigpipe_kill_left(list);
@@ -70,6 +61,12 @@ static void					sigchild_alt(__unused int sig, siginfo_t *info,
 		list = list->next;
 	}
 	sig = 0;
+}
+
+static void				sigpipe(int sig)
+{
+	ft_printf("Fuck, sigpipe (%d)!\n", sig);
+	abort();
 }
 
 void					setup_signal_handlers(void)
@@ -89,4 +86,5 @@ void					setup_signal_handlers(void)
 	action.sa_mask = mask;
 	sigaction(SIGCHLD, &action, NULL);
 	signal(SIGWINCH, &resize);
+	signal(SIGPIPE, &sigpipe);
 }

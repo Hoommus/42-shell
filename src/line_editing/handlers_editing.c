@@ -6,12 +6,12 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/18 13:45:39 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/18 13:45:39 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/22 20:40:30 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "line_editing.h"
-#include "shell_script.h"
+#include "twenty_one_sh.h"
 
 void	handle_backspace(union u_char key)
 {
@@ -39,16 +39,6 @@ void	handle_del(union u_char key)
 			buff_del_symbol(g_term->buffer->iterator);
 			buffer_redraw();
 		}
-	}
-}
-
-void	handle_line_kill(union u_char key)
-{
-	if (key.lng == CKILL && g_term->buffer->size > 0)
-	{
-		caret_move(g_term->buffer->iterator, D_LEFT);
-		tputs(tgetstr("cd", NULL), 1, &ft_putc);
-		buff_clear(0);
 	}
 }
 

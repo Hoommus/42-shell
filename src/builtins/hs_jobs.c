@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/08 19:57:36 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/10 17:19:58 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/19 17:50:45 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,11 +24,10 @@ int			hs_jobs(const char **args)
 	{
 		if (flag_short_present(args, 'l'))
 			ft_printf("[%.2d]  + %d %s %s\n", i++, jobs->pid,
-				g_state_names[jobs->state], jobs->args[0]);
+				g_state_names[jobs->state], jobs->cmd->args[0]);
 		else
 			ft_printf("[%.2d]  + %d %s %s\n", i++, jobs->pid,
-					  g_state_names[jobs->state], jobs->args[0]);
-
+				g_state_names[jobs->state], jobs->cmd->args[0]);
 		jobs = jobs->next;
 	}
 	return (0);

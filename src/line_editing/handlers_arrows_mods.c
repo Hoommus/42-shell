@@ -13,7 +13,6 @@
 #include "line_editing.h"
 #include "twenty_one_sh.h"
 
-#include <assert.h>
 static bool		is_buffer_symbol_at_index_wsp(int64_t index)
 {
 	return (buff_char_at_equals(index, " ") ||
@@ -23,7 +22,7 @@ static bool		is_buffer_symbol_at_index_wsp(int64_t index)
 			buff_char_at_equals(index, "\a"));
 }
 
-void	handle_alt_left(union u_char key)
+void			handle_alt_left(union u_char key)
 {
 	int64_t			i;
 
@@ -44,7 +43,7 @@ void	handle_alt_left(union u_char key)
 	g_term->buffer->iterator = (u_int64_t)(i + 1);
 }
 
-void	handle_alt_right(union u_char key)
+void			handle_alt_right(union u_char key)
 {
 	int64_t			i;
 
@@ -64,7 +63,8 @@ void	handle_alt_right(union u_char key)
 	g_term->buffer->iterator = i;
 }
 
-void	handle_ctrl_w(union u_char key)
+// TODO: add word to paste_board
+void			handle_ctrl_w(union u_char key)
 {
 	int64_t				i;
 

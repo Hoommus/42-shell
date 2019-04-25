@@ -28,7 +28,7 @@ int				read_fd(const int fd, char **result)
 		{
 			free(data);
 			*result = ft_strnew(0);
-			return (0);
+			return (-1);
 		}
 		swap = ft_strjoin(data, buffer);
 		free(data);
@@ -66,6 +66,7 @@ int				read_filename(const char *file, char **data)
 		return (1);
 	}
 	read_fd(fd, data);
+	close_wrapper(fd);
 	return (0);
 }
 

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/17 17:09:26 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/25 15:59:10 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,8 @@
 # include "get_next_line.h"
 # include "shell_environ.h"
 
+# define SH "21sh"
+
 # define PROMPT_HOST "\x1b[0m\x1b[34;1m[%s@%s]\x1b[0m"
 # define PROMPT_PATH " \x1b[36;1m%s\x1b[0m"
 # define PROMPT_TERMINATOR " \x1b[%d;1m(%d) $\x1b[0m "
@@ -51,12 +53,20 @@
 # define TERM_CLR_LINE tputs(tgetstr("ce", NULL), 1, &ft_putc)
 # define TERM_CLR_CHAR tputs(tgetstr("dc", NULL), 1, &ft_putc)
 
-# define HISTORY_FILE ".21sh_history"
-# define CONFIG_FILE ".21shrc"
-# define LOG_FILE ".21sh.log"
+# define HISTORY_FILE "." SH "_history"
+# define CONFIG_FILE "." SH "shrc"
+# define LOG_FILE "." SH ".log"
 
-# define BUILD 1741
-# define BUILD_DATE "17.04.19 17:09:26 EEST"
+# define ERR_PERMISSION_DENIED SH ": permission denied: %s\n"
+# define ERR_COMMAND_NOT_FOUND SH ": command not found: %s\n"
+# define ERR_BAD_FD            SH ": Bad file descriptor: %d\n"
+# define ERR_NO_SUCH_FILE      SH ": no such file or directory: %s\n"
+# define ERR_IS_A_DIRECTORY    SH ": %s: is a directory\n"
+# define ERR_SYNTAX_AT_LINE    SH ": syntax error near token '%s' on line %d\n"
+# define ERR_RUNNING_JOBS      SH ": you have running jobs\n"
+
+# define BUILD 1848
+# define BUILD_DATE "25.04.19 15:59:10 EEST"
 
 # ifdef MAX_INPUT
 #  undef MAX_INPUT
@@ -67,28 +77,26 @@
 #  define MAX_FD 1000
 # endif
 
-/*
-** Used for controlling input state
-*/
-
 enum					e_input_state
 {
-	STATE_NORMAL,
-	STATE_QUOTE,
-	STATE_DQUOTE,
-	STATE_BQUOTE,
-	STATE_HEREDOC,
-	STATE_ESCAPED,
-	STATE_EMPTY_PIPE,
-	STATE_PIPE_HEREDOC,
-	STATE_NEXT_ESCAPED,
-	STATE_COMMIT,
-	STATE_SEARCH,
-	STATE_PARTIAL_EXPAND,
-	STATE_NON_INTERACTIVE,
-	STATE_JOB_IN_FG,
-	STATE_EXPANSION,
-	STATE_BREAK
+	STATE_NORMAL          = 1,
+	STATE_QUOTE           = 2,
+	STATE_DQUOTE          = 4,
+	STATE_BQUOTE          = 8,
+	STATE_HEREDOC         = 16,
+	STATE_HEREDOCD        = 32,
+	STATE_ESCAPED         = 64,
+	STATE_EMPTY_PIPE      = 128,
+	STATE_PIPE_HEREDOC    = 256,
+	STATE_NEXT_ESCAPED    = 512,
+	STATE_COMMIT          = 1024,
+	STATE_SEARCH          = 2048,
+	STATE_PARTIAL_EXPAND  = 4096,
+	STATE_NON_INTERACTIVE = 8192,
+	STATE_JOB_IN_FG       = 16384,
+	STATE_EXPANSION       = 32768,
+	STATE_BREAK           = 65536,
+	STATE_LIMITED         = 131072,
 };
 
 struct					s_fd_lst
@@ -136,8 +144,9 @@ typedef struct			s_position
 {
 	short				col;
 	short				row;
-}						t_carpos;
+} __attribute__((packed))						t_carpos;
 
+typedef struct s_position	t_dimensions;
 /*
 ** g_term stores terminal parameters as well as cursor position and input buffer
 ** TODO: extract buffer variable to separate global var and create normal API
@@ -145,6 +154,7 @@ typedef struct			s_position
 struct					s_term
 {
 	enum e_input_state	input_state;
+	char				*heredoc_word;
 	short				ws_col;
 	short				ws_row;
 	short				tty_fd;
@@ -207,7 +217,7 @@ void					context_mark_fd_closed(t_context *context, const int fd, bool is_orig);
 */
 
 int						shell_loop(void);
-char					*read_command(void);
+char					*read_arbitrary(void);
 void					setup_signal_handlers(void);
 void					display_prompt(enum e_input_state state);
 int						display_normal_prompt(void);
@@ -219,7 +229,6 @@ u_int64_t				hash_sdbm(const char *str);
 ssize_t					ponies_teleported(void);
 bool					is_string_numeric(const char *str, const int base);
 char					**smart_split(const char *str, const char *delims);
-size_t					carray_size(char **array);
 int						read_fd(const int fd, char **result);
 
 /*

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/03 16:28:37 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/11 10:24:24 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/18 15:29:20 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,8 +38,8 @@
 const t_rule g_complete_command = {
 	.token = TOKEN_NOT_APPLICABLE,
 	.expands_to = {
-		{&g_list, &g_separator},
-		{&g_list},
+		{&g_list, &g_separator, &g_linebreak},
+		{&g_list, &g_linebreak},
 		{&g_linebreak}
 	},
 	.human_readable = "complete_command",
@@ -580,7 +580,7 @@ const t_rule g_separator_op = {
 	.token = TOKEN_NOT_APPLICABLE,
 	.expands_to = {
 		{&g_semicolon_token},
-//		{&g_ampersand_token}
+		{&g_ampersand_token}
 	},
 	.human_readable = "separator_op",
 	.tree_builder = NULL
@@ -604,7 +604,6 @@ const t_rule g_semicolon_list_dash = {
 	},
 	.human_readable = "semicolon_list_dash",
 	.tree_builder = NULL
-
 };
 
 const t_rule g_separator = {

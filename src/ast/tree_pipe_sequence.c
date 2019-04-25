@@ -13,7 +13,6 @@
 #include "shell_script.h"
 #include "shell_script_parser.h"
 
-#include <assert.h>
 t_bresult	*pipe_sequence_build(const t_state *state,
 									struct s_result *last_build)
 {
@@ -42,7 +41,6 @@ t_bresult	*pipe_sequence_build(const t_state *state,
 	return (bresult);
 }
 
-
 t_bresult	*pipe_sequence_finalize(const t_state *state,
 									struct s_result *last_build)
 {
@@ -51,9 +49,8 @@ t_bresult	*pipe_sequence_finalize(const t_state *state,
 	t_node				*leftmost;
 	t_bresult			*bresult;
 
-	assert(state->rule == &g_pipe_sequence);
 	if (last_build->ast->root->left == NULL)
-		return pipe_andor_finalize_right(state, last_build);
+		return (pipe_andor_finalize_right(state, last_build));
 	bresult = ft_memalloc(sizeof(t_bresult));
 	bresult->request = state->rule;
 	leftmost = last_build->ast->root->left;

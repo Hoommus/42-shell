@@ -1,37 +1,36 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_utf_strlen.c                                    :+:      :+:    :+:   */
+/*   auxiliary_buffer.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/05/25 20:07:41 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/05/25 20:42:35 by vtarasiu         ###   ########.fr       */
+/*   Created: 2019/04/22 21:10:25 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/04/22 21:10:25 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "buffer_works.h"
 
 /*
-** Function counts actual number of characters in Unicode string without
-** counting those starting with 0x80 (binary 10xxxxxx)
+** Returns number of 0b10xxxxxx-based characters
 */
 
-size_t	ft_utf_strlen(const char *str)
+u_int32_t		utf_body_size(char first)
 {
-	size_t	i;
-	size_t	size;
+	unsigned char	c;
 
-	i = 0;
-	size = 0;
-	while (str[i])
-	{
-		while ((u_int8_t)str[i] > 0x7F && (str[i] & 0x80) == (str[i] & 0xC0))
-			i++;
-		if (str[i] == 0)
-			break ;
-		size++;
-		i++;
-	}
-	return (size);
+	c = (unsigned char)first;
+	if (c >= 32 && c < 127)
+		return (0);
+	if ((c & 0xC0) == 0xC0)
+		return (1);
+	else if ((c & 0xE0) == 0xE0)
+		return (2);
+	else if ((c & 0xF0) == 0xF0)
+		return (3);
+	else if (c == 27)
+		return (7);
+	else
+		return (0);
 }

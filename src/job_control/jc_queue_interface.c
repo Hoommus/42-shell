@@ -62,7 +62,11 @@ void						jc_collect_zombies(void)
 	list = jc_get()->job_queue;
 	while (list)
 	{
-		waitpid(list->pid, &status, 0);
+		if (waitpid(list->pid, &status, WNOHANG) == 0)
+		{
+			kill(list->pid, SIGPIPE);
+			continue ;
+		}
 		list->exit_status = status;
 		list->state = JOB_TERMINATED;
 		list = list->next;
@@ -79,7 +83,6 @@ void						jc_destroy_queue(void)
 	{
 		next = list->next;
 		context_deep_free(&(list->context));
-		free_array((void **)list->args);
 		ft_memdel((void **)&list);
 		list = next;
 	}

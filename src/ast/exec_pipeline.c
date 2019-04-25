@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/05 17:50:23 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/16 13:35:25 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/25 15:00:33 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ int					exec_pipeline_terminator(const t_node *node,
 {
 	int			pp[2];
 	t_context	*context_left;
+	int			status;
 
 	assert(node->left->node_type == NODE_COMMAND
 		&& node->right->node_type == NODE_COMMAND);
@@ -32,10 +33,9 @@ int					exec_pipeline_terminator(const t_node *node,
 	context_remove_ofd(context_left, 1);
 	context_add_fd(context_right, 0, pp[0], "pipe");
 	context_add_fd(context_left, 1, pp[1], "pipe");
-	context_mark_fd_closed(context_left, 0, true);
-	exec_command(node->left, context_left);
-	exec_command(node->right, context_right);
-	return (0); // TODO
+	status = exec_command(node->left, context_left) ||
+			exec_command(node->right, context_right);
+	return (status);
 }
 
 int					exec_pipeline_inner(const t_node *node,
@@ -57,22 +57,23 @@ int					exec_pipeline_inner(const t_node *node,
 	context_add_fd(context_right, 0, pp[0], "pipe");
 	context_add_fd(context_left, 1, pp[1], "pipe");
 	exec_pipeline_inner(node->left, context_left);
-//	alterate_filedes(node->right->command, context_right);
-	exec_command(node->right, context_right);
-	return (0); // TODO
+	return (exec_command(node->right, context_right));
 }
 
 int					exec_pipeline(const t_node *node)
 {
 	int		pipeline_status;
 	char	*swap;
+	int		status;
 
 	assert(node->right->node_type != NODE_PIPE);
 	if (node->left->node_type == NODE_PIPE)
-		exec_pipeline_inner(node, NULL);
+		status = exec_pipeline_inner(node, NULL);
 	else
-		exec_pipeline_terminator(node, NULL);
-	pipeline_status = jc_execute_pipeline_queue();
+		status = exec_pipeline_terminator(node, NULL);
+	pipeline_status = status;
+	if (status == 0)
+		pipeline_status = jc_execute_pipeline_queue();
 	jc_destroy_queue();
 	environ_push_entry(jc_get()->shell_context->environ, "?",
 						(swap = ft_itoa(pipeline_status)), SCOPE_SHELL_LOCAL);

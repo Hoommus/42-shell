@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:32 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/17 13:01:31 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/25 16:11:51 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,15 +56,12 @@ int					shell_loop(void)
 				ft_printf("\n");
 			buff_clear(0);
 			display_prompt(g_term->input_state = STATE_NORMAL);
-			commands = read_command();
+			commands = read_arbitrary();
+			history_write(commands, get_history_fd());
 		}
 		else
 			read_fd(0, &commands);
-		history_write(commands, get_history_fd());
 		run_script(tokenize(commands, TOKEN_DELIMITERS), false);
-//		if (commands)
-//			environ_push_entry(g_term->context_current->environ, "_",
-//							commands, SCOPE_EXPORT);
 		ft_strdel(&commands);
 		if (g_term->input_state == STATE_NON_INTERACTIVE)
 			exit(0);
@@ -100,6 +97,9 @@ void			init_variables(void)
 	set_env_v(vector, "SHORT_HOST", host, SCOPE_SHELL_LOCAL);
 	set_env_v(vector, "BUILD", swap, SCOPE_SHELL_LOCAL);
 	set_env_v(vector, "BUILD_DATE", BUILD_DATE, SCOPE_SHELL_LOCAL);
+	set_env_v(vector, "SHELL", SH, SCOPE_EXPORT);
+	ft_memdel((void **)&swap);
+	environ_push_entry(vector, "%", (swap = ft_itoa(getpid())), SCOPE_SHELL_LOCAL);
 	ft_memdel((void **)&swap);
 	var = get_env_v(g_term->context_current->environ, "SHLVL");
 	if (var == NULL || var->value == NULL || ft_strlen(var->value) == 0)
@@ -115,20 +115,23 @@ void			init_variables(void)
 
 void				print_messages(void)
 {
-	t_var	*var;
+	t_var *var;
 
-	ft_printf("\n%*s\n%*s\n\n%*s%d (%s)\n",
-				g_term->ws_col / 2 + 15, "  Willkommen und bienvenue.  ",
-				g_term->ws_col / 2 + 15, "Welcome to 42sh divided by 2.",
-				5, "Build #", BUILD, BUILD_DATE);
-	var = get_env_v(NULL, "SHLVL");
-	if (var && ft_atoi(var->value) > 2)
-		ft_printf("\nRabbit hole depth: %s\n", var->value);
-	var = get_env_v(NULL, "TERM");
-	if (!var || !var->value || tgetent(NULL, var->value) == ERR)
-		ft_printf("\x1b[41;1m%-53s\x1b[0;0m\n\x1b[41;1m%52s\x1b[0;0m\n",
-					"Warning: TERM environment variable is not set.",
-					"Terminal capabilities are somewhat limited.");
+	if (g_term->input_state != STATE_NON_INTERACTIVE)
+	{
+		ft_printf("\n%*s\n%*s\n\n%*s%d (%s)\n",
+			g_term->ws_col / 2 + 15, "  Willkommen und bienvenue.  ",
+			g_term->ws_col / 2 + 15, "Welcome to 42sh divided by 2.",
+			5, "Build #", BUILD, BUILD_DATE);
+		var = get_env_v(NULL, "SHLVL");
+		if (var && ft_atoi(var->value) > 2)
+			ft_printf("\nRabbit hole depth: %s\n", var->value);
+		var = get_env_v(NULL, "TERM");
+		if (!var || !var->value || tgetent(NULL, var->value) == ERR)
+			ft_printf("\x1b[41;1m%-53s\x1b[0;0m\n\x1b[41;1m%53s\x1b[0;0m\n",
+				"Warning: TERM environment variable is not set.",
+				"Terminal capabilities are somewhat limited.");
+	}
 }
 
 int					main(int argc, char **argv)

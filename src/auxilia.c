@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:36 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/02 14:21:12 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/19 13:22:23 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ ssize_t		ponies_teleported(void)
 	}
 }
 
-void	display_prompt(enum e_input_state state)
+void		display_prompt(enum e_input_state state)
 {
 	if (state == STATE_NORMAL)
 		display_normal_prompt();
@@ -58,7 +58,9 @@ void	display_prompt(enum e_input_state state)
 	else if (state == STATE_ESCAPED)
 		ft_printf("> ");
 	else if (state == STATE_HEREDOC)
-		ft_printf("heredoc> ");
+		ft_printf("hdoc %s> ", g_term->heredoc_word);
+	else if (state == STATE_HEREDOCD)
+		ft_printf("hdocd %s> ", g_term->heredoc_word);
 	else if (state == STATE_EMPTY_PIPE)
 		ft_printf("pipe> ");
 	else
@@ -66,7 +68,7 @@ void	display_prompt(enum e_input_state state)
 	carpos_update(POS_PROMPT);
 }
 
-bool	is_string_numeric(const char *str, const int base)
+bool		is_string_numeric(const char *str, const int base)
 {
 	static char		*numbers = "0123456789ABCDEF";
 	bool			is_found;
@@ -85,14 +87,3 @@ bool	is_string_numeric(const char *str, const int base)
 	}
 	return (true);
 }
-
-size_t	carray_size(char **array)
-{
-	size_t	i;
-
-	i = 0;
-	while (array && array[i])
-		i++;
-	return (i);
-}
-

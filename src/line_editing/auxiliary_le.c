@@ -1,22 +1,42 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   write_anywhere.c                                   :+:      :+:    :+:   */
+/*   auxiliary_le.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/12/16 19:41:32 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/18 15:08:14 by vtarasiu         ###   ########.fr       */
+/*   Created: 2019/04/22 20:36:27 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/04/22 20:51:01 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "twenty_one_sh.h"
 #include "line_editing.h"
 
-void		write_at(int col, int row, char *string)
+int		ft_putc(int c)
+{
+	return ((int)write(2, &c, 1));
+}
+
+bool	is_single_symbol(const char *c)
+{
+	if (c[1] == 0 && ((c[0] >= 10 && c[0] <= 13) || (c[0] >= 32 && c[0] < 127)))
+		return (true);
+	if (((c[0] & 0xC0) && (c[1] & 0x80) && !c[2]) ||
+		((c[0] & 0xE0) && (c[1] & 0x80) && (c[2] & 0x80) && !c[3]) ||
+		((c[0] & 0xF0) && (c[1] & 0x80) && (c[2] & 0x80) && (c[3] & 0x80)
+																	&& !c[4]))
+		return (true);
+	else
+		return (false);
+}
+
+void	write_at(int col, int row, char *string)
 {
 	int		i;
 
+	if (g_term->input_state == STATE_NON_INTERACTIVE || g_term->tty_fd == -1)
+		return ;
 	carpos_save_as(POS_CUSTOM1);
 	tputs(tgoto(tgetstr("cm", NULL), col, row), 1, &ft_putc);
 	ft_printf("\x1b[37;1m");
@@ -36,4 +56,3 @@ void		write_at(int col, int row, char *string)
 	ft_printf("\x1b[0m");
 	carpos_load(POS_CUSTOM1);
 }
-
