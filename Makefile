@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/04/23 17:51:41 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/04/26 12:32:42 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -31,13 +31,13 @@ LIB_DIR = ./printf
 LIB_NAME = libftprintf.a
 
 SHELL_SRC = main.c init.c memory.c auxilia.c       \
-            errors.c \
             service_routines.c args_parsing.c string_hash.c \
             shell_environ.c shell_environ_tools.c shell_environ_vector.c \
             syscall_wrappers.c
 
 LEXER_DIR = lexer/
-LEXER_SRC = quotes.c smart_split.c tokenizer.c tokens_mem.c token_word_types.c
+LEXER_SRC = smart_split.c tokenizer.c tokens_mem.c token_word_types.c \
+            tokenizer_preprocess.c
 
 AST_DIR = ast/
 AST_SRC = ast_exec_main.c ast_exec_preprocess.c \
@@ -49,8 +49,7 @@ AST_SRC = ast_exec_main.c ast_exec_preprocess.c \
           exec_pipeline.c exec_andor_if.c\
           tree_auxillary.c \
           tree_simple_command.c tree_simple_command_rdrs.c tree_subshell.c \
-          tree_pipe_sequence.c tree_and_or.c tree_list.c \
-          auxiliary_cmd_rdrs.c
+          tree_pipe_sequence.c tree_and_or.c tree_list.c
 
 BUILTIN_DIR = builtins/
 BUILTIN_SRC = cd.c where.c builtins.c hs_history.c tokenizer_test.c \
@@ -68,12 +67,10 @@ INTERFACE_SRC = buffer_drawing.c buffer_input.c  \
                 auxiliary_buffer.c auxiliary_le.c
 
 JOB_CONTROL_DIR = job_control/
-JOB_CONTROL_SRC = signals_manipulation.c signals_basic.c \
+JOB_CONTROL_SRC = signals_basic.c \
                   context_manipulations.c context_switch.c command_lookup.c \
-                  jc_jobs_manipulations.c \
                   jc_children_cleanup.c jc_headquaters.c  \
-                  jc_queue_execution.c jc_queue_interface.c \
-                  auxiliary_access_checks.c
+                  jc_queue_execution.c jc_queue_forknrun.c jc_queue_interface.c
 
 EXPANSIONS_DIR = expansions/
 EXPANSIONS_SRC = expander_engine.c expand_escaped.c expand_quotes.c \

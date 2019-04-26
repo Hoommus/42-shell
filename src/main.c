@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:32 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/25 16:11:51 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/25 20:43:58 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,6 @@ int					shell_loop(void)
 	while (ponies_teleported())
 	{
 		g_interrupt = 0;
-		g_term->last_status = 0;
 		if (g_term->tty_fd != -1 && g_term->input_state
 			!= STATE_NON_INTERACTIVE)
 		{
@@ -57,6 +56,7 @@ int					shell_loop(void)
 				ft_printf("\n");
 			buff_clear(0);
 			display_prompt(g_term->input_state = STATE_NORMAL);
+			g_term->last_status = 0;
 			commands = read_arbitrary();
 			history_write(commands, get_history_fd());
 		}
@@ -78,17 +78,18 @@ void				init_variables(void)
 	char			host[1025];
 
 	vector = g_term->context_original->environ;
-	swap = ft_itoa(BUILD);
 	ft_bzero(host, sizeof(host));
 	gethostname(host, 1024);
 	set_env_v(vector, "HOST", host, SCOPE_SHELL_LOCAL);
 	host[ft_strchr(host, '.') - host] = 0;
+	swap = ft_itoa(BUILD);
 	set_env_v(vector, "SHORT_HOST", host, SCOPE_SHELL_LOCAL);
 	set_env_v(vector, "BUILD", swap, SCOPE_SHELL_LOCAL);
 	set_env_v(vector, "BUILD_DATE", BUILD_DATE, SCOPE_SHELL_LOCAL);
 	set_env_v(vector, "SHELL", SH, SCOPE_EXPORT);
 	ft_memdel((void **)&swap);
-	environ_push_entry(vector, "%", (swap = ft_itoa(getpid())), SCOPE_SHELL_LOCAL);
+	environ_push_entry(vector, "%", (swap = ft_itoa(getpid())),
+		SCOPE_SHELL_LOCAL);
 	ft_memdel((void **)&swap);
 	var = get_env_v(g_term->context_current->environ, "SHLVL");
 	if (var == NULL || var->value == NULL || ft_strlen(var->value) == 0)
@@ -125,19 +126,19 @@ int					main(int argc, char **argv)
 {
 	extern char		**environ;
 
-	ft_printf("Initing...\n");
+//	ft_printf("Initing...\n");
 	init_shell_context();
-	ft_printf("Initing files...\n");
+//	ft_printf("Initing files...\n");
 	init_files();
-	ft_printf("Loading history...\n");
+//	ft_printf("Loading history...\n");
 	history_load(g_term->history_file);
-	ft_printf("Parsing args...\n");
+//	ft_printf("Parsing args...\n");
 	parse_args(argc, argv);
-	ft_printf("Initing variables...\n");
+//	ft_printf("Initing variables...\n");
 	init_variables();
-	ft_printf("Initing job control...\n");
+//	ft_printf("Initing job control...\n");
 	jc_init(g_term->context_current);
-	ft_printf("Printing messages...\n");
+//	ft_printf("Printing messages...\n");
 	print_messages();
 	setup_signal_handlers();
 	shell_loop();

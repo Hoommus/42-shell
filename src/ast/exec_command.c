@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/05 17:50:36 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/25 14:40:44 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/26 15:56:35 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,9 +68,11 @@ static bool	alterate_vars(const struct s_command *command, t_context *context)
 
 static void	expand_everything(const struct s_command *command)
 {
-	char	*swap;
-	int		i;
+	struct s_io_redirect	*rdrs;
+	char					*swap;
+	int						i;
 
+	rdrs = command->io_redirects;
 	i = -1;
 	while (command->args[++i])
 	{
@@ -85,22 +87,16 @@ static void	expand_everything(const struct s_command *command)
 		command->assignments[i] = expand(command->assignments[i]);
 		ft_memdel((void **)&swap);
 	}
-	// TODO: Expand words in redirects
-//	i = 0;
-//	while (command->io_redirects + i)
-//	{
-// 		swap = ((command->io_redirects) + i)->what.path;
-// 		if (swap)
-//			((command->io_redirects) + i)->what.path =
-//				expand(((command->io_redirects) + i)->what.path);
-//		ft_memdel((void **)&swap);
-// 		swap = ((command->io_redirects) + i)->where.path;
-// 		if (swap)
-//			((command->io_redirects) + i)->where.path =
-//				expand(((command->io_redirects) + i)->where.path);
-//		ft_memdel((void **)&swap);
-//		i++;
-//	}
+	i = -1;
+	while (rdrs[++i].type != TOKEN_NOT_APPLICABLE)
+	{
+ 		if ((swap = rdrs[i].what.path))
+			rdrs[i].what.path = expand(rdrs[i].what.path);
+		ft_memdel((void **)&swap);
+ 		if ((swap = rdrs[i].where.path))
+			rdrs[i].where.path = expand(rdrs[i].where.path);
+		ft_memdel((void **)&swap);
+	}
 }
 
 /*
@@ -145,6 +141,7 @@ int		exec_command(const t_node *command_node, t_context *new_context)
 	{
 		jc_enqueue_job(jc_create_job(command, context, job_class));
 		status = !new_context ? jc_execute_pipeline_queue() : 0;
+		g_term->last_status = status;
 		if (!new_context)
 			jc_destroy_queue();
 	}

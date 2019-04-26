@@ -6,49 +6,14 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/10 16:42:51 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/25 18:31:54 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/25 18:34:59 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell_job_control.h"
 #include "shell_builtins.h"
 
-static char				*g_sigs[31] =
-{
-	"hangup",
-	"interrupted",
-	"quit",
-	"illegal instruction",
-	"trace trap",
-	"abort",
-	"EMT instruction",
-	"floating point exception",
-	"killed",
-	"bus error",
-	"segmentation fault",
-	"invalid system call",
-	"broken pipe",
-	"suspended (tty input)",
-	"terminated",
-	"suspended (tty input)",
-	"suspended (signal)",
-	"suspended",
-	"suspended (tty input)",
-	"suspended (tty input)",
-	"suspended (tty input)",
-	"suspended (tty output)",
-	"suspended (tty input)",
-	"cpu limit exceeded",
-	"file size limit exceeded",
-	"virtual time alarm",
-	"profile signal",
-	"suspended (tty input)",
-	"suspended (tty input)",
-	"user-defined signal 1",
-	"user-defined signal 2"
-};
-
-char					*path_to_target(t_job *job)
+static char				*path_to_target(t_job *job)
 {
 	const char	**args = (const char **)job->cmd->args;
 	t_var		*var;

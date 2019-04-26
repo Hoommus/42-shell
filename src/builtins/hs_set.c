@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/14 17:11:49 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/16 20:28:59 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/26 16:15:50 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,10 @@ void	print_var(const t_var *var)
 	char		*output;
 
 	if (!ft_strchr_any(var->key, spec) && !ft_strchr_any(var->value, spec)
-		&& ft_strlen(var->value))
+		&& ft_strlen(var->value) && is_valid_var(var->key))
 		output = "%s=%s\n";
-	else if ((!ft_strchr_any(var->key, spec) && ft_strchr_any(var->value, spec))
-		|| !var->value || ft_strlen(var->value) == 0)
+	else if ((!ft_strchr_any(var->key, spec) && ft_strchr_any(var->value, spec)
+		&& is_valid_var(var->key)) || !var->value || !ft_strlen(var->value))
 		output = "%s='%s'\n";
 	else if (ft_strchr_any(var->key, spec) && !ft_strchr_any(var->value, spec))
 		output = "\"%s\"=%s\n";

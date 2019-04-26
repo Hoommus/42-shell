@@ -170,19 +170,18 @@ extern const t_rule				g_compound_list;
 extern const t_rule				g_term_rule;
 extern const t_rule				g_term_rule_dash;
 
-extern const t_rule				g_name;
-extern const t_rule				g_in;
-extern const t_rule				g_wordlist;
-extern const t_rule				g_wordlist_dash;
 extern const t_rule				g_if_clause;
 extern const t_rule				g_else_part;
 extern const t_rule				g_while_clause;
 
 /*
 ** some rules are omitted because I am a bad programmer. But here they are:
+8* extern const t_rule	g_name;
+** extern const t_rule	g_in;
+** extern const t_rule	g_wordlist;
+** extern const t_rule	g_wordlist_dash;
 ** extern const t_rule	g_for_clause;
 ** extern const t_rule	g_until_clause;
-**
 ** extern const t_rule	g_function_definition;
 ** extern const t_rule	g_function_body;
 ** extern const t_rule	g_fname;
@@ -190,6 +189,17 @@ extern const t_rule				g_while_clause;
 ** extern const t_rule	g_case_list;
 ** extern const t_rule	g_case_item_ns;
 ** extern const t_rule	g_case_item;
+** extern const t_rule	g_for_token;
+** extern const t_rule	g_if_token;
+** extern const t_rule	g_then_token;
+** extern const t_rule	g_fi_token;
+** extern const t_rule	g_elif_token;
+** extern const t_rule	g_else_token;
+** extern const t_rule	g_while_token;
+** extern const t_rule	g_until_token;
+** extern const t_rule	g_do_token;
+** extern const t_rule	g_done_token;
+** extern const t_rule	g_bang_token;
 */
 
 extern const t_rule				g_brace_group;
@@ -222,24 +232,13 @@ extern const t_rule				g_ampersand_token;
 extern const t_rule				g_newline_token;
 extern const t_rule				g_and_if_token;
 extern const t_rule				g_or_if_token;
-extern const t_rule				g_bang_token;
 extern const t_rule				g_pipe_token;
 extern const t_rule				g_empty_token;
 extern const t_rule				g_lbracket_token;
 extern const t_rule				g_rbracket_token;
 extern const t_rule				g_lbrace_token;
 extern const t_rule				g_rbrace_token;
-extern const t_rule				g_for_token;
 extern const t_rule				g_word_token;
-extern const t_rule				g_if_token;
-extern const t_rule				g_then_token;
-extern const t_rule				g_fi_token;
-extern const t_rule				g_elif_token;
-extern const t_rule				g_else_token;
-extern const t_rule				g_while_token;
-extern const t_rule				g_until_token;
-extern const t_rule				g_do_token;
-extern const t_rule				g_done_token;
 extern const t_rule				g_assignment_word_token;
 extern const t_rule				g_io_number_token;
 extern const t_rule				g_dless_token;

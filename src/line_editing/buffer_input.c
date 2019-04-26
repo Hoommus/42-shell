@@ -41,7 +41,7 @@ void				deal_with_heredoc_nl(const char *input)
 	offset = buff_rchr("\n", g_term->buffer->size);
 	offset = offset < 0 ? 0 : offset;
 	swap = buff_get_part((u_int64_t)offset + 1, g_term->buffer->size);
-	if (ft_strcmp(swap, g_term->heredoc_word) == 0)
+	if (swap && ft_strcmp(swap, g_term->heredoc_word) == 0)
 	{
 		buff_clear((u_int64_t)(offset + 1));
 		write(STDOUT_FILENO, "\n", 1);
@@ -111,8 +111,9 @@ char				*read_arbitrary(void)
 	{
 		if (read(0, ft_memset(swap, 0, 1025), 1024) == -1)
 			return ((char *)(write(1, "\n", 1) & 0));
-		else if (is_key_hooked(*(union u_char *)ft_memcpy(input.arr, swap, 8)))
-			handle_key(*((union u_char *)ft_memcpy(input.arr, swap, 8)));
+		else if (is_key_hooked(*(union u_char *)ft_memcpy(input.arr, swap, 8))
+			|| input.arr[0] == 0x1b)
+			handle_key(input);
 		else if (is_single_symbol(swap) && swap[0] == '\n')
 			deal_with_newline(swap);
 		else if (is_single_symbol(swap) && swap[0] != '\n')

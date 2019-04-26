@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/25 18:27:50 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/26 16:16:11 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,6 @@
 # define PROMPT_TERMINATOR " \x1b[%d;1m(%d) $\x1b[0m "
 # define SHELL_PROMPT PROMPT_HOST PROMPT_PATH PROMPT_TERMINATOR
 
-// TODO: Replace all APPLY_CONFIGs with context switches
 # define TERM_APPLY_CONFIG(term) tcsetattr(0, TCSANOW, term)
 
 # define TERM_CLR_LINES_BELOW tputs(tgetstr("cd", NULL), 1, &ft_putc)
@@ -65,8 +64,8 @@
 # define ERR_SYNTAX_AT_LINE    SH ": syntax error near token '%s' on line %d\n"
 # define ERR_RUNNING_JOBS      SH ": you have running jobs\n"
 
-# define BUILD 1848
-# define BUILD_DATE "25.04.19 15:59:10 EEST"
+# define BUILD 1882
+# define BUILD_DATE "26.04.19 16:16:11 EEST"
 
 # ifdef MAX_INPUT
 #  undef MAX_INPUT
@@ -79,24 +78,24 @@
 
 enum					e_input_state
 {
-	STATE_NORMAL          = 1,
-	STATE_QUOTE           = 2,
-	STATE_DQUOTE          = 4,
-	STATE_BQUOTE          = 8,
-	STATE_HEREDOC         = 16,
-	STATE_HEREDOCD        = 32,
-	STATE_ESCAPED         = 64,
-	STATE_EMPTY_PIPE      = 128,
-	STATE_PIPE_HEREDOC    = 256,
-	STATE_NEXT_ESCAPED    = 512,
-	STATE_COMMIT          = 1024,
-	STATE_SEARCH          = 2048,
-	STATE_PARTIAL_EXPAND  = 4096,
+	STATE_NORMAL = 1,
+	STATE_QUOTE = 2,
+	STATE_DQUOTE = 4,
+	STATE_BQUOTE = 8,
+	STATE_HEREDOC = 16,
+	STATE_HEREDOCD = 32,
+	STATE_ESCAPED = 64,
+	STATE_EMPTY_PIPE = 128,
+	STATE_PIPE_HEREDOC = 256,
+	STATE_NEXT_ESCAPED = 512,
+	STATE_COMMIT = 1024,
+	STATE_SEARCH = 2048,
+	STATE_PARTIAL_EXPAND = 4096,
 	STATE_NON_INTERACTIVE = 8192,
-	STATE_JOB_IN_FG       = 16384,
-	STATE_EXPANSION       = 32768,
-	STATE_BREAK           = 65536,
-	STATE_LIMITED         = 131072,
+	STATE_JOB_IN_FG = 16384,
+	STATE_EXPANSION = 32768,
+	STATE_BREAK = 65536,
+	STATE_LIMITED = 131072,
 };
 
 struct					s_fd_lst
@@ -195,6 +194,7 @@ void					parse_args(int argc, char **argv);
 /*
 ** Environment (environ_utils.c)
 */
+
 t_var					*get_env_v(t_env_vector *vector, const char *key);
 int						set_env_v(t_env_vector *vector, const char *key,
 	const char *value, enum e_var_scope scope);
@@ -210,9 +210,12 @@ t_context				*context_duplicate(const t_context *context,
 void					context_add_fd(t_context *context, const int original,
 	const int actual, const char *label);
 void					context_remove_fd(t_context *context, const int fd);
-void					context_remove_ofd(t_context *context, const int original);
-bool					context_is_fd_present(const t_context *context, const int original);
-void					context_mark_fd_closed(t_context *context, const int fd, bool is_orig);
+void					context_remove_ofd(t_context *context,
+	const int original);
+bool					context_is_fd_present(const t_context *context,
+	const int original);
+void					context_mark_fd_closed(t_context *context,
+	const int fd, bool is_orig);
 
 /*
 ** Main Loop (main.c, )
@@ -237,6 +240,7 @@ bool					is_string_numeric(const char *str, const int base);
 /*
 ** Final input parsing (variables_replacement.c)
 */
+
 int						is_valid_var(const char *var);
 
 /*
@@ -264,12 +268,12 @@ bool					flag_plus_short_present(const char **args,
 												const char flag);
 
 /*
- * Syscall wrappers
- */
+** Syscall wrappers
+*/
+
 int						open_wrapper(const char *path, int oflag);
 int						openm_wrapper(const char *path, int oflag, mode_t mode);
 int						close_wrapper(int filedes);
-
 
 /*
 ** Compatibility
@@ -283,4 +287,3 @@ int						gethostname(char *arr, size_t size);
 # pragma clang diagnostic pop
 
 #endif
-

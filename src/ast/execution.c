@@ -49,7 +49,7 @@ int							exec_semicolon_recursive(const t_node *parent)
 		exec_node(parent->left);
 	if (parent->right)
 		exec_node(parent->right);
-	return (0);
+	return (g_term->last_status);
 }
 
 /*

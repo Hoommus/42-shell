@@ -53,7 +53,8 @@ void							handle_tab(union u_char key)
 
 void							handle_eot(union u_char key)
 {
-	if (key.lng == CEOT && g_term->buffer->size == 0)
+	if (key.lng == CEOT && g_term->buffer->size == 0
+						&& g_term->input_state != STATE_HEREDOC)
 	{
 		if (g_term->running_process != 0)
 		{

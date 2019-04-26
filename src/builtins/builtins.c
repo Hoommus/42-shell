@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:42 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/10 17:14:33 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/26 14:58:05 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ int					hs_echo(const char **args)
 	}
 	str = ft_strarr_join(" ", (char **)args);
 	ft_printf("%s\n", str);
+	free(str);
 	return (0);
 }
 

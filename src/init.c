@@ -31,13 +31,13 @@ void			init_shell_context(void)
 		context_add_fd(g_term->context_original, 2, 2, "stderr");
 	environ_from_array(g_term->context_original->environ, environ);
 	g_term->context_current = context_duplicate(g_term->context_original, true);
-	ft_printf("Deallocating vector...\n");
+//	ft_printf("Deallocating vector...\n");
 	environ_deallocate_vector(g_term->context_current->environ);
-	ft_printf("Deallocated!\n");
+//	ft_printf("Deallocated!\n");
 	free(g_term->context_current->term_config);
 	g_term->context_current->environ = g_term->context_original->environ;
 	g_term->context_current->term_config = init_term();
-	ft_printf("Switching context...\n");
+//	ft_printf("Switching context...\n");
 	context_switch(g_term->context_current);
 }
 

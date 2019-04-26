@@ -15,12 +15,9 @@
 
 void	handle_backspace(union u_char key)
 {
-	union u_char	k;
-
 	if (key.lng == K_BSP && g_term->buffer->iterator > 0)
 	{
-		k.lng = K_LEFT;
-		handle_left(k);
+		handle_left((union u_char){K_LEFT});
 		toggle_state(buff_char_at(g_term->buffer->iterator));
 		buff_del_symbol(g_term->buffer->iterator);
 		tputs(tgetstr("dc", NULL), 1, &ft_putc);

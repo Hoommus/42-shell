@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/09 15:45:40 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/25 17:04:06 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/25 17:07:16 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,7 +115,7 @@ int				alterate_filedes(const struct s_command *command,
 	const t_io_rdr	*rdr = (const t_io_rdr *)command->io_redirects;
 
 	g_access_error = 0;
-	while (rdr && rdr->type != TOKEN_IF && rdr->type != TOKEN_NOT_APPLICABLE)
+	while (rdr && rdr->type != TOKEN_NOT_APPLICABLE)
 	{
 		if (rdr->type == TOKEN_GREATAND && !ft_strcmp(rdr->where.path, "-"))
 			context_mark_fd_closed(contxt, rdr->what.fd, true);
