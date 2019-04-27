@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:46:06 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/25 18:36:38 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/27 14:18:34 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,45 +38,16 @@ static void				resize(int sig)
 	}
 }
 
-static void				sigchild_alt(int sig, siginfo_t *info,
-	void *smthng)
-{
-	t_job	*list;
-	int		status;
-
-	list = jc_get()->job_queue;
-	while (list->next)
-	{
-		if (list->pid == info->si_pid &&
-			(WIFEXITED(info->si_status) || WIFSIGNALED(info->si_status)))
-		{
-			list->exit_status = WEXITSTATUS(status);
-			list->state = JOB_TERMINATED;
-			sigpipe_kill_left(list);
-			break ;
-		}
-		list = list->next;
-	}
-	sig = 0;
-	smthng = 0;
-}
-
 void					setup_signal_handlers(void)
 {
 	struct sigaction	action;
-	sigset_t			mask;
 
 	ft_bzero(&action, sizeof(struct sigaction));
 	action.__sigaction_u.__sa_handler = &tstp;
 	sigaction(SIGTSTP, &action, NULL);
 	action.__sigaction_u.__sa_handler = &handle_sigint;
 	sigaction(SIGINT, &action, NULL);
-	action.sa_flags = SA_RESTART;
-	action.__sigaction_u.__sa_sigaction = &sigchild_alt;
-	sigemptyset(&mask);
-	sigaddset(&mask, SIGCHLD);
-	action.sa_mask = mask;
-	sigaction(SIGCHLD, &action, NULL);
 	signal(SIGWINCH, &resize);
 	signal(SIGPIPE, &tstp);
+	signal(SIGCHLD, SIG_IGN);
 }

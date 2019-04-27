@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/26 16:16:11 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/27 14:45:42 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,8 +64,8 @@
 # define ERR_SYNTAX_AT_LINE    SH ": syntax error near token '%s' on line %d\n"
 # define ERR_RUNNING_JOBS      SH ": you have running jobs\n"
 
-# define BUILD 1882
-# define BUILD_DATE "26.04.19 16:16:11 EEST"
+# define BUILD 1908
+# define BUILD_DATE "27.04.19 14:45:42 EEST"
 
 # ifdef MAX_INPUT
 #  undef MAX_INPUT
@@ -162,7 +162,6 @@ struct					s_term
 	t_carpos			carpos_db[7];
 
 	short				history_file;
-	short				logfile;
 
 	short				flags;
 

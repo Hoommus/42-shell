@@ -53,11 +53,11 @@ static int				run_builtin(t_job *job)
 		if (ft_strcmp(bltin, g_builtins[i].name) == 0)
 		{
 			context_switch(job->context);
-			job->exit_status = g_builtins[i].
+			job->status = g_builtins[i].
 				function((const char **)job->cmd->args + 1);
 			close_redundant_fds(job->context);
 			context_switch(jc_get()->shell_context);
-			return (job->exit_status);
+			return (job->status);
 		}
 		i++;
 	}

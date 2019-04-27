@@ -10,9 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "twenty_one_sh.h"
 #include "shell_script.h"
-#include "shell_script_parser.h"
 #include "shell_job_control.h"
 
 static char	**split_to_var(const char *str)

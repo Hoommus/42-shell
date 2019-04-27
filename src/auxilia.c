@@ -32,10 +32,9 @@ int			is_valid_var(const char *var)
 ssize_t		ponies_teleported(void)
 {
 	ssize_t			ponies;
-	static int		fd;
+	int				fd;
 
-	if (fd == 0)
-		fd = open_wrapper("/dev/urandom", O_RDONLY);
+	fd = open_wrapper("/dev/urandom", O_RDONLY);
 	if (fd < 0)
 		return (1);
 	else
@@ -43,6 +42,7 @@ ssize_t		ponies_teleported(void)
 		read(fd, &ponies, sizeof(ssize_t));
 		if (ponies == 0)
 			ponies += 1348;
+		close(fd);
 		return (ABS(ponies));
 	}
 }

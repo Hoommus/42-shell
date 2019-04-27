@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/25 18:31:57 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/26 13:30:40 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/27 14:35:35 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,8 +55,7 @@ void					close_redundant_fds(t_context *context)
 	list = context->fd_list;
 	while (list)
 	{
-		if (ft_strcmp(list->label, "pipe") == 0 ||
-			ft_strcmp(list->label, "heredoc") == 0)
+		if (ft_strcmp(list->label, "rdr_duped"))
 			close(list->current);
 		list = list->next;
 	}
@@ -98,21 +97,62 @@ void					write_heredocs(t_job *job)
 	}
 }
 
-void					waitnclaim(t_job *job)
+void					waitall(void)
 {
 	int			status;
-	int			wait_status;
+	pid_t		returned;
+	t_job		*list;
 
-	wait_status = waitpid(job->pid, &status, 0);
+	while (jc_get()->queue_size--)
+	{
+		if ((returned = wait(&status)) == -1)
+			break ;
+		list = jc_get()->job_queue;
+		while (list)
+		{
+			if (list->pid == returned)
+			{
+				list->status = status;
+				list->wexitstatus = WEXITSTATUS(status);
+				list->state = JOB_TERMINATED;
+				break;
+			}
+			list = list->next;
+		}
+	}
+}
+
+void					waitnclaim(__unused t_job *job)
+{
+	int			status;
+
+	waitall();
+	status = job->status;
 	tcsetpgrp(0, jc_get()->shell_pid);
 	TERM_APPLY_CONFIG(g_term->context_current->term_config);
-	if (job->exit_status == 0
-		&& WIFSIGNALED(status) && !WIFEXITED(status)
+	if (WIFSIGNALED(status) && !WIFEXITED(status)
 		&& WTERMSIG(status) != 1 && WTERMSIG(status) <= 31)
 		handle_signaled(job, status);
-	if (wait_status > 0)
-		g_term->last_status = WEXITSTATUS(status);
-	jc_collect_zombies();
+	g_term->last_status = WEXITSTATUS(status);
+}
+
+void					close_foreign_fds(t_job *list, t_job *current)
+{
+	struct s_fd_lst	*fds;
+
+	while (list)
+	{
+		if (list != current)
+		{
+			fds = list->context->fd_list;
+			while (fds)
+			{
+				close(fds->current);
+				fds = fds->next;
+			}
+		}
+		list = list->next;
+	}
 }
 
 int						forknrun(t_job *job, char *path)
@@ -121,6 +161,8 @@ int						forknrun(t_job *job, char *path)
 	if (job->pid == 0)
 	{
 		context_switch(job->context);
+		close_redundant_fds(job->context);
+		close_foreign_fds(jc_get()->job_queue, job);
 		execve(path, job->cmd->args, environ_to_array(job->context->environ,
 			SCOPE_EXPORT | SCOPE_COMMAND_LOCAL | SCOPE_SCRIPT_GLOBAL));
 		context_switch(jc_get()->shell_context);

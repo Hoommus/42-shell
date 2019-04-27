@@ -15,11 +15,14 @@
 
 u_int64_t		ft_rand(u_int64_t limit)
 {
+	u_int64_t		dummy;
 	ssize_t			ponies;
-	static int		fd;
+	int				fd;
 
-	if (fd == 0)
-		fd = open("/dev/urandom", O_RDONLY);
+	fd = open("/dev/urandom", O_RDONLY);
+	if (fd == -1)
+		return (*(&dummy) % limit);
 	read(fd, &ponies, sizeof(ssize_t));
+	close(fd);
 	return (ponies % limit);
 }

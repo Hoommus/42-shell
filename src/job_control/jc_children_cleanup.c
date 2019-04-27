@@ -24,7 +24,7 @@ void					sigpipe_kill_left(t_job *pivot)
 		{
 			kill(pivot->pid, SIGPIPE);
 			waitpid(pivot->pid, &status, 0);
-			pivot->exit_status = WEXITSTATUS(status);
+			pivot->status = WEXITSTATUS(status);
 		}
 		pivot->state = JOB_TERMINATED;
 		pivot = pivot->prev;

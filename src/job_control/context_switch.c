@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/10 12:09:35 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/07 16:36:48 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/27 11:30:00 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ static void		duplicate_fds(t_context *new, const t_context *context,
 	{
 		tmp = ft_memalloc(sizeof(struct s_fd_lst));
 		if (list->label)
-			tmp->label = ft_strdup(list->label);
+			tmp->label = ft_strdup("cloned");
 		tmp->original = list->original;
 		tmp->current = with_dup ? dup(list->current) : list->current;
 		if (!new->fd_list && !new_list)

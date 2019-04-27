@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/16 12:28:13 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/25 18:31:54 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/27 12:16:21 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 #include "shell_environ.h"
 #include "line_editing.h"
 
-#include <time.h>
 void			init_shell_context(void)
 {
 	extern const char	**environ;
@@ -30,14 +29,9 @@ void			init_shell_context(void)
 	if (fcntl(STDERR_FILENO, F_GETFD) != -1)
 		context_add_fd(g_term->context_original, 2, 2, "stderr");
 	environ_from_array(g_term->context_original->environ, environ);
-	g_term->context_current = context_duplicate(g_term->context_original, true);
-//	ft_printf("Deallocating vector...\n");
-	environ_deallocate_vector(g_term->context_current->environ);
-//	ft_printf("Deallocated!\n");
+	g_term->context_current = context_duplicate(g_term->context_original, false);
 	free(g_term->context_current->term_config);
-	g_term->context_current->environ = g_term->context_original->environ;
 	g_term->context_current->term_config = init_term();
-//	ft_printf("Switching context...\n");
 	context_switch(g_term->context_current);
 }
 
@@ -53,16 +47,19 @@ struct termios	*init_term(void)
 	if (!isatty(STDIN_FILENO) || g_term->tty_fd == -1)
 		g_term->input_state = STATE_NON_INTERACTIVE;
 	else
+	{
 		g_term->input_state = STATE_NORMAL;
-	g_term->context_original->term_config = oldterm;
-	tcgetattr(g_term->tty_fd, oldterm);
-	ft_memcpy(newterm, oldterm, sizeof(struct termios));
-	newterm->c_lflag &= ~(ECHO | ICANON | IEXTEN) | ECHOE | ECHONL;
-	newterm->c_iflag &= ~(IXOFF);
-	ioctl(STDOUT_FILENO, TIOCGWINSZ, &window);
-	tputs(tgetstr("ei", NULL), 1, &ft_putc);
-	g_term->ws_col = window.ws_col;
-	g_term->ws_row = window.ws_row;
+		g_term->context_original->term_config = oldterm;
+		tcgetattr(g_term->tty_fd, oldterm);
+		ft_memcpy(newterm, oldterm, sizeof(struct termios));
+		newterm->c_lflag &= ~(ECHO | ICANON | IEXTEN) | ECHOE | ECHONL;
+		newterm->c_iflag &= ~(IXOFF);
+		ioctl(STDOUT_FILENO, TIOCGWINSZ, &window);
+		tputs(tgetstr("ei", NULL), 1, &ft_putc);
+		g_term->ws_col = window.ws_col;
+		g_term->ws_row = window.ws_row;
+		close(g_term->tty_fd);
+	}
 	init_buffer_vector(MAX_INPUT);
 	return (newterm);
 }
@@ -87,15 +84,7 @@ short			init_fd_at_home(char *filename, int flags)
 
 void			init_files(void)
 {
-	time_t		rawtime;
-	struct tm	*timeinfo;
-
-	time(&rawtime);
-	timeinfo = localtime(&rawtime);
-	g_term->logfile = init_fd_at_home(LOG_FILE, 0);
 	g_term->history_file = init_fd_at_home(HISTORY_FILE, 0);
-	ft_dprintf(g_term->logfile, "21sh log [pid %d]\nDate: %s\n", getpid(),
-				asctime(timeinfo));
 }
 
 void			parse_args(int argc, char **argv)

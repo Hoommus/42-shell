@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/08 12:40:49 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/25 18:31:54 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/27 14:18:34 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,8 @@ typedef struct			s_job
 {
 	pid_t					pid;
 	enum e_job_state		state;
-	int						exit_status;
+	int						status;
+	int						wexitstatus;
 	const struct s_command	*cmd;
 	t_context				*context;
 	struct s_job			*prev;
@@ -56,6 +57,7 @@ struct					s_job_control
 	t_job			*job_queue;
 	t_context		*shell_context;
 	pid_t			shell_pid;
+	int				queue_size;
 };
 
 void					jc_init(t_context *context);
