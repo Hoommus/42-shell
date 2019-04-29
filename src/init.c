@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/16 12:28:13 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/27 12:16:21 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/29 14:41:36 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,10 @@ void			init_shell_context(void)
 	if (fcntl(STDERR_FILENO, F_GETFD) != -1)
 		context_add_fd(g_term->context_original, 2, 2, "stderr");
 	environ_from_array(g_term->context_original->environ, environ);
-	g_term->context_current = context_duplicate(g_term->context_original, false);
+	g_term->context_current = context_duplicate(g_term->context_original, true);
+	environ_deallocate_vector(g_term->context_current->environ);
 	free(g_term->context_current->term_config);
+	g_term->context_current->environ = g_term->context_original->environ;
 	g_term->context_current->term_config = init_term();
 	context_switch(g_term->context_current);
 }
@@ -58,7 +60,7 @@ struct termios	*init_term(void)
 		tputs(tgetstr("ei", NULL), 1, &ft_putc);
 		g_term->ws_col = window.ws_col;
 		g_term->ws_row = window.ws_row;
-		close(g_term->tty_fd);
+		close_wrapper(g_term->tty_fd);
 	}
 	init_buffer_vector(MAX_INPUT);
 	return (newterm);
@@ -91,5 +93,6 @@ void			parse_args(int argc, char **argv)
 {
 	environ_push_entry(g_term->context_original->environ, "0",
 		argv[0], SCOPE_SHELL_LOCAL);
+	if (argc > 1)
 	argc = 0;
 }

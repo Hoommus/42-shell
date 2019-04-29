@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/11 10:53:11 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/26 15:07:54 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/28 13:45:11 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ int							exec_and_if(const t_node *parent)
 	status_left = exec_node(parent->left);
 	if (status_left == 0)
 		status_right = exec_node(parent->right);
-	return (g_term->last_status = (status_left && status_right));
+	return ((status_left && status_right));
 }
 
 int							exec_or_if(const t_node *parent)
@@ -33,5 +33,5 @@ int							exec_or_if(const t_node *parent)
 	status_left = exec_node(parent->left);
 	if (status_left != 0)
 		status_right = exec_node(parent->right);
-	return (g_term->last_status = (status_left == 0 || status_right == 0));
+	return ((status_left == 0 || status_right == 0));
 }

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/25 18:31:57 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/27 14:35:35 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/29 19:32:11 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,13 +55,37 @@ void					close_redundant_fds(t_context *context)
 	list = context->fd_list;
 	while (list)
 	{
-		if (ft_strcmp(list->label, "rdr_duped"))
-			close(list->current);
+		if (ft_strcmp(list->label, "rdr_duped_1337"))
+		{
+			if (list->current > 2)
+				close(list->current);
+		}
 		list = list->next;
 	}
 }
 
-static void				handle_signaled(t_job *job, int status)
+
+void					close_foreign_fds(t_job *jobs, t_job *current)
+{
+	struct s_fd_lst	*list;
+
+	while (jobs)
+	{
+		if (jobs != current)
+		{
+			list = jobs->context->fd_list;
+			while (list)
+			{
+				if (list->current > 2)
+					close(list->current);
+				list = list->next;
+			}
+		}
+		jobs = jobs->next;
+	}
+}
+
+void				handle_signaled(t_job *job, int status)
 {
 	char		*swap;
 	t_job		*list;
@@ -87,7 +111,8 @@ void					write_heredocs(t_job *job)
 
 	while (io_rdrs->type != TOKEN_NOT_APPLICABLE)
 	{
-		if ((io_rdrs->type == TOKEN_DLESS || io_rdrs->type == TOKEN_DLESSDASH))
+		if ((io_rdrs->type == TOKEN_DLESS || io_rdrs->type == TOKEN_DLESSDASH
+			|| io_rdrs->type == TOKEN_TRILESS))
 		{
 			write(io_rdrs->what.fd, io_rdrs->what.path,
 					ft_strlen(io_rdrs->what.path));
@@ -97,62 +122,63 @@ void					write_heredocs(t_job *job)
 	}
 }
 
-void					waitall(void)
+bool					are_all_terminated(t_job *jobs)
+{
+	int		i;
+	int		terminated;
+
+	i = 0;
+	terminated = 0;
+	while (jobs)
+	{
+		if (jobs->state == JOB_TERMINATED)
+			terminated++;
+		i++;
+		jobs = jobs->next;
+	}
+	return (i == terminated);
+}
+
+int						waitall(void)
 {
 	int			status;
 	pid_t		returned;
 	t_job		*list;
 
-	while (jc_get()->queue_size--)
+	list = jc_get()->job_queue;
+	while (list)
 	{
 		if ((returned = wait(&status)) == -1)
 			break ;
-		list = jc_get()->job_queue;
-		while (list)
+		if (list->pid == returned)
 		{
-			if (list->pid == returned)
-			{
-				list->status = status;
-				list->wexitstatus = WEXITSTATUS(status);
-				list->state = JOB_TERMINATED;
-				break;
-			}
-			list = list->next;
-		}
-	}
-}
-
-void					waitnclaim(__unused t_job *job)
-{
-	int			status;
-
-	waitall();
-	status = job->status;
-	tcsetpgrp(0, jc_get()->shell_pid);
-	TERM_APPLY_CONFIG(g_term->context_current->term_config);
-	if (WIFSIGNALED(status) && !WIFEXITED(status)
-		&& WTERMSIG(status) != 1 && WTERMSIG(status) <= 31)
-		handle_signaled(job, status);
-	g_term->last_status = WEXITSTATUS(status);
-}
-
-void					close_foreign_fds(t_job *list, t_job *current)
-{
-	struct s_fd_lst	*fds;
-
-	while (list)
-	{
-		if (list != current)
-		{
-			fds = list->context->fd_list;
-			while (fds)
-			{
-				close(fds->current);
-				fds = fds->next;
-			}
+			list->status = status;
+			list->wexitstatus = WEXITSTATUS(status);
+			list->state = JOB_TERMINATED;
+			return (status);
 		}
 		list = list->next;
 	}
+	return (-1);
+}
+
+int						waitnclaim(t_job *last)
+{
+	int			status;
+
+//	if (last->prev == NULL)
+		waitpid(last->pid, &status, 0);
+//	else
+//		status = waitall();
+	last->status = status;
+	last->wexitstatus = WEXITSTATUS(last->status);
+//	if (WIFSIGNALED(status) && !WIFEXITED(status)
+//		&& WTERMSIG(status) != 1 && WTERMSIG(status) <= 31)
+//		handle_signaled(last, status);
+	//waitall();
+	while (waitpid(-1, &status, WNOHANG) != -1)
+		;
+	return (last->wexitstatus);
 }
 
 int						forknrun(t_job *job, char *path)
@@ -174,13 +200,9 @@ int						forknrun(t_job *job, char *path)
 	{
 		write_heredocs(job);
 		close_redundant_fds(job->context);
-		if (job->next == NULL)
-		{
-			waitnclaim(job);
-			ft_memdel((void **)&path);
-			return (g_term->last_status);
-		}
 		ft_memdel((void **)&path);
+		if (job->next == NULL)
+			return (waitnclaim(job));
 	}
 	return (-1024);
 }

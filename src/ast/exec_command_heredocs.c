@@ -12,7 +12,8 @@
 
 #include "shell_script.h"
 
-#define IS_HEREDOC(type) ((type) == TOKEN_DLESS || (type) == TOKEN_DLESSDASH)
+#define IS_HEREDOC(t) ((t) == TOKEN_DLESS || (t) == TOKEN_DLESSDASH || IS_HW(t))
+#define IS_HW(t) ((t) == TOKEN_TRILESS)
 
 static void		concat_heredocs(t_io_rdr *what, t_io_rdr *with_what)
 {

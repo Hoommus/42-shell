@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/05 17:50:23 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/26 13:16:41 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/27 16:45:53 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include "shell_script_parser.h"
 #include "shell_job_control.h"
 
-int					exec_pipeline_terminator(const t_node *node,
+static int			exec_pipeline_terminator(const t_node *node,
 	t_context *context_right)
 {
 	int			pp[2];
@@ -30,12 +30,12 @@ int					exec_pipeline_terminator(const t_node *node,
 	context_remove_ofd(context_left, 1);
 	context_add_fd(context_right, 0, pp[0], "pipe");
 	context_add_fd(context_left, 1, pp[1], "pipe");
-	exec_command(node->left, context_left);
-	status = exec_command(node->right, context_right);
+	status = exec_command(node->left, context_left) ||
+		exec_command(node->right, context_right);
 	return (status);
 }
 
-int					exec_pipeline_inner(const t_node *node,
+static int			exec_pipeline_inner(const t_node *node,
 	t_context *context_right)
 {
 	int			pp[2];
@@ -73,6 +73,5 @@ int					exec_pipeline(const t_node *node)
 	environ_push_entry(jc_get()->shell_context->environ, "?",
 						(swap = ft_itoa(pipeline_status)), SCOPE_SHELL_LOCAL);
 	ft_memdel((void **)&swap);
-	g_term->last_status = pipeline_status;
 	return (pipeline_status);
 }

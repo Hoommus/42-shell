@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:32 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/25 20:43:58 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/28 17:34:53 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,10 +35,10 @@ int					display_normal_prompt(void)
 	host[ft_strchr(host, '.') - host] = 0;
 	user = get_env_v(NULL, "USER");
 	size = ft_printf(SHELL_PROMPT,
-		user ? user->value : "%username%", host,
+		user ? user->value : "$USER", host,
 		ft_strrchr(cwd, '/') == NULL ? cwd
 									: ft_strrchr(cwd, '/') + !!(cwd[1] != '\0'),
-		g_term->last_status ? 31 : 32, g_term->last_status);
+		g_term->last_status ? 31 : 32);
 	return (size);
 }
 
@@ -49,20 +49,23 @@ int					shell_loop(void)
 	while (ponies_teleported())
 	{
 		g_interrupt = 0;
-		if (g_term->tty_fd != -1 && g_term->input_state
-			!= STATE_NON_INTERACTIVE)
+		if (g_term->input_state != STATE_NON_INTERACTIVE)
 		{
+			tcsetpgrp(0, jc_get()->shell_pid);
+			TERM_APPLY_CONFIG(g_term->context_current->term_config);
 			if (carpos_update(POS_CURRENT)->col > 1)
 				ft_printf("\n");
-			buff_clear(0);
 			display_prompt(g_term->input_state = STATE_NORMAL);
-			g_term->last_status = 0;
+			buff_clear(g_term->last_status = 0);
 			commands = read_arbitrary();
 			history_write(commands, get_history_fd());
 		}
 		else
 			read_fd(0, &commands);
 		run_script(tokenize(commands, TOKEN_DELIMITERS), false);
+		ft_strdel(&commands);
+		environ_push_entry(g_term->context_original->environ, "?",
+			(commands = ft_itoa(g_term->last_status)), SCOPE_SHELL_LOCAL);
 		ft_strdel(&commands);
 		if (g_term->input_state == STATE_NON_INTERACTIVE)
 			exit(0);

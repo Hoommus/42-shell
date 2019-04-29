@@ -6,34 +6,50 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/23 18:06:24 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/23 18:06:24 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/29 18:56:33 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell_script.h"
 
+#define IS_HEREDOC(t) ((t) == TOKEN_DLESS || (t) == TOKEN_DLESSDASH || IS_HW(t))
+#define IS_HW(t) ((t) == TOKEN_TRILESS)
+
+static char			*add_newline(char **hereword)
+{
+	char	*swap;
+	size_t	len;
+
+	len = ft_strlen(*hereword);
+	swap = ft_strnew(len + 1);
+	ft_strcpy(swap, *hereword);
+	swap[len] = '\n';
+	ft_strdel(hereword);
+	*hereword = swap;
+	return (swap);
+}
+
 void				run_heredocs(t_node *node)
 {
-	struct s_io_redirect	*io_rdr;
+	struct s_io_redirect	*rdr;
 	char					*swap;
 
 	if (node && node->node_type == NODE_COMMAND && !g_interrupt)
 	{
-		io_rdr = node->command->io_redirects;
-		while (io_rdr->type != TOKEN_NOT_APPLICABLE)
-		{
-			if (io_rdr->type == TOKEN_DLESS || io_rdr->type == TOKEN_DLESSDASH)
+		rdr = node->command->io_redirects - 1;
+		while ((++rdr)->type != TOKEN_NOT_APPLICABLE)
+			if (IS_HW(rdr->type))
+				add_newline(&(rdr->what.path));
+			else if (IS_HEREDOC(rdr->type))
 			{
-				g_term->heredoc_word = io_rdr->what.path;
+				g_term->heredoc_word = rdr->what.path;
 				g_term->input_state = STATE_HEREDOC;
 				swap = read_arbitrary();
 				if (swap == NULL)
 					return ((void)(exec_abort(0)));
-				free(io_rdr->what.path);
-				io_rdr->what.path = swap;
+				free(rdr->what.path);
+				rdr->what.path = swap;
 			}
-			io_rdr++;
-		}
 	}
 	if (node && node->left != NULL)
 		run_heredocs(node->left);

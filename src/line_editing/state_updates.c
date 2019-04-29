@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/22 20:16:53 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/22 20:17:43 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/28 13:36:05 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,11 @@ enum e_input_state	update_state(const char *input)
 	updated = current;
 	if (!ft_strcmp(input, "\\") && buff_char_at_equals_any(iterator, "\"\\'`"))
 	{
-		swap = buff_char_at(iterator);
+		swap = buff_char_at(iterator + 1);
 		updated = toggle_state(swap);
 	}
-	else if (!ft_strcmp(input, "\\"))
+	else if (!ft_strcmp(input, "\\") && current != STATE_QUOTE
+		&& current != STATE_DQUOTE && current != STATE_BQUOTE)
 		updated = toggle_escaped();
 	else if (ft_strchr("\"\\'`", *input))
 		updated = toggle_state(input);

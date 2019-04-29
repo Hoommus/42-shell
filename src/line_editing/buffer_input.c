@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/18 16:28:45 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/22 20:17:43 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/29 13:12:17 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ void				deal_with_heredoc_nl(const char *input)
 	}
 	else
 	{
+		TERM_CLR_LINE;
 		write(STDOUT_FILENO, "\n", 1);
 		buff_insert_single_at(g_term->buffer->iterator, input);
 		display_prompt(g_term->input_state);
@@ -63,7 +64,8 @@ void				deal_with_newline(const char *arr)
 		deal_with_heredoc_nl(arr);
 	else if (g_term->input_state == STATE_QUOTE
 			|| g_term->input_state == STATE_DQUOTE
-			|| g_term->input_state == STATE_ESCAPED)
+			|| (g_term->input_state == STATE_ESCAPED &&
+				g_term->buffer->iterator == g_term->buffer->size))
 	{
 		write(STDOUT_FILENO, "\n", 1);
 		buff_insert_single_at(g_term->buffer->iterator, arr);
@@ -92,10 +94,6 @@ void				deal_with_pasted(char *str)
 	buff_insert_string_at(g_term->buffer->iterator, str);
 	write(1, str, len);
 }
-
-/*
-** TODO: Make this work in non-tty environment
-*/
 
 char				*read_arbitrary(void)
 {

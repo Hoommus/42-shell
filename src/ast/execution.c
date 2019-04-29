@@ -45,11 +45,13 @@ int							exec_node(const t_node *node)
 
 int							exec_semicolon_recursive(const t_node *parent)
 {
+	int		status;
+
 	if (parent->left)
-		exec_node(parent->left);
+		status = exec_node(parent->left);
 	if (parent->right)
-		exec_node(parent->right);
-	return (g_term->last_status);
+		status = exec_node(parent->right);
+	return (status);
 }
 
 /*
@@ -68,7 +70,7 @@ int							exec_semicolon_iterative(t_node *parent)
 
 	g_interrupt = 0;
 	if (!parent || parent->node_type != NODE_SEPARATOR)
-		return (ft_printf("Some weird error in tree\n"));
+		return (ft_dprintf(2, "21sh: Some weird error in AST\n"));
 	sep = parent;
 	while (sep->node_type == NODE_SEPARATOR
 		&& sep->left && sep->left->node_type == NODE_COMMAND

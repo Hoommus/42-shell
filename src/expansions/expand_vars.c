@@ -6,12 +6,17 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/06 16:43:04 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/26 16:13:01 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/29 14:51:34 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "expansions_internal.h"
 #include "twenty_one_sh.h"
+
+bool			is_special_var(const char c)
+{
+	return (c == '$' || c == '%' || c == '?' || c == '!' || c == '0');
+}
 
 // TODO: replace smart_split with function that returns first found token
 static char		*extract_var(const char *str, u_int32_t *off)

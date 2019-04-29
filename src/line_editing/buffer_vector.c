@@ -65,7 +65,7 @@ int				buff_insert_single_at(u_int64_t index, const char str[8])
 {
 	t_symbol	symbol;
 
-	ft_memcpy(symbol.s, str, 8);
+	ft_memcpy(symbol.s, str, 4);
 	return (buff_insert_symbol_at(index, &symbol));
 }
 

@@ -13,20 +13,20 @@
 #include "twenty_one_sh.h"
 #include "line_editing.h"
 
-int			is_valid_var(const char *var)
+bool		is_valid_var(const char *var)
 {
 	int		i;
 
-	if (var == NULL)
-		return (0);
+	if (var == NULL || ft_isdigit(*var))
+		return (false);
 	i = 0;
 	while (var[i])
 	{
 		if (!(ft_isalnum(var[i]) || var[i] == '_'))
-			return (0);
+			return (false);
 		i++;
 	}
-	return (1);
+	return (true);
 }
 
 ssize_t		ponies_teleported(void)

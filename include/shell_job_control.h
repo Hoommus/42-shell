@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/08 12:40:49 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/27 14:18:34 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/27 14:23:19 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,6 @@ void					jc_enqueue_job(t_job *job);
 t_job					*jc_dequeue_job(pid_t pid, t_job *job);
 int						jc_execute_pipeline_queue(void);
 void					jc_destroy_queue(void);
-void					jc_collect_zombies(void);
 
 /*
 ** Auxiliary
@@ -79,6 +78,5 @@ void					jc_collect_zombies(void);
 
 int						forknrun(t_job *job, char *path);
 void					close_redundant_fds(t_context *context);
-void					sigpipe_kill_left(t_job *pivot);
 
 #endif

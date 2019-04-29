@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/10 16:42:51 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/25 18:34:59 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/29 13:32:17 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,9 +75,9 @@ int						jc_execute_pipeline_queue(void)
 	list = jc_get()->job_queue;
 	while (list)
 	{
-		if ((g_term->last_status = run_builtin(list)) != -512 && !list->next)
-			return (g_term->last_status);
-		else if (g_term->last_status == -512)
+		if ((status = run_builtin(list)) != -512 && !list->next)
+			return (status);
+		else if (status == -512)
 		{
 			if ((bin = path_to_target(list)) != NULL && access(bin, F_OK) == -1)
 				return (DIRTY_HACK(ERR_NO_SUCH_FILE));

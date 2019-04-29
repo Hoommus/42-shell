@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/18 11:54:55 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/25 15:58:42 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/28 15:59:10 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,8 +66,11 @@ void							handle_eot(union u_char key)
 	}
 	else if (key.lng == CEOF && g_term->input_state == STATE_HEREDOC)
 	{
-		ft_dprintf(2, SH ": warning: here-document delimited by end-of-file "
-					"(wanted `%s')\n", g_term->heredoc_word);
+		TERM_INVERT;
+		ft_printf("%c", '%');
+		TERM_DISABLE_APPEARANCE;
+		ft_dprintf(2, "\n" SH ": warning: here-document delimited "
+			"by end-of-file (wanted `%s')\n", g_term->heredoc_word);
 		g_term->input_state = STATE_COMMIT;
 	}
 }

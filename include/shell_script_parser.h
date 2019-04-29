@@ -241,6 +241,7 @@ extern const t_rule				g_rbrace_token;
 extern const t_rule				g_word_token;
 extern const t_rule				g_assignment_word_token;
 extern const t_rule				g_io_number_token;
+extern const t_rule				g_triless_token;
 extern const t_rule				g_dless_token;
 extern const t_rule				g_dlessdash_token;
 

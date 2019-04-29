@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/27 14:45:42 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/29 19:33:49 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@
 
 # define PROMPT_HOST "\x1b[0m\x1b[34;1m[%s@%s]\x1b[0m"
 # define PROMPT_PATH " \x1b[36;1m%s\x1b[0m"
-# define PROMPT_TERMINATOR " \x1b[%d;1m(%d) $\x1b[0m "
+# define PROMPT_TERMINATOR "\x1b[%d;1m $ \x1b[0m"
 # define SHELL_PROMPT PROMPT_HOST PROMPT_PATH PROMPT_TERMINATOR
 
 # define TERM_APPLY_CONFIG(term) tcsetattr(0, TCSANOW, term)
@@ -51,25 +51,28 @@
 # define TERM_CLR_LINES_BELOW tputs(tgetstr("cd", NULL), 1, &ft_putc)
 # define TERM_CLR_LINE tputs(tgetstr("ce", NULL), 1, &ft_putc)
 # define TERM_CLR_CHAR tputs(tgetstr("dc", NULL), 1, &ft_putc)
+# define TERM_INVERT tputs(tgetstr("mr", NULL), 1, &ft_putc)
+# define TERM_DISABLE_APPEARANCE tputs(tgetstr("me", NULL), 1, &ft_putc)
 
 # define HISTORY_FILE "." SH "_history"
 # define CONFIG_FILE "." SH "shrc"
 # define LOG_FILE "." SH ".log"
 
-# define ERR_PERMISSION_DENIED SH ": permission denied: %s\n"
-# define ERR_COMMAND_NOT_FOUND SH ": command not found: %s\n"
-# define ERR_BAD_FD            SH ": Bad file descriptor: %d\n"
-# define ERR_NO_SUCH_FILE      SH ": no such file or directory: %s\n"
-# define ERR_IS_A_DIRECTORY    SH ": %s: is a directory\n"
-# define ERR_SYNTAX_AT_LINE    SH ": syntax error near token '%s' on line %d\n"
-# define ERR_RUNNING_JOBS      SH ": you have running jobs\n"
+# define ERR_PERMISSION_DENIED  SH ": permission denied: %s\n"
+# define ERR_COMMAND_NOT_FOUND  SH ": command not found: %s\n"
+# define ERR_BAD_FD             SH ": Bad file descriptor: %d\n"
+# define ERR_NO_SUCH_FILE       SH ": no such file or directory: %s\n"
+# define ERR_IS_A_DIRECTORY     SH ": %s: is a directory\n"
+# define ERR_SYNTAX_AT_LINE     SH ": syntax error near token '%s' on line %d\n"
+# define ERR_RUNNING_JOBS       SH ": you have running jobs\n"
+# define ERR_AMBIGUOUS_REDIRECT SH ": ambiguous redirect\n"
 
-# define BUILD 1908
-# define BUILD_DATE "27.04.19 14:45:42 EEST"
+# define BUILD 2034
+# define BUILD_DATE "29.04.19 19:33:49 EEST"
 
 # ifdef MAX_INPUT
 #  undef MAX_INPUT
-#  define MAX_INPUT 256
+#  define MAX_INPUT 1024
 # endif
 
 # ifndef MAX_FD
@@ -107,8 +110,11 @@ struct					s_fd_lst
 };
 
 /*
-** So context is an entity that controls used environment variables, filedes
-** table for easy duplications used in redirections and pipes and term config.
+** So context is an entity that controls used environment variables,
+** term config and filedes table for easy duplications used in
+** redirects and pipes.
+ *
+ * This thing is quite "heavy" regarding memory and  usage
 **
 ** TODO: Add info about shell config
 */
@@ -240,7 +246,7 @@ bool					is_string_numeric(const char *str, const int base);
 ** Final input parsing (variables_replacement.c)
 */
 
-int						is_valid_var(const char *var);
+bool					is_valid_var(const char *var);
 
 /*
 ** Memory utils (memory.c)

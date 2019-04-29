@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:56:01 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/23 18:06:47 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/28 13:38:34 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ void				run_script(t_token *list_head, bool log_recursion)
 	{
 		run_heredocs(result.ast->root);
 		if (!g_interrupt)
-			exec_semicolon_iterative(result.ast->root);
+			g_term->last_status = exec_semicolon_iterative(result.ast->root);
 	}
 	free_all(&state, &result);
 }

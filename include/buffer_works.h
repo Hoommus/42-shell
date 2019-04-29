@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/16 17:42:29 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/19 16:17:47 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/27 15:56:33 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,11 @@ union				u_char
 	char			arr[8];
 };
 
-typedef struct __attribute__((packed))	s_symbol
+typedef struct		s_symbol
 {
-	char			s[9];
-	u_int8_t		visual_size : 2;
-}					t_symbol;
+	char			s[5];
+	u_int8_t		visual_size;
+} __attribute__((packed))					t_symbol;
 
 typedef struct		s_buffer
 {

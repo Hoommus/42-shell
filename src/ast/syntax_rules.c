@@ -520,7 +520,8 @@ const t_rule g_io_here = {
 	.token = TOKEN_NOT_APPLICABLE,
 	.expands_to = {
 		{&g_dless_token, &g_here_end},
-		{&g_dlessdash_token, &g_here_end}
+		{&g_dlessdash_token, &g_here_end},
+		{&g_triless_token, &g_here_end}
 	},
 	.human_readable = "io_here",
 	.tree_builder = NULL
@@ -774,6 +775,12 @@ const t_rule g_io_number_token = {
 	TOKEN_IO_NUMBER,
 	{{0}},
 	"io_nbr_t",
+	.tree_builder = NULL
+};
+const t_rule g_triless_token = {
+	TOKEN_TRILESS,
+	{{0}},
+	"triless_t",
 	.tree_builder = NULL
 };
 const t_rule g_dless_token = {

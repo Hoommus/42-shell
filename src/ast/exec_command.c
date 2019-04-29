@@ -122,12 +122,12 @@ int		exec_command(const t_node *command_node, t_context *new_context)
 	else
 		context = context_duplicate(g_term->context_original, true);
 	expand_everything(command);
-	ft_printf("+{ ");
-	for (int i = 0; command->assignments[i] != NULL; i++)
-		ft_printf("%s ", command->assignments[i]);
-	for (int i = 0; command->args[i] != NULL; i++)
-		ft_printf("%s ", command->args[i]);
-	ft_printf("}\n");
+//	ft_printf("+{ ");
+//	for (int i = 0; command->assignments[i] != NULL; i++)
+//		ft_printf("%s ", command->assignments[i]);
+//	for (int i = 0; command->args[i] != NULL; i++)
+//		ft_printf("%s ", command->args[i]);
+//	ft_printf("}\n");
 	if (alterate_filedes(command, context))
 	{
 		context_deep_free(&context);
@@ -139,7 +139,6 @@ int		exec_command(const t_node *command_node, t_context *new_context)
 	{
 		jc_enqueue_job(jc_create_job(command, context, job_class));
 		status = !new_context ? jc_execute_pipeline_queue() : 0;
-		g_term->last_status = status;
 		if (!new_context)
 			jc_destroy_queue();
 	}

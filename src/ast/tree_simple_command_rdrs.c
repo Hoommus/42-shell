@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/25 14:51:17 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/25 15:03:03 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/29 15:33:04 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,9 @@ bool						is_redirect(t_token *t)
 	return (t && (t->type == TOKEN_IO_NUMBER
 				|| t->type == TOKEN_DGREAT
 				|| t->type == TOKEN_GREAT
-				|| t->type == TOKEN_DLESS
 				|| t->type == TOKEN_LESS
+				|| t->type == TOKEN_DLESS
+				|| t->type == TOKEN_TRILESS
 				|| t->type == TOKEN_GREATAND
 				|| t->type == TOKEN_LESSAND
 				|| t->type == TOKEN_DLESSDASH
@@ -33,8 +34,8 @@ static void					construct_redirect(t_token *pivot,
 	bool	is_left;
 
 	rdr->type = pivot->type;
-	is_left = rdr->type == TOKEN_DLESS || rdr->type == TOKEN_LESSAND
-			|| rdr->type == TOKEN_LESS || rdr->type == TOKEN_DLESSDASH;
+	is_left = rdr->type == TOKEN_DLESS || rdr->type == TOKEN_DLESSDASH
+			|| rdr->type == TOKEN_LESS || rdr->type == TOKEN_TRILESS;
 	rdr->what.fd = 1;
 	rdr->where.fd = 0;
 	if (is_left)
@@ -48,7 +49,12 @@ static void					construct_redirect(t_token *pivot,
 		if (is_string_numeric(pivot->prev->value, 10))
 			rdr->what.fd = ft_atoi(pivot->prev->value);
 		if (pivot->next && pivot->next->type == TOKEN_WORD)
-			rdr->where.path = ft_strdup(pivot->next->value);
+		{
+			if (is_string_numeric(pivot->next->value, 10))
+				rdr->where.fd = ft_atoi(pivot->next->value);
+			else
+				rdr->where.path = ft_strdup(pivot->next->value);
+		}
 	}
 }
 

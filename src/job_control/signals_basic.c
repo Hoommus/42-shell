@@ -6,13 +6,12 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:46:06 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/27 14:18:34 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/29 19:14:46 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "line_editing.h"
 #include "twenty_one_sh.h"
-#include "shell_history.h"
 #include "shell_job_control.h"
 
 static void				tstp(int sig)
@@ -23,6 +22,7 @@ static void				tstp(int sig)
 static void				handle_sigint(int sig)
 {
 	g_interrupt = sig;
+	g_term->last_status = 1;
 }
 
 static void				resize(int sig)
@@ -38,6 +38,29 @@ static void				resize(int sig)
 	}
 }
 
+void				sigchild_alt(int sig, siginfo_t *info,
+										void *smthng)
+{
+	t_job	*list;
+	int		status;
+
+	list = jc_get()->job_queue;
+	while (list)
+	{
+		if (list->pid == info->si_pid &&
+			(WIFEXITED(info->si_status) || WIFSIGNALED(info->si_status)))
+		{
+			list->wexitstatus = WEXITSTATUS(status);
+			list->state = JOB_TERMINATED;
+			break ;
+		}
+		list = list->next;
+	}
+	sig = 0;
+	smthng = 0;
+}
+
+
 void					setup_signal_handlers(void)
 {
 	struct sigaction	action;
@@ -47,7 +70,10 @@ void					setup_signal_handlers(void)
 	sigaction(SIGTSTP, &action, NULL);
 	action.__sigaction_u.__sa_handler = &handle_sigint;
 	sigaction(SIGINT, &action, NULL);
+//	action.sa_flags = SA_RESTART;
+//	action.__sigaction_u.__sa_sigaction = &sigchild_alt;
+//	sigaction(SIGCHLD, &action, NULL);
 	signal(SIGWINCH, &resize);
 	signal(SIGPIPE, &tstp);
-	signal(SIGCHLD, SIG_IGN);
+	signal(SIGCHLD, SIG_DFL);
 }
