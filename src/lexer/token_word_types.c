@@ -60,7 +60,7 @@ enum e_token_type	token_class_contextual(const char *str,
 	enum e_token_type	type;
 	int					i;
 
-	i = TOKEN_IF;
+	i = 0;
 	type = TOKEN_NOT_APPLICABLE;
 	while (str && g_tokens[i].token_name && type == TOKEN_NOT_APPLICABLE)
 	{
@@ -71,7 +71,7 @@ enum e_token_type	token_class_contextual(const char *str,
 	if (type == TOKEN_NOT_APPLICABLE)
 	{
 		if ((prev == TOKEN_ASSIGNMENT_WORD || prev == TOKEN_NEWLINE ||
-			 prev == TOKEN_SEMICOLON) && is_assignment_word(str))
+			prev == TOKEN_SEMICOLON) && is_assignment_word(str))
 			type = TOKEN_ASSIGNMENT_WORD;
 		else
 			type = TOKEN_WORD;

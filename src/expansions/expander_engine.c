@@ -6,17 +6,21 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/27 18:59:20 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/06 16:50:44 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/26 16:02:59 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "expansions_internal.h"
 #include "twenty_one_sh.h"
 
+/*
+** Leave .starting_point empty to enforce running such expansion on any string
+*/
+
 static const struct s_expansion		g_expansions[] =
 {
-	{"$", expand_vars},
 	{"~", expand_tilde},
+	{"$", expand_vars},
 	{"", expand_quote},
 	{"", expand_dquote},
 	{"", expand_escaped},
@@ -50,10 +54,6 @@ char								*expand_tilde(char *str)
 	}
 	return (str);
 }
-
-/*
-** Leave .starting_point empty to enforce running such expansion on any string
-*/
 
 char								*expand(char *string)
 {

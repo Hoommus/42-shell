@@ -18,12 +18,12 @@
 **
 ** History builtin is used to read this data and provides user interface.
 **
-** History is a ArrayList-like collection with expandable array of entries that
+** History is an ArrayList-like collection with expandable array of entries that
 ** contain the exact user-provided command without any expansions and variable
 ** resolution.
 **
 ** This collection is saved to a file at HOME in a special format with
-** filename defined in HISTORY_FILE define in twenty_one_sh.h
+** filename of HISTORY_FILE define in twenty_one_sh.h
 ** File format goes like this (without any leading tabulations):
 **     : <unix epoch time>:0;<exact command text>
 **     : <unix epoch time>:0;<exact command text
@@ -63,7 +63,7 @@ void		history_save_entry(int fd)
 {
 	g_history->iterator = g_history->size;
 	ft_dprintf(fd, ": %10.0ld:0;%s\n", history_pop_entry()->timestamp,
-			   history_pop_entry()->command);
+				history_pop_entry()->command);
 }
 
 char		*history_write(char *command, int history_file)

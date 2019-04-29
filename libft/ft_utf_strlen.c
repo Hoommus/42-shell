@@ -17,7 +17,7 @@
 ** counting those starting with 0x80 (binary 10xxxxxx)
 */
 
-size_t	ft_utf_strlen(char *str)
+size_t	ft_utf_strlen(const char *str)
 {
 	size_t	i;
 	size_t	size;

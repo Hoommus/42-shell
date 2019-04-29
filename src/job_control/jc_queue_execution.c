@@ -6,23 +6,23 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/10 16:42:51 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/10 19:46:28 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/29 13:32:17 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell_job_control.h"
 #include "shell_builtins.h"
 
-static char					*path_to_target(t_job *job)
+static char				*path_to_target(t_job *job)
 {
-	const char	**args = (const char **)job->args;
+	const char	**args = (const char **)job->cmd->args;
 	t_var		*var;
 	int			i;
 	char		*swap;
 	char		**paths;
 
 	if (ft_strchr(args[0], '/') != NULL)
-		return (ft_strdup(args[0]));
+		return (access(args[0], F_OK) == -1 ? NULL : ft_strdup(args[0]));
 	var = get_env_v(NULL, "PATH");
 	if (!var || !var->value)
 		return (NULL);
@@ -32,7 +32,7 @@ static char					*path_to_target(t_job *job)
 	while (paths[i])
 	{
 		swap = ft_strings_join(2, "/", paths[i], (char *)args[0], NULL);
-		if (access(swap, X_OK) == 0)
+		if (access(swap, F_OK) == 0)
 			break ;
 		ft_memdel((void **)&swap);
 		i++;
@@ -41,75 +41,56 @@ static char					*path_to_target(t_job *job)
 	return (swap);
 }
 
-static int					run_builtin(t_job *job)
+static int				run_builtin(t_job *job)
 {
 	extern struct s_builtin	g_builtins[];
-	const char				*builtin = job->args ? job->args[0] : NULL;
+	const char				*bltin = job->cmd->args ? job->cmd->args[0] : NULL;
 	int						i;
 
 	i = 0;
-	while (builtin && g_builtins[i].name)
+	while (bltin && g_builtins[i].name)
 	{
-		if (ft_strcmp(builtin, g_builtins[i].name) == 0)
+		if (ft_strcmp(bltin, g_builtins[i].name) == 0)
 		{
 			context_switch(job->context);
-			job->exit_status = g_builtins[i].function((const char **)job->args + 1);
-			context_switch(NULL);
-			return (job->exit_status);
+			job->status = g_builtins[i].
+				function((const char **)job->cmd->args + 1);
+			close_redundant_fds(job->context);
+			context_switch(jc_get()->shell_context);
+			return (job->status);
 		}
 		i++;
 	}
-	return (-127);
+	return (-512);
 }
 
-// TODO: think about what happens if command does not exist
-int							jc_execute_queue(void)
+#define DIRTY_HACK(err) (ft_dprintf(2, err, list->cmd->args[0]) & 0) & -1024
+
+int						jc_execute_pipeline_queue(void)
 {
 	int			status;
 	t_job		*list;
-	pid_t		fork_pid;
-	char		*binary;
+	char		*bin;
 
 	list = jc_get()->job_queue;
 	while (list)
 	{
-		if (run_builtin(list) != -127)
+		if ((status = run_builtin(list)) != -512 && !list->next)
+			return (status);
+		else if (status == -512)
 		{
-			list = list->next;
-			continue ;
+			if ((bin = path_to_target(list)) != NULL && access(bin, F_OK) == -1)
+				return (DIRTY_HACK(ERR_NO_SUCH_FILE));
+			else if (bin != NULL && is_dir(bin))
+				return (DIRTY_HACK(ERR_IS_A_DIRECTORY));
+			else if (bin != NULL && access(bin, X_OK) == -1)
+				return (DIRTY_HACK(ERR_PERMISSION_DENIED));
+			else if (bin == NULL)
+				return (DIRTY_HACK(ERR_COMMAND_NOT_FOUND));
+			else if (!g_interrupt && (status = forknrun(list, bin)) != -1024)
+				return (status);
 		}
-		binary = path_to_target(list);
-		if (binary != NULL)
-		{
-			fork_pid = fork();
-			if (fork_pid == 0)
-			{
-				context_switch(list->context);
-				execve(binary, list->args,
-					environ_to_array(list->context->environ,
-					SCOPE_EXPORT | SCOPE_COMMAND_LOCAL | SCOPE_SCRIPT_GLOBAL));
-				exit(0);
-			}
-			else
-			{
-				list->pid = fork_pid;
-				if (list->state == JOB_FG)
-				{
-					waitpid(fork_pid, &status, 0);
-					tcsetpgrp(g_term->tty_fd, jc_get()->shell_pid);
-					TERM_APPLY_CONFIG(g_term->context_current->term_config);
-					ft_memdel((void **)&binary);
-					// TODO: think what happens if queue has multiple FG jobs
-					return (g_term->last_cmd_status = WEXITSTATUS(status));
-				}
-				else
-					jc_register_job(list);
-			}
-		}
-		else
-			ft_dprintf(2, "21sh: jc: command not found: %s\n", list->args[0]);
-		ft_memdel((void **)&binary);
 		list = list->next;
 	}
-	return (-1024); // Why did I do this?..
+	return (-1024);
 }

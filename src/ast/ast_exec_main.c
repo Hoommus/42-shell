@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   entry_point.c                                      :+:      :+:    :+:   */
+/*   ast_exec_main.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:56:01 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/20 15:59:43 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/28 13:38:34 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,11 @@ static inline void	free_all(t_state *state, struct s_result *result)
 		ast_free_recursive(result->backup_ast->root);
 }
 
-void			run_script(t_token *list_head, bool log_recursion)
+/*
+** TODO: Remove that crutch with newlines checks
+*/
+
+void				run_script(t_token *list_head, bool log_recursion)
 {
 	t_state				state;
 	struct s_result		result;
@@ -51,17 +55,20 @@ void			run_script(t_token *list_head, bool log_recursion)
 		return ;
 	init_state(&state, list_head, log_recursion);
 	result = is_syntax_valid(state);
-	if (result.error != NULL)
-		ft_dprintf(2, "Syntax error: %s\n", result.error->text);
-	state.list_offset = offset_list(state.list_offset, result.consumed + result.valid);
+	state.list_offset = offset_list(state.list_offset, result.consumed +
+		result.valid);
+	if (state.list_offset && state.list_offset->type == TOKEN_NEWLINE &&
+		state.list_offset->prev->type == TOKEN_NEWLINE)
+		state.list_offset = state.list_offset->next;
 	if (state.list_offset != NULL)
-		ft_dprintf(2,
-			"21sh: syntax error near token '%s' on line %d\n",
+		ft_dprintf(2, ERR_SYNTAX_AT_LINE,
 			ft_strcmp(state.list_offset->value, "\n") == 0 ? "\\n" :
-			state.list_offset->value,
-			state.list_offset->line_nbr);
-	// TODO: solve heredocs problem
+			state.list_offset->value, state.list_offset->line_nbr);
 	if (result.ast && state.list_offset == NULL)
-		exec_semicolon_iterative(result.ast->root);
+	{
+		run_heredocs(result.ast->root);
+		if (!g_interrupt)
+			g_term->last_status = exec_semicolon_iterative(result.ast->root);
+	}
 	free_all(&state, &result);
 }

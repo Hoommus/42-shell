@@ -33,6 +33,7 @@ void			buff_clear_part(u_int64_t from_index, u_int64_t to_index)
 /*
 ** bzero'es buffer starting from 'from_index' and to the end
 */
+
 void			buff_clear(u_int64_t from_index)
 {
 	struct s_symbol	*start;
@@ -65,6 +66,7 @@ int				buff_del_symbol(u_int64_t at_index)
 ** Returns malloc'ed char string of buffer contents
 ** not bigger than (8 * buffer_capacity) + 1 bytes
 */
+
 char			*buff_get_part(u_int64_t from_index, u_int64_t to_index)
 {
 	char		*buffer;

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 14:44:44 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/09 15:52:56 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/25 17:26:02 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,31 +41,16 @@
 
 enum						e_token_type
 {
-	TOKEN_IF,
-	TOKEN_THEN,
-	TOKEN_ELSE,
-	TOKEN_ELIF,
-	TOKEN_FI,
-	TOKEN_DO,
-	TOKEN_DONE,
-	TOKEN_WHILE,
-//	TOKEN_UNTIL,
-//	TOKEN_FOR,
-
-//	TOKEN_IN,
-
 	TOKEN_LBRACE,
 	TOKEN_RBRACE,
 	TOKEN_LBRACKET,
 	TOKEN_RBRACKET,
-//	TOKEN_LSQBRACKET,
-//	TOKEN_RSQBRACKET,
 
 	TOKEN_SEMICOLON,
-	TOKEN_BANG,
 	TOKEN_AND_IF,
 	TOKEN_OR_IF,
 
+	TOKEN_TRILESS,
 	TOKEN_DLESSDASH,
 	TOKEN_DLESS,
 	TOKEN_DGREAT,
@@ -158,7 +143,7 @@ struct						s_command
 	char		**args;
 	char		**assignments;
 	t_io_rdr	*io_redirects;
-	bool		is_async;
+	bool		is_async; // TODO: Cut this out
 };
 
 union						u_executor
@@ -179,6 +164,7 @@ extern const struct s_executor		g_executors_table[];
 /*
 ** Lexer
 */
+
 struct s_token				*tokenize(char *str, const char *delimiters);
 struct s_token				*new_token(char *value, enum e_token_type type);
 void						add_token(t_token **head, t_token **tail,
@@ -191,7 +177,19 @@ enum e_token_type			token_class_contextual(const char *str,
 void						free_array(void **array);
 
 /*
-** AST
+** Lexer Preprocess
+*/
+
+char						*strip_escaped_nl_and_comments(char *string);
+
+/*
+** AST Preprocess
+*/
+
+void						run_heredocs(t_node *node);
+
+/*
+** AST Main
 */
 
 void						run_script(t_token *list_head, bool log_recursion);
@@ -204,12 +202,21 @@ int							exec_or_if(const t_node *parent);
 int							exec_node(const t_node *node);
 int							exec_abort(int dummy);
 int							exec_pipeline(const t_node *node);
+
 /*
 ** File reading and executing
 */
-int							read_filename(const char *file, char **data);
-bool						alterate_filedes(const struct s_command *command,
-	t_context *context);
 
+int							read_filename(const char *file, char **data);
+
+void						rdr_heredocs(t_context *context, t_io_rdr *rdrs);
+int							alterate_filedes(const struct s_command *command,
+	t_context *contxt);
+
+/*
+** Expansions
+*/
+
+char						*expand(char *string);
 
 #endif

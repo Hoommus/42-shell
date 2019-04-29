@@ -27,31 +27,8 @@ int			tree_get_depth(t_node *parent)
 		i += left > right ? left : right;
 	}
 	if (parent && parent->left == NULL && parent->right == NULL)
-		i = 1; // last layer
+		i = 1;
 	return (i);
-}
-
-void		print_command_node(t_node *node)
-{
-	struct s_command	*cmd;
-	char				*tmp;
-
-	if (node->node_type != NODE_COMMAND)
-		return ;
-	cmd = (struct s_command *)node->command;
-	ft_printf("COMMAND [ %s ] :\n", cmd->is_async ? "async" : "regular");
-	if (cmd->args && cmd->args[0])
-	{
-		ft_printf("    args: [\x1b[36m %s \x1b[0m]\n", tmp = ft_strarr_join(", ", cmd->args));
-		free(tmp);
-	}
-	if (cmd->assignments && cmd->assignments[0])
-	{
-		ft_printf("    assignments: [ %s ] \n", tmp = ft_strarr_join(", ", cmd->assignments));
-		free(tmp);
-	}
-	ft_printf("    redirects: [ ");
-	ft_printf("] \n");
 }
 
 t_bresult	*pipe_andor_finalize_right(const t_state *state,
@@ -67,4 +44,3 @@ t_bresult	*pipe_andor_finalize_right(const t_state *state,
 	}
 	return (last_build->ast);
 }
-

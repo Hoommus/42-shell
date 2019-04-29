@@ -19,10 +19,10 @@ int		hs_export(const char **args)
 	u_int32_t		i;
 	bool			is_p;
 
-	if (!(args == NULL || *args == NULL || ft_strchr(*args, '-')))
+	if (!(args == NULL || *args == NULL || ft_strncmp(*args, "-", 1) == 0))
 		return (hs_setenv(args));
 	i = 0;
-	is_p = flag_short_present((const char **)args, 'p');
+	is_p = flag_short_present(args, 'p');
 	while (i < g_term->context_current->environ->size)
 	{
 		if (vars[i].scope & SCOPE_EXPORT)

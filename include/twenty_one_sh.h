@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/10 20:03:07 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/29 19:33:49 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,56 +39,66 @@
 # include "get_next_line.h"
 # include "shell_environ.h"
 
+# define SH "21sh"
+
 # define PROMPT_HOST "\x1b[0m\x1b[34;1m[%s@%s]\x1b[0m"
 # define PROMPT_PATH " \x1b[36;1m%s\x1b[0m"
-# define PROMPT_TERMINATOR " \x1b[%d;1m$\x1b[0m "
+# define PROMPT_TERMINATOR "\x1b[%d;1m $ \x1b[0m"
 # define SHELL_PROMPT PROMPT_HOST PROMPT_PATH PROMPT_TERMINATOR
 
-// TODO: Replace all APPLY_CONFIGs with context switches
 # define TERM_APPLY_CONFIG(term) tcsetattr(0, TCSANOW, term)
 
 # define TERM_CLR_LINES_BELOW tputs(tgetstr("cd", NULL), 1, &ft_putc)
 # define TERM_CLR_LINE tputs(tgetstr("ce", NULL), 1, &ft_putc)
 # define TERM_CLR_CHAR tputs(tgetstr("dc", NULL), 1, &ft_putc)
+# define TERM_INVERT tputs(tgetstr("mr", NULL), 1, &ft_putc)
+# define TERM_DISABLE_APPEARANCE tputs(tgetstr("me", NULL), 1, &ft_putc)
 
-# define HISTORY_FILE ".21sh_history"
-# define CONFIG_FILE ".21shrc"
-# define LOG_FILE ".21sh.log"
+# define HISTORY_FILE "." SH "_history"
+# define CONFIG_FILE "." SH "shrc"
+# define LOG_FILE "." SH ".log"
 
-# define BUILD 1443
-# define BUILD_DATE "10.04.19 20:03:07 EEST"
+# define ERR_PERMISSION_DENIED  SH ": permission denied: %s\n"
+# define ERR_COMMAND_NOT_FOUND  SH ": command not found: %s\n"
+# define ERR_BAD_FD             SH ": Bad file descriptor: %d\n"
+# define ERR_NO_SUCH_FILE       SH ": no such file or directory: %s\n"
+# define ERR_IS_A_DIRECTORY     SH ": %s: is a directory\n"
+# define ERR_SYNTAX_AT_LINE     SH ": syntax error near token '%s' on line %d\n"
+# define ERR_RUNNING_JOBS       SH ": you have running jobs\n"
+# define ERR_AMBIGUOUS_REDIRECT SH ": ambiguous redirect\n"
+
+# define BUILD 2034
+# define BUILD_DATE "29.04.19 19:33:49 EEST"
 
 # ifdef MAX_INPUT
 #  undef MAX_INPUT
-#  define MAX_INPUT 256
+#  define MAX_INPUT 1024
 # endif
 
 # ifndef MAX_FD
 #  define MAX_FD 1000
 # endif
 
-/*
-** Used for controlling input state
-*/
-
 enum					e_input_state
 {
-	STATE_NORMAL,
-	STATE_QUOTE,
-	STATE_DQUOTE,
-	STATE_BQUOTE,
-	STATE_HEREDOC,
-	STATE_ESCAPED,
-	STATE_EMPTY_PIPE,
-	STATE_PIPE_HEREDOC,
-	STATE_NEXT_ESCAPED,
-	STATE_COMMIT,
-	STATE_SEARCH,
-	STATE_PARTIAL_EXPAND,
-	STATE_NON_INTERACTIVE,
-	STATE_JOB_IN_FG,
-	STATE_EXPANSION,
-	STATE_BREAK
+	STATE_NORMAL = 1,
+	STATE_QUOTE = 2,
+	STATE_DQUOTE = 4,
+	STATE_BQUOTE = 8,
+	STATE_HEREDOC = 16,
+	STATE_HEREDOCD = 32,
+	STATE_ESCAPED = 64,
+	STATE_EMPTY_PIPE = 128,
+	STATE_PIPE_HEREDOC = 256,
+	STATE_NEXT_ESCAPED = 512,
+	STATE_COMMIT = 1024,
+	STATE_SEARCH = 2048,
+	STATE_PARTIAL_EXPAND = 4096,
+	STATE_NON_INTERACTIVE = 8192,
+	STATE_JOB_IN_FG = 16384,
+	STATE_EXPANSION = 32768,
+	STATE_BREAK = 65536,
+	STATE_LIMITED = 131072,
 };
 
 struct					s_fd_lst
@@ -100,8 +110,11 @@ struct					s_fd_lst
 };
 
 /*
-** So context is an entity that controls used environment variables, filedes
-** table for easy duplications used in redirections and pipes and term config.
+** So context is an entity that controls used environment variables,
+** term config and filedes table for easy duplications used in
+** redirects and pipes.
+ *
+ * This thing is quite "heavy" regarding memory and  usage
 **
 ** TODO: Add info about shell config
 */
@@ -117,6 +130,7 @@ typedef struct			s_context
 ** Used to store specific caret positions. Heavy usage in cursor_positions.c
 ** Also, see line_editing.h
 */
+
 enum					e_position
 {
 	POS_CURRENT,
@@ -132,30 +146,32 @@ enum					e_position
 ** CArPOS. Got it? Like Carbon-Argentum-Phosphorus-Oxygen-Sulfur
 ** Alright, it's carpos for 'caret position'
 */
+
 typedef struct			s_position
 {
 	short				col;
 	short				row;
-}						t_carpos;
+} __attribute__((packed))						t_carpos;
 
 /*
 ** g_term stores terminal parameters as well as cursor position and input buffer
 ** TODO: extract buffer variable to separate global var and create normal API
 */
+
 struct					s_term
 {
 	enum e_input_state	input_state;
+	char				*heredoc_word;
 	short				ws_col;
 	short				ws_row;
 	short				tty_fd;
 	t_carpos			carpos_db[7];
 
 	short				history_file;
-	short				logfile;
 
 	short				flags;
 
-	int					last_cmd_status;
+	int					last_status;
 	pid_t				running_process;
 
 	struct s_context	*context_original;
@@ -163,24 +179,27 @@ struct					s_term
 	struct s_context	*context_backup;
 
 	t_buffer			*buffer;
+	struct s_symbol		*paste_board;
 };
-extern volatile sig_atomic_t		g_is_interrupted;
-extern struct s_term	*g_term;
+extern volatile sig_atomic_t	g_interrupt;
+extern struct s_term			*g_term;
 
 int						execute(const char **args, const bool does_wait);
 
 /*
 ** Init (init.c)
 */
-void					init_shell_context(void);
 struct termios			*init_term(void);
+void					init_shell_context(void);
 void					init_files(void);
+void					init_variables(void);
 short					init_fd_at_home(char *filename, int flags);
 void					parse_args(int argc, char **argv);
 
 /*
 ** Environment (environ_utils.c)
 */
+
 t_var					*get_env_v(t_env_vector *vector, const char *key);
 int						set_env_v(t_env_vector *vector, const char *key,
 	const char *value, enum e_var_scope scope);
@@ -190,21 +209,25 @@ int						unset_env_v(t_env_vector *vector, const char *key);
 ** Context management
 */
 void					context_switch(t_context *to_which);
-t_context				*context_init(void);
 void					context_deep_free(t_context **context);
 t_context				*context_duplicate(const t_context *context,
 	bool with_dup);
 void					context_add_fd(t_context *context, const int original,
 	const int actual, const char *label);
 void					context_remove_fd(t_context *context, const int fd);
-bool					context_is_fd_present(const t_context *context, const int original);
+void					context_remove_ofd(t_context *context,
+	const int original);
+bool					context_is_fd_present(const t_context *context,
+	const int original);
+void					context_mark_fd_closed(t_context *context,
+	const int fd, bool is_orig);
 
 /*
 ** Main Loop (main.c, )
 */
 
 int						shell_loop(void);
-char					*read_command(void);
+char					*read_arbitrary(void);
 void					setup_signal_handlers(void);
 void					display_prompt(enum e_input_state state);
 int						display_normal_prompt(void);
@@ -214,30 +237,23 @@ int						display_normal_prompt(void);
 */
 u_int64_t				hash_sdbm(const char *str);
 ssize_t					ponies_teleported(void);
-bool					is_string_numeric(const char *str, const int base);
-void					init_variables(void);
 char					**smart_split(const char *str, const char *delims);
-size_t					carray_size(char **array);
+int						read_fd(const int fd, char **result);
+bool					is_dir(const char *path);
+bool					is_string_numeric(const char *str, const int base);
+
 /*
 ** Final input parsing (variables_replacement.c)
 */
-char					*expand(char *string);
 
-int						is_valid_var(const char *var);
+bool					is_valid_var(const char *var);
 
 /*
 ** Memory utils (memory.c)
 */
 
-void					chfree(void *obj);
 void					chfree_n(int n, ...);
 void					free_array(void **array);
-
-/*
-** errors.c
-*/
-
-void					throw_fatal(char *cause);
 
 /*
 ** service_routines.c
@@ -257,14 +273,12 @@ bool					flag_plus_short_present(const char **args,
 												const char flag);
 
 /*
- * Syscall wrappers
- */
+** Syscall wrappers
+*/
+
 int						open_wrapper(const char *path, int oflag);
 int						openm_wrapper(const char *path, int oflag, mode_t mode);
 int						close_wrapper(int filedes);
-int						dup_wrapper(int fd_what);
-int						dup2_wrapper(int fd_what, int fd_where);
-
 
 /*
 ** Compatibility
@@ -278,4 +292,3 @@ int						gethostname(char *arr, size_t size);
 # pragma clang diagnostic pop
 
 #endif
-

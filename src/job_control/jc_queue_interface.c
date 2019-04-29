@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/09 15:39:07 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/10 19:11:10 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/27 16:38:59 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,18 +20,22 @@ void						jc_enqueue_job(t_job *job)
 	if (list == NULL)
 	{
 		jc_get()->job_queue = job;
+		jc_get()->queue_size++;
 		return ;
 	}
 	while (list->next)
 		list = list->next;
 	list->next = job;
 	job->prev = list;
+	job->next = NULL;
+	jc_get()->queue_size++;
 }
 
 /*
 ** Function searches for a job using either pid or job->pid value, so no need
 ** for supplying both.
 */
+
 t_job						*jc_dequeue_job(pid_t pid, t_job *job)
 {
 	t_job		*list;
@@ -63,10 +67,9 @@ void						jc_destroy_queue(void)
 	{
 		next = list->next;
 		context_deep_free(&(list->context));
-		free_array((void **)list->args);
 		ft_memdel((void **)&list);
 		list = next;
 	}
+	jc_get()->queue_size = 0;
 	jc_get()->job_queue = NULL;
 }
-

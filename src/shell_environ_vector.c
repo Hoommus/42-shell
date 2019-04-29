@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/10 17:26:29 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/25 15:38:25 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/17 15:35:34 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,11 @@
 #include "shell_environ.h"
 
 /*
-** TODO: make use of hashes
-** seems like I did it, but in a very limited way
+** TODO: Add binary search instead of classic iteration
+**       For this sort entries in the table by their hash
 */
 
-t_env_vector	*environ_create_vector(const u_int32_t capacity)
+t_env_vector		*environ_create_vector(const u_int32_t capacity)
 {
 	t_env_vector	*vector;
 	char			*swap;
@@ -27,13 +27,14 @@ t_env_vector	*environ_create_vector(const u_int32_t capacity)
 	vector->capacity = capacity;
 	vector->size = 0;
 	vector->array = (t_var *)ft_memalloc(capacity * sizeof(t_var));
+	ft_bzero(vector->array, sizeof(t_var) * vector->capacity);
 	environ_push_entry(vector, "env_vector_capacity", swap = ft_itoa(capacity),
 						 SCOPE_SHELL_LOCAL);
 	free(swap);
 	return (vector);
 }
 
-void			environ_deallocate_vector(t_env_vector *vector)
+void				environ_deallocate_vector(t_env_vector *vector)
 {
 	t_var		*vars;
 	u_int32_t	i;
@@ -50,7 +51,7 @@ void			environ_deallocate_vector(t_env_vector *vector)
 	ft_memdel((void **)&(vector));
 }
 
-t_env_vector	*environ_reallocate_vector(t_env_vector *vector)
+t_env_vector		*environ_reallocate_vector(t_env_vector *vector)
 {
 	t_var			*array;
 	size_t			array_size;
@@ -69,11 +70,16 @@ t_env_vector	*environ_reallocate_vector(t_env_vector *vector)
 	return (vector);
 }
 
+/*
+** The difference between this function and set_env_v is that set_env_v
+** checks if name is good.
+*/
+
 t_var				*environ_update_entry(t_env_vector *vector,
 	const char *key, const char *value, const enum e_var_scope scope)
 {
-	t_var	*entry;
-	char	*tmp;
+	t_var *entry;
+	char *tmp;
 
 	entry = environ_get_entry(vector, key);
 	ft_memdel((void **)&(entry->value));
@@ -96,7 +102,7 @@ t_var				*environ_push_entry(t_env_vector *vector,
 		environ_reallocate_vector(vector);
 	if (environ_get_entry(vector, key))
 		entry = environ_update_entry(vector, key, value, scope);
-	else if (is_valid_var((char *)key))
+	else if (is_valid_var((char *)key) || scope == SCOPE_SHELL_LOCAL)
 	{
 		entry = ft_memalloc(sizeof(t_var));
 		entry->key = ft_strdup(key);

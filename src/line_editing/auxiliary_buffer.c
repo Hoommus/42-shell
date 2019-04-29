@@ -1,21 +1,36 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   tree_pipeline.c                                    :+:      :+:    :+:   */
+/*   auxiliary_buffer.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/02/15 15:56:04 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/05 13:26:20 by vtarasiu         ###   ########.fr       */
+/*   Created: 2019/04/22 21:10:25 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/04/22 21:10:25 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "shell_script.h"
-#include "shell_script_parser.h"
+#include "buffer_works.h"
 
-int					pipe_node_execute(t_node *root)
+/*
+** Returns number of 0b10xxxxxx-based characters
+*/
+
+u_int32_t		utf_body_size(char first)
 {
+	unsigned char	c;
 
-
-	return (0);
+	c = (unsigned char)first;
+	if (c >= 32 && c < 127)
+		return (0);
+	if ((c & 0xC0) == 0xC0)
+		return (1);
+	else if ((c & 0xE0) == 0xE0)
+		return (2);
+	else if ((c & 0xF0) == 0xF0)
+		return (3);
+	else if (c == 27)
+		return (7);
+	else
+		return (0);
 }

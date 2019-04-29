@@ -13,13 +13,11 @@
 #include "shell_script.h"
 #include "shell_script_parser.h"
 
-#include <assert.h>
 t_bresult	*subshell_build(const t_state *state, struct s_result *last_build)
 {
 	t_node				*node;
 	t_bresult			*bresult;
 
-	assert(state->rule == &g_subshell);
 	bresult = ft_memalloc(sizeof(t_bresult));
 	bresult->request = state->rule;
 	node = ast_new_node(NULL, NODE_SUBSHELL);

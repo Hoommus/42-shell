@@ -6,31 +6,28 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/27 13:23:10 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/09 14:24:19 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/25 16:30:56 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "twenty_one_sh.h"
 #include "shell_script.h"
-#include "shell_script_parser.h"
 
-#include <assert.h>
-volatile sig_atomic_t		g_is_interrupted;
+volatile sig_atomic_t		g_interrupt;
 
 const struct s_executor		g_executors_table[] = {
-	{ NODE_COMMAND,   {.exec_alt_context = &exec_command} },
+	{ NODE_COMMAND, {.exec_alt_context = &exec_command} },
 	{ NODE_SEPARATOR, {&exec_semicolon_recursive} },
-	{ NODE_PIPE,      {&exec_pipeline} },
-	{ NODE_OR_IF,     {&exec_or_if} },
-	{ NODE_AND_IF,    {&exec_and_if} },
-	{ NODE_SUBSHELL,  {NULL} },
+	{ NODE_PIPE, {&exec_pipeline} },
+	{ NODE_OR_IF, {&exec_or_if} },
+	{ NODE_AND_IF, {&exec_and_if} },
+	{ NODE_SUBSHELL, {NULL} },
 	{ 0, {NULL }}
 };
 
 int							exec_abort(int dummy)
 {
 	dummy = 0;
-	return (g_is_interrupted = -77);
+	return (g_interrupt = -77);
 }
 
 int							exec_node(const t_node *node)
@@ -38,48 +35,23 @@ int							exec_node(const t_node *node)
 	int		i;
 
 	i = -1;
-	while (g_executors_table[++i].executor.exec && !g_is_interrupted)
+	while (g_executors_table[++i].executor.exec && !g_interrupt)
 		if (node->node_type == g_executors_table[i].node_type)
 			return (g_executors_table[i].executor.exec_alt_context(node, NULL));
-	if (!g_is_interrupted)
+	if (!g_interrupt)
 		ft_printf("No executor for node of type %d\n", node->node_type);
 	return (71);
 }
 
-int							exec_and_if(const t_node *parent)
-{
-	int		status_left;
-	int		status_right;
-
-	assert(parent && parent->node_type == NODE_AND_IF);
-	status_right = 0;
-	status_left = exec_node(parent->left);
-	if (status_left == 0)
-		status_right = exec_node(parent->right);
-	return (status_left && status_right);
-}
-
-int							exec_or_if(const t_node *parent)
-{
-	int		status_left;
-	int		status_right;
-
-	assert(parent && parent->node_type == NODE_OR_IF);
-	status_right = 0;
-	status_left = exec_node(parent->left);
-	if (status_left != 0)
-		status_right = exec_node(parent->right);
-	return (status_left == 0 || status_right == 0);
-}
-
 int							exec_semicolon_recursive(const t_node *parent)
 {
-	assert(parent && parent->node_type == NODE_SEPARATOR);
+	int		status;
+
 	if (parent->left)
-		exec_node(parent->left);
+		status = exec_node(parent->left);
 	if (parent->right)
-		exec_node(parent->right);
-	return (0); // always successful
+		status = exec_node(parent->right);
+	return (status);
 }
 
 /*
@@ -96,14 +68,14 @@ int							exec_semicolon_iterative(t_node *parent)
 {
 	t_node	*sep;
 
-	g_is_interrupted = 0;
+	g_interrupt = 0;
 	if (!parent || parent->node_type != NODE_SEPARATOR)
-		return (ft_printf("Some weird error in tree\n"));
+		return (ft_dprintf(2, "21sh: Some weird error in AST\n"));
 	sep = parent;
 	while (sep->node_type == NODE_SEPARATOR
 		&& sep->left && sep->left->node_type == NODE_COMMAND
 		&& sep->right && sep->right->node_type == NODE_SEPARATOR
-		&& g_is_interrupted == 0)
+		&& g_interrupt == 0)
 	{
 		exec_command(sep->left, NULL);
 		sep = sep->right;

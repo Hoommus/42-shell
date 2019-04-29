@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/10 13:17:59 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/08 19:05:39 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/23 16:16:56 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ typedef struct					s_syntax_rule
 	const struct s_syntax_rule *restrict	expands_to[8][6];
 	const char *restrict const				human_readable;
 	t_builder								tree_builder;
-}								t_rule;
+} __attribute__((packed))								t_rule;
 
 typedef struct					s_syntax_error
 {
@@ -107,8 +107,8 @@ struct							s_result
 	t_error			*error;
 	t_bresult		*ast;
 	t_bresult		*backup_ast;
-	bool			fatal;
 	int				consumed;
+	bool			fatal;
 	bool			valid;
 };
 
@@ -140,12 +140,18 @@ t_bresult						*pipe_andor_finalize_right(const t_state *state,
 t_bresult						*list_build(const t_state *state,
 												struct s_result *last_build);
 
+/*
+** Simple command builder auxiliary
+*/
+bool							is_redirect(t_token *t);
+struct s_io_redirect			*get_redirects(t_token *list, int length);
+
+
 t_node							*ast_new_node(void *value,
 												enum e_node_type node_type);
 void							ast_free_recursive(t_node *node);
 
 int								tree_get_depth(t_node *parent);
-void							print_command_node(t_node *node);
 t_bresult						*insert_left_recursive(t_bresult *bresult,
 									t_node *parent, t_node *insertion);
 
@@ -164,19 +170,18 @@ extern const t_rule				g_compound_list;
 extern const t_rule				g_term_rule;
 extern const t_rule				g_term_rule_dash;
 
-extern const t_rule				g_name;
-extern const t_rule				g_in;
-extern const t_rule				g_wordlist;
-extern const t_rule				g_wordlist_dash;
 extern const t_rule				g_if_clause;
 extern const t_rule				g_else_part;
 extern const t_rule				g_while_clause;
 
 /*
 ** some rules are omitted because I am a bad programmer. But here they are:
+8* extern const t_rule	g_name;
+** extern const t_rule	g_in;
+** extern const t_rule	g_wordlist;
+** extern const t_rule	g_wordlist_dash;
 ** extern const t_rule	g_for_clause;
 ** extern const t_rule	g_until_clause;
-**
 ** extern const t_rule	g_function_definition;
 ** extern const t_rule	g_function_body;
 ** extern const t_rule	g_fname;
@@ -184,6 +189,17 @@ extern const t_rule				g_while_clause;
 ** extern const t_rule	g_case_list;
 ** extern const t_rule	g_case_item_ns;
 ** extern const t_rule	g_case_item;
+** extern const t_rule	g_for_token;
+** extern const t_rule	g_if_token;
+** extern const t_rule	g_then_token;
+** extern const t_rule	g_fi_token;
+** extern const t_rule	g_elif_token;
+** extern const t_rule	g_else_token;
+** extern const t_rule	g_while_token;
+** extern const t_rule	g_until_token;
+** extern const t_rule	g_do_token;
+** extern const t_rule	g_done_token;
+** extern const t_rule	g_bang_token;
 */
 
 extern const t_rule				g_brace_group;
@@ -216,26 +232,16 @@ extern const t_rule				g_ampersand_token;
 extern const t_rule				g_newline_token;
 extern const t_rule				g_and_if_token;
 extern const t_rule				g_or_if_token;
-extern const t_rule				g_bang_token;
 extern const t_rule				g_pipe_token;
 extern const t_rule				g_empty_token;
 extern const t_rule				g_lbracket_token;
 extern const t_rule				g_rbracket_token;
 extern const t_rule				g_lbrace_token;
 extern const t_rule				g_rbrace_token;
-extern const t_rule				g_for_token;
 extern const t_rule				g_word_token;
-extern const t_rule				g_if_token;
-extern const t_rule				g_then_token;
-extern const t_rule				g_fi_token;
-extern const t_rule				g_elif_token;
-extern const t_rule				g_else_token;
-extern const t_rule				g_while_token;
-extern const t_rule				g_until_token;
-extern const t_rule				g_do_token;
-extern const t_rule				g_done_token;
 extern const t_rule				g_assignment_word_token;
 extern const t_rule				g_io_number_token;
+extern const t_rule				g_triless_token;
 extern const t_rule				g_dless_token;
 extern const t_rule				g_dlessdash_token;
 

@@ -6,14 +6,13 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/16 12:28:37 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/22 14:34:30 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/28 14:25:16 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "line_editing.h"
 #include "shell_history.h"
-
-// TODO: add partial command completion from history
+#include "twenty_one_sh.h"
 
 void	handle_up(union u_char key)
 {
@@ -70,6 +69,10 @@ void	handle_left(union u_char key)
 {
 	if (key.lng == K_LEFT && g_term->buffer->iterator > 0)
 	{
+		if ((g_term->input_state == STATE_HEREDOC ||
+			 g_term->input_state == STATE_HEREDOCD)
+			 && buff_char_at_equals(g_term->buffer->iterator - 1, "\n"))
+			return ;
 		caret_move(1, D_LEFT);
 		g_term->buffer->iterator--;
 	}

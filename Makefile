@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/04/10 19:38:03 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/04/26 12:32:42 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,11 +17,11 @@ CC = clang
 FDS = shell(ulimit -n)
 
 ##### Remove the -g flag #####
-FLAGS =  -std=c99 -Wall \
-                    -Wextra \
-                    -Werror \
-                    -Wno-unknown-pragmas \
-                    #-fsanitize="address"
+FLAGS = -g -Wall  \
+               -Wextra \
+               -Werror  \
+               -Wno-unknown-pragmas \
+               #-fsanitize="address"
 
 HEADER = -I include/ -I printf/include -I libft/
 SRC_DIR = ./src/
@@ -31,22 +31,24 @@ LIB_DIR = ./printf
 LIB_NAME = libftprintf.a
 
 SHELL_SRC = main.c init.c memory.c auxilia.c       \
-            errors.c \
             service_routines.c args_parsing.c string_hash.c \
             shell_environ.c shell_environ_tools.c shell_environ_vector.c \
             syscall_wrappers.c
 
 LEXER_DIR = lexer/
-LEXER_SRC = quotes.c smart_split.c tokenizer.c tokens_mem.c token_word_types.c
+LEXER_SRC = smart_split.c tokenizer.c tokens_mem.c token_word_types.c \
+            tokenizer_preprocess.c
 
 AST_DIR = ast/
-AST_SRC = parser.c entry_point.c syntax_rules.c \
+AST_SRC = ast_exec_main.c ast_exec_preprocess.c \
+          parser.c syntax_rules.c \
           nodes_memory.c nodes_manipulations.c \
           execution.c \
-          exec_command.c exec_command_alterators.c exec_subshell.c \
-          exec_pipeline.c \
+          exec_command.c exec_command_alterators.c exec_command_heredocs.c \
+          exec_subshell.c \
+          exec_pipeline.c exec_andor_if.c\
           tree_auxillary.c \
-          tree_simple_command.c tree_subshell.c \
+          tree_simple_command.c tree_simple_command_rdrs.c tree_subshell.c \
           tree_pipe_sequence.c tree_and_or.c tree_list.c
 
 BUILTIN_DIR = builtins/
@@ -55,20 +57,20 @@ BUILTIN_SRC = cd.c where.c builtins.c hs_history.c tokenizer_test.c \
               hs_export.c hs_jobs.c
 
 INTERFACE_DIR = line_editing/
-INTERFACE_SRC = buffer_drawing.c buffer_works.c     \
+INTERFACE_SRC = buffer_drawing.c buffer_input.c  \
                 cursor_control.c cursor_positions.c \
                 buffer_vector.c buffer_vector_tools1.c buffer_vector_tools2.c  \
-                state_machine.c \
+                state_toggles.c state_updates.c \
                 handlers_arrows.c handlers_editing.c handlers_engine.c \
                 handlers_arrows_mods.c handlers_arrows_vertical.c \
-                write_anywhere.c
+                handlers_clipboard.c \
+                auxiliary_buffer.c auxiliary_le.c
 
 JOB_CONTROL_DIR = job_control/
-JOB_CONTROL_SRC = signals_manipulation.c signals_basic.c \
+JOB_CONTROL_SRC = signals_basic.c \
                   context_manipulations.c context_switch.c command_lookup.c \
-                  jc_jobs_manipulations.c \
-                  jc_children_cleanup.c jc_headquaters.c  \
-                  jc_queue_execution.c jc_queue_interface.c
+                  jc_headquaters.c  \
+                  jc_queue_execution.c jc_queue_forknrun.c jc_queue_interface.c
 
 EXPANSIONS_DIR = expansions/
 EXPANSIONS_SRC = expander_engine.c expand_escaped.c expand_quotes.c \

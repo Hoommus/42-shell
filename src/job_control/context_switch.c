@@ -6,20 +6,11 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/10 12:09:35 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/07 16:36:48 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/29 18:47:04 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "twenty_one_sh.h"
-
-t_context		*context_init(void)
-{
-	t_context	*dummy;
-
-	dummy = ft_memalloc(sizeof(t_context));
-	dummy->environ = environ_create_vector(VARIABLES_VECTOR_INITIAL_SIZE);
-	return (dummy);
-}
 
 void			context_deep_free(t_context **context)
 {
@@ -31,7 +22,10 @@ void			context_deep_free(t_context **context)
 	while (list)
 	{
 		swap = list->next;
-		close(list->current);
+		// TODO: make checks of fds presence in main context to avoid closing
+		//  something like history file
+		if (list->current > 2)
+			close(list->current);
 		free(list->label);
 		free(list);
 		list = swap;
@@ -60,7 +54,10 @@ void			context_switch(t_context *to_which)
 	list = to_which->fd_list;
 	while (list)
 	{
-		dup2(list->current, list->original);
+		if (list->current == -1)
+			close(list->original);
+		else
+			dup2(list->current, list->original);
 		list = list->next;
 	}
 	TERM_APPLY_CONFIG(to_which->term_config);
@@ -101,7 +98,7 @@ static void		duplicate_fds(t_context *new, const t_context *context,
 	{
 		tmp = ft_memalloc(sizeof(struct s_fd_lst));
 		if (list->label)
-			tmp->label = ft_strdup(list->label);
+			tmp->label = ft_strdup("cloned");
 		tmp->original = list->original;
 		tmp->current = with_dup ? dup(list->current) : list->current;
 		if (!new->fd_list && !new_list)
@@ -133,7 +130,8 @@ t_context		*context_duplicate(const t_context *context, bool with_dup)
 	new = ft_memalloc(sizeof(t_context));
 	new->term_config = ft_memalloc(sizeof(struct termios));
 	if (context->term_config != NULL)
-		ft_memcpy(new->term_config, context->term_config, sizeof(struct termios));
+		ft_memcpy(new->term_config, context->term_config,
+			sizeof(struct termios));
 	if (with_dup)
 		duplicate_environ(new, context);
 	else

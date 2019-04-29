@@ -6,36 +6,35 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:36 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/02 14:21:12 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/19 13:22:23 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "twenty_one_sh.h"
 #include "line_editing.h"
 
-int			is_valid_var(const char *var)
+bool		is_valid_var(const char *var)
 {
 	int		i;
 
-	if (var == NULL)
-		return (0);
+	if (var == NULL || ft_isdigit(*var))
+		return (false);
 	i = 0;
 	while (var[i])
 	{
 		if (!(ft_isalnum(var[i]) || var[i] == '_'))
-			return (0);
+			return (false);
 		i++;
 	}
-	return (1);
+	return (true);
 }
 
 ssize_t		ponies_teleported(void)
 {
 	ssize_t			ponies;
-	static int		fd;
+	int				fd;
 
-	if (fd == 0)
-		fd = open_wrapper("/dev/urandom", O_RDONLY);
+	fd = open_wrapper("/dev/urandom", O_RDONLY);
 	if (fd < 0)
 		return (1);
 	else
@@ -43,11 +42,12 @@ ssize_t		ponies_teleported(void)
 		read(fd, &ponies, sizeof(ssize_t));
 		if (ponies == 0)
 			ponies += 1348;
+		close(fd);
 		return (ABS(ponies));
 	}
 }
 
-void	display_prompt(enum e_input_state state)
+void		display_prompt(enum e_input_state state)
 {
 	if (state == STATE_NORMAL)
 		display_normal_prompt();
@@ -58,7 +58,9 @@ void	display_prompt(enum e_input_state state)
 	else if (state == STATE_ESCAPED)
 		ft_printf("> ");
 	else if (state == STATE_HEREDOC)
-		ft_printf("heredoc> ");
+		ft_printf("hdoc %s> ", g_term->heredoc_word);
+	else if (state == STATE_HEREDOCD)
+		ft_printf("hdocd %s> ", g_term->heredoc_word);
 	else if (state == STATE_EMPTY_PIPE)
 		ft_printf("pipe> ");
 	else
@@ -66,7 +68,7 @@ void	display_prompt(enum e_input_state state)
 	carpos_update(POS_PROMPT);
 }
 
-bool	is_string_numeric(const char *str, const int base)
+bool		is_string_numeric(const char *str, const int base)
 {
 	static char		*numbers = "0123456789ABCDEF";
 	bool			is_found;
@@ -86,13 +88,11 @@ bool	is_string_numeric(const char *str, const int base)
 	return (true);
 }
 
-size_t	carray_size(char **array)
+bool		is_dir(const char *path)
 {
-	size_t	i;
+	struct stat		s;
 
-	i = 0;
-	while (array && array[i])
-		i++;
-	return (i);
+	if (stat(path, &s) == -1)
+		return (false);
+	return (S_ISDIR(s.st_mode));
 }
-

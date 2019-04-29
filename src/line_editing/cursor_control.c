@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/16 12:28:16 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/16 13:00:38 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/19 13:08:18 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,20 +19,10 @@
 ** Can you~
 */
 
+#include "twenty_one_sh.h"
 #include "line_editing.h"
 
-int			ft_strchr_back(const char *str, char c, int i)
-{
-	while (i >= 0)
-	{
-		if (str[i] == c)
-			break;
-		i--;
-	}
-	return (i);
-}
-
-void	carpos_adjust_db(int by)
+void			carpos_adjust_db(int by)
 {
 	int		i;
 
@@ -50,36 +40,36 @@ void	carpos_adjust_db(int by)
 ** If distance is big, searches for first newline
 ** and counts physical coordinates from that character
 **
-** That's a shitload of `-1', isn't it?
+** That's a shitload of '-1', isn't it?
 **
 ** Also, 'penult' is short for 'penultimate'
 */
 
-static void		left_hard(int dist, int *new_col, int *new_row)
+static void		left_hard(int dist, int *new_c, int *new_r)
 {
 	int		ult_nl;
 	int		penult_nl;
 
-	ult_nl = (int) g_term->buffer->iterator;
+	ult_nl = (int)g_term->buffer->iterator;
 	while (dist)
 	{
 		ult_nl = ult_nl - 1;
-		if (*new_col == 0 && buff_char_at_equals(ult_nl, "\n"))
+		if (*new_c == 0 && buff_char_at_equals(ult_nl, "\n"))
 		{
-			penult_nl = buff_chroff(g_term->buffer, "\n", ult_nl - 1);
+			penult_nl = buff_rchr("\n", ult_nl - 1);
 			if (penult_nl < 0)
 				penult_nl = -carpos_get(POS_PROMPT)->col - 1;
-			*new_col = ult_nl - penult_nl - 1;
-			*new_row -= *new_col > g_term->ws_col ? *new_col / g_term->ws_col : 1;
-			*new_col = *new_col > g_term->ws_col ? *new_col % g_term->ws_col : *new_col;
+			*new_c = ult_nl - penult_nl - 1;
+			*new_r -= *new_c > g_term->ws_col ? *new_c / g_term->ws_col : 1;
+			*new_c = *new_c > g_term->ws_col ? *new_c % g_term->ws_col : *new_c;
 		}
-		else if (*new_col == 0)
+		else if (*new_c == 0)
 		{
-			*(new_col) = g_term->ws_col - 1;
-			*new_row -= 1;
+			*(new_c) = g_term->ws_col - 1;
+			*new_r -= 1;
 		}
 		else
-			*(new_col) -= 1;
+			*(new_c) -= 1;
 		dist--;
 	}
 }

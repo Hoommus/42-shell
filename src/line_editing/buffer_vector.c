@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   buffer_vector.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/04/22 21:11:27 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/04/22 21:11:27 by vtarasiu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "buffer_works.h"
 #include "twenty_one_sh.h"
 
@@ -15,7 +27,7 @@ void			init_buffer_vector(u_int64_t capacity)
 	g_term->buffer = g_buffer;
 }
 
-void			reallocate_buffer_vector(void)
+static void		reallocate_buffer_vector(void)
 {
 	t_symbol	*tmp;
 	u_int64_t	sz;
@@ -53,7 +65,7 @@ int				buff_insert_single_at(u_int64_t index, const char str[8])
 {
 	t_symbol	symbol;
 
-	ft_memcpy(symbol.s, str, 8);
+	ft_memcpy(symbol.s, str, 4);
 	return (buff_insert_symbol_at(index, &symbol));
 }
 

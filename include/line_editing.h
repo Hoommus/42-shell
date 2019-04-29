@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:56:36 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/18 18:40:27 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/23 15:19:25 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,8 @@
 # include "twenty_one_sh.h"
 
 # define K_CTRL_W          23
-# define K_CTRL_U          CKILL
+# define K_CTRL_U          CTRL('u')
+# define K_CTRL_Y          CTRL('y')
 # define K_CTRL_D          CEOT
 # define K_BSP             127
 
@@ -47,53 +48,10 @@
 # define K_ALT_SHIFT_RIGHT 18911811444235035
 
 /*
-**  if (ch == 127)
-**		symbol_del(shell);
-**	else if (ch >= 32 && ch < 127)
-**		enter_ch(shell, ch);
-**	else if (ch == 4283163)
-**		history_up(shell);
-**	else if (ch == 4348699)
-**		history_down(shell);
-**	else if (ch == 4414235)
-**		right_key(shell);
-**	else if (ch == 4479771)
-**		left_key(shell);
-**	else if (ch == 25115)
-**		alt_left_key(shell);
-**	else if (ch == 26139)
-**		alt_right_key(shell);
-**	else if (ch == 4741915)
-**		home_key(shell);
-**	else if (ch == 4610843)
-**		end_key(shell);
-**	else if (ch == 74982532143899)
-**		shift_left(shell);
-**	else if (ch == 73883020516123)
-**		shift_right(shell);
-**	else if (ch == 23)
-**		cut(shell);
-**	else if (ch == 27)
-**		left_selection(shell);
-**	else if (ch == 29)
-**		right_selection(shell);
-**	else if (ch == 5)
-**		copy(shell);
-**	else if (ch == 18)
-**		paste(shell);
-**	else if (ch == 4)
-**		printf("CTRL+D\n");
-**	else if (ch == 16)
-**		play_music();
-**	else if (ch == 12)
-**		stop_music();
-*/
-
-/*
 ** Cursor movement direction
 */
 
-enum						e_direction
+enum				e_direction
 {
 	D_UP,
 	D_DOWN,
@@ -102,59 +60,68 @@ enum						e_direction
 	D_NOWHERE
 };
 
-struct						s_listener
+struct				s_listener
 {
-	union u_char	key;
-	void			(*handler) (union u_char);
+	const union u_char	key;
+	void				(*const handler) (union u_char);
 };
 
-int							ft_putc(int c);
-void						buffer_redraw(void);
+int					ft_putc(int c);
+void				buffer_redraw(void);
+
+bool				is_key_hooked(union u_char key);
 
 /*
-** Key handlers (handlers_zbase.c, handlers_arrows.c, handlers_editing.c)
+** Key handlers (handlers_engine.c, handlers_arrows.c, handlers_editing.c)
 */
-void						handle_key(union u_char key);
+void				handle_key(union u_char key);
 
-void					handle_delchar(union u_char key);
-void						handle_home(union u_char key);
-void						handle_end(union u_char key);
-void						handle_del(union u_char key);
-void						handle_eot(union u_char key);
+void			handle_delchar(union u_char key);
+void				handle_home(union u_char key);
+void				handle_end(union u_char key);
+void				handle_del(union u_char key);
+void				handle_eot(union u_char key);
+void				handle_up(union u_char key);
+void				handle_down(union u_char key);
+void				handle_left(union u_char key);
+void				handle_right(union u_char key);
+void				handle_tab(union u_char key);
+void				handle_ctrl_w(union u_char key);
+void				handle_ctrl_u(union u_char key);
+void				handle_ctrl_y(union u_char key);
+void				handle_backspace(union u_char key);
+void				handle_alt_up(union u_char key);
+void				handle_alt_down(union u_char key);
+void				handle_alt_left(union u_char key);
+void				handle_alt_right(union u_char key);
 
-void						handle_ctrl_w(union u_char key);
-
-void						handle_up(union u_char key);
-void						handle_down(union u_char key);
-void						handle_left(union u_char key);
-void						handle_right(union u_char key);
-void						handle_ignore(union u_char key);
-void						handle_line_kill(union u_char key);
-void						handle_backspace(union u_char key);
-void						handle_alt_up(union u_char key);
-void						handle_alt_down(union u_char key);
-void						handle_alt_left(union u_char key);
-void						handle_alt_right(union u_char key);
 /*
-** State machine (state_machine.c)
+** State machine (state_machine.c, state_updates.c)
 */
-int							toggle_state(const char *c);
-int							toggle_quote(void);
-int							toggle_bquote(void);
-int							toggle_dquote(void);
-int							toggle_escaped(void);
+
+enum e_input_state	update_state(const char *input);
+int					toggle_state(const char *c);
+int					toggle_quote(void);
+int					toggle_bquote(void);
+int					toggle_dquote(void);
+int					toggle_escaped(void);
+
 /*
 ** Caret positions manipulation (cursor_positions.c)
 */
-void						carpos_adjust_db(int by);
-t_carpos					caret_move(int distance,
-										enum e_direction direction);
-t_carpos					*carpos_get(enum e_position type);
-t_carpos					*get_caretpos(enum e_position type);
-t_carpos					*carpos_load(enum e_position type);
-t_carpos					*carpos_save_as(enum e_position type);
-t_carpos					*carpos_update(enum e_position type);
 
-void						write_at(int col, int row, char *string);
+void				carpos_adjust_db(int by);
+t_carpos			caret_move(int distance, enum e_direction direction);
+t_carpos			*carpos_get(enum e_position type);
+t_carpos			*carpos_load(enum e_position type);
+t_carpos			*carpos_save_as(enum e_position type);
+t_carpos			*carpos_update(enum e_position type);
+
+/*
+** Auxiliary (auxiliary_le.c)
+*/
+
+void				write_at(int col, int row, char *string);
+bool				is_single_symbol(const char *c);
 
 #endif

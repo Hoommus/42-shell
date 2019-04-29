@@ -6,12 +6,17 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/06 16:43:04 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/08 12:15:19 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/29 14:51:34 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "expansions_internal.h"
 #include "twenty_one_sh.h"
+
+bool			is_special_var(const char c)
+{
+	return (c == '$' || c == '%' || c == '?' || c == '!' || c == '0');
+}
 
 // TODO: replace smart_split with function that returns first found token
 static char		*extract_var(const char *str, u_int32_t *off)
@@ -21,8 +26,8 @@ static char		*extract_var(const char *str, u_int32_t *off)
 	char		*swap;
 
 	swap = ft_strdup(str);
-	array = smart_split(str + *off + 1, "\n\t $!#%&()*+,-./:;<=>?@[\\]^`{|}~");
-	if (array && array[0] && is_valid_var(array[0]))
+	array = smart_split(str + *off + 1, "\n\t $&()*+,-./:;<=>[\\]^`{|}~\"\'");
+	if (array && array[0])
 	{
 		var = environ_get_entry(g_term->context_current->environ, array[0]);
 		ft_memdel((void **)&swap);
@@ -52,7 +57,8 @@ char			*expand_vars(char *str)
 			swap = str;
 			str = extract_var(str, &i);
 			ft_memdel((void **)&swap);
-			len = ft_strlen(str);
+			if ((len = ft_strlen(str)) == 0)
+				break ;
 		}
 		i += (str[i] == '\\') ? 2 : 1;
 	}
