@@ -35,7 +35,8 @@ void	write_at(int col, int row, char *string)
 {
 	int		i;
 
-	if (g_term->input_state == STATE_NON_INTERACTIVE || g_term->tty_fd == -1)
+	if (g_term->input_state == STATE_NON_INTERACTIVE || g_term->tty_fd == -1 ||
+		get_env_v(NULL, "TERM") == NULL)
 		return ;
 	carpos_save_as(POS_CUSTOM1);
 	tputs(tgoto(tgetstr("cm", NULL), col, row), 1, &ft_putc);

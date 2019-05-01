@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/06 16:43:59 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/06 17:01:14 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/04/30 12:18:40 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ char	*strinsert(const char *dst, const char *insertion,
 	ft_strncat(final, dst, region_start);
 	ft_strcat(final + region_start, insertion);
 	ft_strncat(final + region_start + ft_strlen(insertion),
-			   dst + region_start + region_size,
-			   ft_strlen(final + region_start + region_size));
+				dst + region_start + region_size,
+				ft_strlen(dst + region_start + region_size));
 	return (final);
 }

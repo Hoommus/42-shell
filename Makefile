@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/04/26 12:32:42 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/04/30 11:58:09 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -68,7 +68,7 @@ INTERFACE_SRC = buffer_drawing.c buffer_input.c  \
 
 JOB_CONTROL_DIR = job_control/
 JOB_CONTROL_SRC = signals_basic.c \
-                  context_manipulations.c context_switch.c command_lookup.c \
+                  context_manipulations.c context_switch.c \
                   jc_headquaters.c  \
                   jc_queue_execution.c jc_queue_forknrun.c jc_queue_interface.c
 

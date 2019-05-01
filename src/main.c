@@ -121,7 +121,7 @@ void				print_messages(void)
 		if (!var || !var->value || tgetent(NULL, var->value) == ERR)
 			ft_printf("\x1b[41;1m%-53s\x1b[0;0m\n\x1b[41;1m%53s\x1b[0;0m\n",
 				"Warning: TERM environment variable is not set.",
-				"Terminal capabilities are somewhat limited.");
+				"Terminal capabilities are somewhat limited. ");
 	}
 }
 

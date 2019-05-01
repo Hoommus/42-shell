@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/29 19:33:49 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/01 15:44:26 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,8 +67,8 @@
 # define ERR_RUNNING_JOBS       SH ": you have running jobs\n"
 # define ERR_AMBIGUOUS_REDIRECT SH ": ambiguous redirect\n"
 
-# define BUILD 2034
-# define BUILD_DATE "29.04.19 19:33:49 EEST"
+# define BUILD 2115
+# define BUILD_DATE "01.05.19 15:44:26 EEST"
 
 # ifdef MAX_INPUT
 #  undef MAX_INPUT

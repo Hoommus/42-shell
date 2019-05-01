@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/10 16:42:51 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/29 13:32:17 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/01 13:04:30 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ static int				run_builtin(t_job *job)
 	return (-512);
 }
 
-#define DIRTY_HACK(err) (ft_dprintf(2, err, list->cmd->args[0]) & 0) & -1024
+#define DIRTY_HACK(err) ((ft_dprintf(2, err, list->cmd->args[0]) & 0) | -1024)
 
 int						jc_execute_pipeline_queue(void)
 {

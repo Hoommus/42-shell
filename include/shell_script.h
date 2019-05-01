@@ -202,6 +202,7 @@ int							exec_or_if(const t_node *parent);
 int							exec_node(const t_node *node);
 int							exec_abort(int dummy);
 int							exec_pipeline(const t_node *node);
+int							exec_subshell(const t_node *node);
 
 /*
 ** File reading and executing

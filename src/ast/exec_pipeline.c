@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/05 17:50:23 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/27 16:45:53 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/01 13:02:39 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,15 +60,12 @@ int					exec_pipeline(const t_node *node)
 {
 	int		pipeline_status;
 	char	*swap;
-	int		status;
 
 	if (node->left->node_type == NODE_PIPE)
-		status = exec_pipeline_inner(node, NULL);
+		exec_pipeline_inner(node, NULL);
 	else
-		status = exec_pipeline_terminator(node, NULL);
-	pipeline_status = status;
-	if (status == 0)
-		pipeline_status = jc_execute_pipeline_queue();
+		exec_pipeline_terminator(node, NULL);
+	pipeline_status = jc_execute_pipeline_queue();
 	jc_destroy_queue();
 	environ_push_entry(jc_get()->shell_context->environ, "?",
 						(swap = ft_itoa(pipeline_status)), SCOPE_SHELL_LOCAL);
