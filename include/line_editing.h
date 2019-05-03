@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:56:36 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/23 15:19:25 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/02 16:20:25 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,8 @@
 # include "twenty_one_sh.h"
 
 # define K_CTRL_W          23
-# define K_CTRL_U          CTRL('u')
-# define K_CTRL_Y          CTRL('y')
+# define K_CTRL_U          21
+# define K_CTRL_Y          25
 # define K_CTRL_D          CEOT
 # define K_BSP             127
 
@@ -31,6 +31,11 @@
 # define K_DOWN            4348699
 # define K_LEFT            4479771
 # define K_RIGHT           4414235
+
+# define K_UP_FALLBACK     4280091
+# define K_DOWN_FALLBACK   4345627
+# define K_LEFT_FALLBACK   4476699
+# define K_RIGHT_FALLBACK  4411163
 
 # define K_ALT_UP          1096489755
 # define K_ALT_DOWN        1113266971
@@ -68,7 +73,7 @@ struct				s_listener
 
 int					ft_putc(int c);
 void				buffer_redraw(void);
-
+void				buffer_redraw_i(u_int64_t from_index);
 bool				is_key_hooked(union u_char key);
 
 /*
@@ -121,7 +126,7 @@ t_carpos			*carpos_update(enum e_position type);
 ** Auxiliary (auxiliary_le.c)
 */
 
-void				write_at(int col, int row, char *string);
+void				write_at(int col, int row, const char *string);
 bool				is_single_symbol(const char *c);
 
 #endif

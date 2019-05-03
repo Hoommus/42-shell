@@ -70,8 +70,8 @@ void	handle_left(union u_char key)
 	if (key.lng == K_LEFT && g_term->buffer->iterator > 0)
 	{
 		if ((g_term->input_state == STATE_HEREDOC ||
-			 g_term->input_state == STATE_HEREDOCD)
-			 && buff_char_at_equals(g_term->buffer->iterator - 1, "\n"))
+				g_term->input_state == STATE_HEREDOCD)
+				&& buff_char_at_equals(g_term->buffer->iterator - 1, "\n"))
 			return ;
 		caret_move(1, D_LEFT);
 		g_term->buffer->iterator--;

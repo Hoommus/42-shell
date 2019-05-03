@@ -6,45 +6,49 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/06 16:43:04 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/30 12:27:54 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/03 18:57:44 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "expansions_internal.h"
 #include "twenty_one_sh.h"
 
-bool			is_special_var(const char c)
+static char		*extract_special(const char *str, u_int32_t *off)
 {
-	return (c == '$' || c == '%' || c == '?' || c == '!' || c == '0');
+	char		*dummy;
+	char		*swap;
+	t_var		*var;
+
+	dummy = ft_strnew(2);
+	dummy[0] = *(str + *off + 1);
+	dummy[1] = 0;
+	var = environ_get_entry(g_term->context_current->environ, dummy);
+	swap = strinsert(str, var ? var->value : "", *off, ft_strlen(dummy) + 1);
+	*off += ft_strlen(var ? var->value : " ") - 1;
+	free(dummy);
+	return (swap);
 }
 
-// TODO: replace smart_split with function that returns first found token
-char			*extract_var(const char *str, u_int32_t *off)
+static char		*extract_var(const char *str, u_int32_t *off)
 {
 	t_var		*var;
 	char		**array;
 	char		*swap;
-	char		*dummy;
+	char		c;
 
-	swap = ft_strdup(str);
-	if (is_special_var(*(str + *off + 1)))
-	{
-		dummy = ft_strnew(2);
-		dummy[0] = *(str + *off + 1);
-		dummy[1] = 0;
-		array = ft_memalloc(sizeof(char *) * 2);
-		*array = dummy;
-	}
-	else
-		array = smart_split(str + *off + 1, "\n\t $&()*+,-./:;<=>[\\]^`{|}~\"\'");
-	if (array && array[0] && ft_strlen(array[0]) > 0)
+	c = *(str + *off + 1);
+	if (c == '$' || c == '?' || c == '!' || c == '0')
+		return (extract_special(str, off));
+	array = smart_split(str + *off + 1, "\n\t $&()*+,-./:;<=>[\\]^`{|}~\"\'");
+	if (array && array[0] && is_valid_var(array[0]))
 	{
 		var = environ_get_entry(g_term->context_current->environ, array[0]);
-		ft_memdel((void **)&swap);
 		swap = strinsert(str, var ? var->value : "", *off,
 			ft_strlen(array[0]) + 1);
 		*off += ft_strlen(var ? var->value : " ") - 1;
 	}
+	else
+		swap = ft_strdup(str);
 	free_array((void **)array);
 	return (swap);
 }
@@ -57,8 +61,6 @@ char			*expand_vars(char *str)
 	bool		ignore;
 
 	str = ft_strdup(str);
-	if (ft_strchr(str, '$') == NULL)
-		return (str);
 	ignore = false;
 	i = 0;
 	len = ft_strlen(str);

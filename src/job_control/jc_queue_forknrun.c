@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/25 18:31:57 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/29 19:32:11 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/03 15:47:17 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ void					close_redundant_fds(t_context *context)
 }
 
 
-void					close_foreign_fds(t_job *jobs, t_job *current)
+static void				close_foreign_fds(t_job *jobs, t_job *current)
 {
 	struct s_fd_lst	*list;
 
@@ -85,7 +85,7 @@ void					close_foreign_fds(t_job *jobs, t_job *current)
 	}
 }
 
-void				handle_signaled(t_job *job, int status)
+static void				handle_signaled(t_job *job, int status)
 {
 	char		*swap;
 	t_job		*list;
@@ -105,77 +105,41 @@ void				handle_signaled(t_job *job, int status)
 	ft_memdel((void **)&swap);
 }
 
-void					write_heredocs(t_job *job)
+static void				write_heredocs(t_job *job)
 {
 	const t_io_rdr		*io_rdrs = job->cmd->io_redirects;
 
 	while (io_rdrs->type != TOKEN_NOT_APPLICABLE)
 	{
-		if ((io_rdrs->type == TOKEN_DLESS || io_rdrs->type == TOKEN_DLESSDASH
-			|| io_rdrs->type == TOKEN_TRILESS))
+		if ((io_rdrs->type == TOKEN_DLESS || io_rdrs->type == TOKEN_DLESSDASH))
+		{
+			if (g_term->fallback_input_state != STATE_NON_INTERACTIVE)
+				write(io_rdrs->what.fd, io_rdrs->what.path,
+					ft_strlen(io_rdrs->what.path));
+			write(io_rdrs->what.fd, "\n", 1);
+			close(io_rdrs->what.fd);
+		}
+		else if (io_rdrs->type == TOKEN_TRILESS)
 		{
 			write(io_rdrs->what.fd, io_rdrs->what.path,
 					ft_strlen(io_rdrs->what.path));
+			write(io_rdrs->what.fd, "\n", 1);
 			close(io_rdrs->what.fd);
 		}
 		io_rdrs++;
 	}
 }
 
-bool					are_all_terminated(t_job *jobs)
-{
-	int		i;
-	int		terminated;
-
-	i = 0;
-	terminated = 0;
-	while (jobs)
-	{
-		if (jobs->state == JOB_TERMINATED)
-			terminated++;
-		i++;
-		jobs = jobs->next;
-	}
-	return (i == terminated);
-}
-
-int						waitall(void)
-{
-	int			status;
-	pid_t		returned;
-	t_job		*list;
-
-	list = jc_get()->job_queue;
-	while (list)
-	{
-		if ((returned = wait(&status)) == -1)
-			break ;
-		if (list->pid == returned)
-		{
-			list->status = status;
-			list->wexitstatus = WEXITSTATUS(status);
-			list->state = JOB_TERMINATED;
-			return (status);
-		}
-		list = list->next;
-	}
-	return (-1);
-}
-
-int						waitnclaim(t_job *last)
+static int				waitnclaim(t_job *last)
 {
 	int			status;
 
-//	if (last->prev == NULL)
-		waitpid(last->pid, &status, 0);
-//	else
-//		status = waitall();
+	waitpid(last->pid, &status, 0);
 	last->status = status;
 	last->wexitstatus = WEXITSTATUS(last->status);
-//	if (WIFSIGNALED(status) && !WIFEXITED(status)
-//		&& WTERMSIG(status) != 1 && WTERMSIG(status) <= 31)
-//		handle_signaled(last, status);
-	//waitall();
+	if (WIFSIGNALED(status) && !WIFEXITED(status)
+		&& WTERMSIG(status) != 1 && WTERMSIG(status) <= 31)
+		handle_signaled(last, status);
 	while (waitpid(-1, &status, WNOHANG) != -1)
 		;
 	return (last->wexitstatus);
@@ -204,5 +168,5 @@ int						forknrun(t_job *job, char *path)
 		if (job->next == NULL)
 			return (waitnclaim(job));
 	}
-	return (-1024);
+	return (-256);
 }

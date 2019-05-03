@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/05 17:50:36 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/01 13:02:37 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/03 20:57:26 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,8 @@ static bool	alterate_vars(const struct s_command *command, t_context *context)
 
 	if (command->args == NULL || command->args[0] == NULL)
 	{
-		scope = SCOPE_SHELL_LOCAL;
+		scope = g_term->fallback_input_state == STATE_NON_INTERACTIVE ?
+			SCOPE_SCRIPT_GLOBAL : SCOPE_SHELL_LOCAL;
 		context = g_term->context_original;
 	}
 	else
@@ -113,21 +114,12 @@ int		exec_command(const t_node *command_node, t_context *new_context)
 	enum e_job_state		job_class;
 	int						status;
 
-	job_class = JOB_FG;
+	job_class = new_context ? JOB_FG : JOB_PIPE;
 	if (new_context)
-	{
 		context = new_context;
-		job_class = command->is_async ? JOB_BG : JOB_PIPE;
-	}
 	else
 		context = context_duplicate(g_term->context_original, true);
 	expand_everything(command);
-//	ft_printf("+{ ");
-//	for (int i = 0; command->assignments[i] != NULL; i++)
-//		ft_printf("%s ", command->assignments[i]);
-//	for (int i = 0; command->args[i] != NULL; i++)
-//		ft_printf("%s ", command->args[i]);
-//	ft_printf("}\n");
 	if (alterate_filedes(command, context))
 	{
 		context_deep_free(&context);

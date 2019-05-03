@@ -31,7 +31,7 @@ bool	is_single_symbol(const char *c)
 		return (false);
 }
 
-void	write_at(int col, int row, char *string)
+void	write_at(int col, int row, const char *string)
 {
 	int		i;
 

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/01 15:44:26 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/03 20:38:40 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,9 +39,13 @@
 # include "get_next_line.h"
 # include "shell_environ.h"
 
-# define SH "21sh"
+# ifndef SH
+#  define SH "21sh"
+# endif
 
-# define PROMPT_HOST "\x1b[0m\x1b[34;1m[%s@%s]\x1b[0m"
+# define ANSI_RESET "\x1b[0m"
+
+# define PROMPT_HOST ANSI_RESET "\x1b[34;1m[%s@%s]\x1b[0m"
 # define PROMPT_PATH " \x1b[36;1m%s\x1b[0m"
 # define PROMPT_TERMINATOR "\x1b[%d;1m $ \x1b[0m"
 # define SHELL_PROMPT PROMPT_HOST PROMPT_PATH PROMPT_TERMINATOR
@@ -58,17 +62,20 @@
 # define CONFIG_FILE "." SH "shrc"
 # define LOG_FILE "." SH ".log"
 
-# define ERR_PERMISSION_DENIED  SH ": permission denied: %s\n"
-# define ERR_COMMAND_NOT_FOUND  SH ": command not found: %s\n"
-# define ERR_BAD_FD             SH ": Bad file descriptor: %d\n"
-# define ERR_NO_SUCH_FILE       SH ": no such file or directory: %s\n"
-# define ERR_IS_A_DIRECTORY     SH ": %s: is a directory\n"
-# define ERR_SYNTAX_AT_LINE     SH ": syntax error near token '%s' on line %d\n"
-# define ERR_RUNNING_JOBS       SH ": you have running jobs\n"
-# define ERR_AMBIGUOUS_REDIRECT SH ": ambiguous redirect\n"
+# define SYNTAX_ERROR ": syntax error near token `%s' on line %d\n"
 
-# define BUILD 2115
-# define BUILD_DATE "01.05.19 15:44:26 EEST"
+# define ERR_PERMISSION_DENIED  ANSI_RESET SH ": permission denied: %s\n"
+# define ERR_COMMAND_NOT_FOUND  ANSI_RESET SH ": command not found: %s\n"
+# define ERR_BAD_FD             ANSI_RESET SH ": Bad file descriptor: %d\n"
+# define ERR_NO_SUCH_FILE      ANSI_RESET SH ": no such file or directory: %s\n"
+# define ERR_IS_A_DIRECTORY     ANSI_RESET SH ": `%s': is a directory\n"
+# define ERR_SYNTAX_AT_LINE     ANSI_RESET SH SYNTAX_ERROR
+# define ERR_RUNNING_JOBS       ANSI_RESET SH ": you have running jobs\n"
+# define ERR_AMBIGUOUS_REDIRECT ANSI_RESET SH ": ambiguous redirect\n"
+
+
+# define BUILD 2219
+# define BUILD_DATE "03.05.19 20:38:40 EEST"
 
 # ifdef MAX_INPUT
 #  undef MAX_INPUT
@@ -156,11 +163,13 @@ typedef struct			s_position
 /*
 ** g_term stores terminal parameters as well as cursor position and input buffer
 ** TODO: extract buffer variable to separate global var and create normal API
+** TODO: consider adding errno-like global variable
 */
 
 struct					s_term
 {
 	enum e_input_state	input_state;
+	enum e_input_state	fallback_input_state;
 	char				*heredoc_word;
 	short				ws_col;
 	short				ws_row;
@@ -179,7 +188,6 @@ struct					s_term
 	struct s_context	*context_backup;
 
 	t_buffer			*buffer;
-	struct s_symbol		*paste_board;
 };
 extern volatile sig_atomic_t	g_interrupt;
 extern struct s_term			*g_term;
@@ -194,7 +202,7 @@ void					init_shell_context(void);
 void					init_files(void);
 void					init_variables(void);
 short					init_fd_at_home(char *filename, int flags);
-void					parse_args(int argc, char **argv);
+int						parse_args(int argc, char **argv);
 
 /*
 ** Environment (environ_utils.c)
@@ -226,7 +234,6 @@ void					context_mark_fd_closed(t_context *context,
 ** Main Loop (main.c, )
 */
 
-int						shell_loop(void);
 char					*read_arbitrary(void);
 void					setup_signal_handlers(void);
 void					display_prompt(enum e_input_state state);

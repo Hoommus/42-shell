@@ -28,7 +28,7 @@ enum e_input_state	update_state(const char *input)
 		swap = buff_char_at(iterator + 1);
 		updated = toggle_state(swap);
 	}
-	else if (!ft_strcmp(input, "\\") && current != STATE_QUOTE
+	else if (ft_strcmp(input, "\\") == 0 && current != STATE_QUOTE
 		&& current != STATE_DQUOTE && current != STATE_BQUOTE)
 		updated = toggle_escaped();
 	else if (ft_strchr("\"\\'`", *input))

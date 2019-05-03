@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/22 21:11:27 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/22 21:11:27 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/02 20:20:14 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,7 @@ int				buff_insert_single_at(u_int64_t index, const char str[8])
 	t_symbol	symbol;
 
 	ft_memcpy(symbol.s, str, 4);
+	symbol.visual_size = 1;
 	return (buff_insert_symbol_at(index, &symbol));
 }
 

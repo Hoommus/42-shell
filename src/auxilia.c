@@ -17,7 +17,7 @@ bool		is_valid_var(const char *var)
 {
 	int		i;
 
-	if (var == NULL || ft_isdigit(*var))
+	if (var == NULL || ft_isdigit(*var) || ft_strlen(var) == 0)
 		return (false);
 	i = 0;
 	while (var[i])

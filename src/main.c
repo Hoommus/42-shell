@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:32 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/28 17:34:53 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/03 20:32:21 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,31 +18,7 @@
 
 struct s_term		*g_term;
 
-int					display_normal_prompt(void)
-{
-	t_var	*home;
-	t_var	*user;
-	char	host[1025];
-	char	cwd[1025];
-	int		size;
-
-	home = get_env_v(NULL, "HOME");
-	getcwd(cwd, 1024);
-	gethostname(host, 1024);
-	if (home && home->value && ft_strcmp(cwd, home->value) == 0 &&
-		(cwd[ft_strlen(cwd)] == '/' || cwd[ft_strlen(cwd)] == 0))
-		ft_strcpy(cwd, "~");
-	host[ft_strchr(host, '.') - host] = 0;
-	user = get_env_v(NULL, "USER");
-	size = ft_printf(SHELL_PROMPT,
-		user ? user->value : "$USER", host,
-		ft_strrchr(cwd, '/') == NULL ? cwd
-									: ft_strrchr(cwd, '/') + !!(cwd[1] != '\0'),
-		g_term->last_status ? 31 : 32);
-	return (size);
-}
-
-int					shell_loop(void)
+static int			shell_loop(void)
 {
 	char		*commands;
 
@@ -55,7 +31,7 @@ int					shell_loop(void)
 			TERM_APPLY_CONFIG(g_term->context_current->term_config);
 			if (carpos_update(POS_CURRENT)->col > 1)
 				ft_printf("\n");
-			display_prompt(g_term->input_state = STATE_NORMAL);
+			display_prompt(g_term->input_state = g_term->fallback_input_state);
 			buff_clear(g_term->last_status = 0);
 			commands = read_arbitrary();
 			history_write(commands, get_history_fd());
@@ -68,7 +44,7 @@ int					shell_loop(void)
 			(commands = ft_itoa(g_term->last_status)), SCOPE_SHELL_LOCAL);
 		ft_strdel(&commands);
 		if (g_term->input_state == STATE_NON_INTERACTIVE)
-			exit(0);
+			return (0);
 	}
 	return (0);
 }
@@ -85,19 +61,17 @@ void				init_variables(void)
 	gethostname(host, 1024);
 	set_env_v(vector, "HOST", host, SCOPE_SHELL_LOCAL);
 	host[ft_strchr(host, '.') - host] = 0;
-	swap = ft_itoa(BUILD);
 	set_env_v(vector, "SHORT_HOST", host, SCOPE_SHELL_LOCAL);
-	set_env_v(vector, "BUILD", swap, SCOPE_SHELL_LOCAL);
+	set_env_v(vector, "BUILD", swap = ft_itoa(BUILD), SCOPE_SHELL_LOCAL);
 	set_env_v(vector, "BUILD_DATE", BUILD_DATE, SCOPE_SHELL_LOCAL);
 	set_env_v(vector, "SHELL", SH, SCOPE_EXPORT);
 	ft_memdel((void **)&swap);
-	environ_push_entry(vector, "%", (swap = ft_itoa(getpid())),
+	environ_push_entry(vector, "$", (swap = ft_itoa(getpid())),
 		SCOPE_SHELL_LOCAL);
 	ft_memdel((void **)&swap);
 	var = get_env_v(g_term->context_current->environ, "SHLVL");
 	if (var == NULL || var->value == NULL || ft_strlen(var->value) == 0)
-		set_env_v(g_term->context_current->environ, "SHLVL", "1",
-				SCOPE_EXPORT);
+		set_env_v(g_term->context_current->environ, "SHLVL", "1", SCOPE_EXPORT);
 	else
 		set_env_v(g_term->context_current->environ, "SHLVL",
 				(swap = ft_itoa(ft_atoi(var->value) + 1)), SCOPE_EXPORT);
@@ -125,25 +99,40 @@ void				print_messages(void)
 	}
 }
 
+void				run_file(const char *path)
+{
+	int		file;
+
+	if (access(path, F_OK) == -1)
+		ft_dprintf(2, ERR_NO_SUCH_FILE, path);
+	else if (access(path, F_OK) != -1  && is_dir(path))
+		ft_dprintf(2, ERR_IS_A_DIRECTORY, path);
+	else if (access(path, F_OK) != -1 && access(path, R_OK) == -1)
+		ft_dprintf(2, ERR_PERMISSION_DENIED, path);
+	else if ((file = open(path, O_RDONLY)) == -1)
+		ft_dprintf(2, ERR_NO_SUCH_FILE, path);
+	else
+	{
+		dup2(file, 0);
+		shell_loop();
+		close(file);
+	}
+}
+
 int					main(int argc, char **argv)
 {
-	extern char		**environ;
-
-//	ft_printf("Initing...\n");
 	init_shell_context();
-//	ft_printf("Initing files...\n");
 	init_files();
-//	ft_printf("Loading history...\n");
+	init_buffer_vector(MAX_INPUT);
 	history_load(g_term->history_file);
-//	ft_printf("Parsing args...\n");
-	parse_args(argc, argv);
-//	ft_printf("Initing variables...\n");
+	argv += parse_args(argc, argv);
 	init_variables();
-//	ft_printf("Initing job control...\n");
 	jc_init(g_term->context_current);
-//	ft_printf("Printing messages...\n");
 	print_messages();
 	setup_signal_handlers();
-	shell_loop();
+	if (argc == 1)
+		shell_loop();
+	else
+		run_file(argv[1]);
 	return (0);
 }

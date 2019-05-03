@@ -38,7 +38,7 @@ static int		open_at_fd(int what_fd, const char *path, int oflag,
 	return (fd);
 }
 
-bool			is_fd_valid(int fd)
+static bool		is_fd_valid(int fd)
 {
 	struct s_fd_lst	*list;
 	bool			is_valid;

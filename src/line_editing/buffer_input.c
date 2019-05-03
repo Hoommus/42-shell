@@ -6,14 +6,14 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/18 16:28:45 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/29 13:12:17 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/03 20:16:38 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "twenty_one_sh.h"
 #include "line_editing.h"
 
-void				deal_with_printable(const char *arr)
+static void			deal_with_printable(const char *arr)
 {
 	g_term->input_state = update_state(arr);
 	buff_insert_single_at(g_term->buffer->iterator, arr);
@@ -33,7 +33,7 @@ void				deal_with_printable(const char *arr)
 		buffer_redraw();
 }
 
-void				deal_with_heredoc_nl(const char *input)
+static void			deal_with_heredoc_nl(const char *arr)
 {
 	int64_t	offset;
 	char	*swap;
@@ -51,14 +51,14 @@ void				deal_with_heredoc_nl(const char *input)
 	{
 		TERM_CLR_LINE;
 		write(STDOUT_FILENO, "\n", 1);
-		buff_insert_single_at(g_term->buffer->iterator, input);
+		buff_insert_single_at(g_term->buffer->iterator, arr);
 		display_prompt(g_term->input_state);
 		buffer_redraw();
 	}
 	free(swap);
 }
 
-void				deal_with_newline(const char *arr)
+static void			deal_with_newline(const char *arr)
 {
 	if (g_term->input_state == STATE_HEREDOC)
 		deal_with_heredoc_nl(arr);
@@ -82,7 +82,7 @@ void				deal_with_newline(const char *arr)
 	}
 }
 
-void				deal_with_pasted(char *str)
+static void			deal_with_pasted(char *str)
 {
 	size_t		len;
 	uint32_t	i;
@@ -90,7 +90,10 @@ void				deal_with_pasted(char *str)
 	i = 0;
 	len = ft_strlen(str);
 	while (i < len)
-		toggle_state(str + i++);
+	{
+		toggle_state(str + i);
+		i++;
+	}
 	buff_insert_string_at(g_term->buffer->iterator, str);
 	write(1, str, len);
 }
@@ -116,7 +119,7 @@ char				*read_arbitrary(void)
 			deal_with_newline(swap);
 		else if (is_single_symbol(swap) && swap[0] != '\n')
 			deal_with_printable(swap);
-		else
+		else if (!is_single_symbol(swap))
 			deal_with_pasted(swap);
 	}
 	g_term->heredoc_word = NULL;

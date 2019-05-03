@@ -6,14 +6,14 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/18 11:54:55 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/28 15:59:10 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/03 14:18:20 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "line_editing.h"
 #include "twenty_one_sh.h"
 
-static const struct s_listener	g_key_listeners[] =
+static const struct s_listener	g_key_hooks[] =
 {
 	{{K_UP}, &handle_up},
 	{{K_DOWN}, &handle_down},
@@ -30,7 +30,16 @@ static const struct s_listener	g_key_listeners[] =
 	{{K_CTRL_D}, &handle_eot},
 	{{K_CTRL_U}, &handle_ctrl_u},
 	{{K_CTRL_Y}, &handle_ctrl_y},
-	{{K_CTRL_W}, &handle_ctrl_w},
+	{{K_UP_FALLBACK}, &handle_up},
+	{{K_DOWN_FALLBACK}, &handle_down},
+	{{K_LEFT_FALLBACK}, &handle_left},
+	{{K_RIGHT_FALLBACK}, &handle_right},
+	{{CINTR}, &handle_tab},
+	{{CSTATUS}, &handle_tab},
+	{{CMIN}, &handle_tab},
+	{{CSUSP}, &handle_tab},
+	{{CTIME}, &handle_tab},
+	{{CSTART}, &handle_tab},
 	{{'\t'}, &handle_tab},
 	{{0}, 0}
 };
@@ -39,9 +48,11 @@ bool							is_key_hooked(union u_char key)
 {
 	int		i;
 
+	if (key.lng < 32 && key.lng != '\n')
+		return (true);
 	i = 0;
-	while (g_key_listeners[i].handler)
-		if (g_key_listeners[i++].key.lng == key.lng)
+	while (g_key_hooks[i].handler)
+		if (g_key_hooks[i++].key.lng == key.lng)
 			return (true);
 	return (false);
 }
@@ -86,8 +97,8 @@ void							handle_key(union u_char key)
 	int		i;
 
 	i = -1;
-	while (g_key_listeners[++i].handler != 0)
-		if (g_key_listeners[i].key.lng == key.lng)
-			g_key_listeners[i].handler(key);
+	while (g_key_hooks[++i].handler != 0)
+		if (g_key_hooks[i].key.lng == key.lng && g_key_hooks[i].handler)
+			g_key_hooks[i].handler(key);
 	write_at(0, 0, key.arr);
 }

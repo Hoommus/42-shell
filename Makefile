@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/04/30 11:58:09 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/05/02 13:00:28 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,8 @@ CC = clang
 FDS = shell(ulimit -n)
 
 ##### Remove the -g flag #####
-FLAGS = -g -Wall  \
+FLAGS = -g -DSH=\"$(NAME)\" \
+               -Wall  \
                -Wextra \
                -Werror  \
                -Wno-unknown-pragmas \
@@ -33,7 +34,8 @@ LIB_NAME = libftprintf.a
 SHELL_SRC = main.c init.c memory.c auxilia.c       \
             service_routines.c args_parsing.c string_hash.c \
             shell_environ.c shell_environ_tools.c shell_environ_vector.c \
-            syscall_wrappers.c
+            syscall_wrappers.c \
+            auxiliary_main.c
 
 LEXER_DIR = lexer/
 LEXER_SRC = smart_split.c tokenizer.c tokens_mem.c token_word_types.c \
@@ -60,10 +62,12 @@ INTERFACE_DIR = line_editing/
 INTERFACE_SRC = buffer_drawing.c buffer_input.c  \
                 cursor_control.c cursor_positions.c \
                 buffer_vector.c buffer_vector_tools1.c buffer_vector_tools2.c  \
+                buffer_vector_insertions.c buffer_vector_parts.c \
                 state_toggles.c state_updates.c \
                 handlers_arrows.c handlers_editing.c handlers_engine.c \
                 handlers_arrows_mods.c handlers_arrows_vertical.c \
                 handlers_clipboard.c \
+                pasteboard_interface.c \
                 auxiliary_buffer.c auxiliary_le.c
 
 JOB_CONTROL_DIR = job_control/
@@ -88,7 +92,21 @@ OBJ = $(addprefix $(OBJ_DIR), $(SHELL_SRC:.c=.o))                         \
       $(addprefix $(OBJ_DIR)$(EXPANSIONS_DIR), $(EXPANSIONS_SRC:.c=.o))   \
       $(addprefix $(OBJ_DIR)$(JOB_CONTROL_DIR), $(JOB_CONTROL_SRC:.c=.o)) \
 
-all: $(NAME)
+
+install: all
+	@if [ grep ~/.brew/bin $PATH 2>/dev/null ] ; \
+	then \
+	    mkdir -p ~/.brew/bin/   ; \
+	    cp $(NAME) ~/.brew/bin/ ; \
+	    echo "\n export PATH=\$$PATH:\$$HOME/.brew/bin" >> ~/.zshrc ; \
+	    source ~/.zshrc         ; \
+	    echo "$(NAME) installed"   ; \
+	else \
+	    cp $(NAME) ~/.brew/bin/ ; \
+	    echo "$(NAME) updated"     ; \
+	fi ;
+
+all: $(NAME) 
 
 #                     ** Do not EVER touch rule below **                       #
 #                     ** Do not EVER touch rule below **                       #
@@ -119,18 +137,6 @@ prepare:
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
 	$(CC) $(FLAGS) $(HEADER) -o $@ -c $< ;
 
-install: all
-	@if [ grep ~/.brew/bin $PATH 2>/dev/null ] ; \
-	then \
-	    mkdir -p ~/.brew/bin/   ; \
-	    cp $(NAME) ~/.brew/bin/ ; \
-	    echo "\n export PATH=\$$PATH:\$$HOME/.brew/bin" >> ~/.zshrc ; \
-	    source ~/.zshrc         ; \
-	    echo "21sh installed"   ; \
-	else \
-	    cp $(NAME) ~/.brew/bin/ ; \
-	    echo "21sh updated"     ; \
-	fi ;
 
 clean:
 	make -C libft clean
@@ -157,7 +163,7 @@ fclean: clean
 	/bin/rm -f $(NAME)
 	/bin/rm -f $(LIB_NAME)
 
-re: fclean $(NAME)
+re: fclean install
 
 love:
 	@echo "Not all."

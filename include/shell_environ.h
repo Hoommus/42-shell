@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:11:59 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/25 15:37:55 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/03 21:10:06 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,8 @@ enum							e_var_scope
 	SCOPE_GLOBAL = 1,
 	SCOPE_SHELL_LOCAL = 2,
 	SCOPE_SCRIPT_GLOBAL = 4,
-	SCOPE_EXPORT = 8,
-	SCOPE_COMMAND_LOCAL = 16,
+	SCOPE_COMMAND_LOCAL = 8,
+	SCOPE_EXPORT = 128,
 };
 
 /*

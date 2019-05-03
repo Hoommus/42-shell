@@ -83,7 +83,7 @@ t_var				*environ_update_entry(t_env_vector *vector,
 
 	entry = environ_get_entry(vector, key);
 	ft_memdel((void **)&(entry->value));
-	entry->scope = scope;
+	entry->scope = scope < entry->scope ? entry->scope : scope;
 	entry->value = ft_strdup(value);
 	tmp = ft_strjoin(key, value);
 	entry->hash = hash_sdbm(tmp) + entry->scope;

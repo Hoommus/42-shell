@@ -51,13 +51,13 @@ int		toggle_escaped(void)
 
 int		toggle_state(const char *c)
 {
-	if (ft_strcmp(c, "\'") == 0)
+	if (*c == '\'')
 		return (toggle_quote());
-	else if (ft_strcmp(c, "\"") == 0)
+	else if (*c == '"')
 		return (toggle_dquote());
-	else if (ft_strcmp(c, "`") == 0)
+	else if (*c == '`')
 		return (toggle_bquote());
-	else if (ft_strcmp(c, "\\") == 0)
+	else if (*c == '\\')
 		return (toggle_escaped());
 	else
 		return (0);

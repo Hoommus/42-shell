@@ -6,28 +6,14 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/23 18:06:24 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/29 18:56:33 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/03 15:40:32 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell_script.h"
 
-#define IS_HEREDOC(t) ((t) == TOKEN_DLESS || (t) == TOKEN_DLESSDASH || IS_HW(t))
-#define IS_HW(t) ((t) == TOKEN_TRILESS)
-
-static char			*add_newline(char **hereword)
-{
-	char	*swap;
-	size_t	len;
-
-	len = ft_strlen(*hereword);
-	swap = ft_strnew(len + 1);
-	ft_strcpy(swap, *hereword);
-	swap[len] = '\n';
-	ft_strdel(hereword);
-	*hereword = swap;
-	return (swap);
-}
+#define IS_HEREDOC(t) ((t) == TOKEN_DLESS || (t) == TOKEN_DLESSDASH)
+#define IS_HEREWORD(t) ((t) == TOKEN_TRILESS)
 
 void				run_heredocs(t_node *node)
 {
@@ -38,9 +24,8 @@ void				run_heredocs(t_node *node)
 	{
 		rdr = node->command->io_redirects - 1;
 		while ((++rdr)->type != TOKEN_NOT_APPLICABLE)
-			if (IS_HW(rdr->type))
-				add_newline(&(rdr->what.path));
-			else if (IS_HEREDOC(rdr->type))
+			if (!IS_HEREWORD(rdr->type) && IS_HEREDOC(rdr->type)
+				&& g_term->input_state != STATE_NON_INTERACTIVE)
 			{
 				g_term->heredoc_word = rdr->what.path;
 				g_term->input_state = STATE_HEREDOC;

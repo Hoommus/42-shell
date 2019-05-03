@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/10 16:42:51 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/01 13:04:30 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/03 19:04:18 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ static char				*path_to_target(t_job *job)
 	char		**paths;
 
 	if (ft_strchr(args[0], '/') != NULL)
-		return (access(args[0], F_OK) == -1 ? NULL : ft_strdup(args[0]));
+		return (ft_strdup(args[0]));
 	var = get_env_v(NULL, "PATH");
 	if (!var || !var->value)
 		return (NULL);
@@ -66,29 +66,35 @@ static int				run_builtin(t_job *job)
 
 #define DIRTY_HACK(err) ((ft_dprintf(2, err, list->cmd->args[0]) & 0) | -1024)
 
+static bool				hack_free(void *ptr)
+{
+	free(ptr);
+	return (true);
+}
+
 int						jc_execute_pipeline_queue(void)
 {
-	int			status;
-	t_job		*list;
-	char		*bin;
+	const t_job		*list = jc_get()->job_queue;
+	int				s;
+	char			*bin;
 
-	list = jc_get()->job_queue;
 	while (list)
 	{
-		if ((status = run_builtin(list)) != -512 && !list->next)
-			return (status);
-		else if (status == -512)
+		if ((s = run_builtin((t_job *)list)) != -512 && !list->next)
+			return (s);
+		else if (s == -512)
 		{
-			if ((bin = path_to_target(list)) != NULL && access(bin, F_OK) == -1)
+			if ((bin = path_to_target((t_job *)list)) != NULL
+				&& access(bin, F_OK) == -1 && ft_strchr(bin, '/') != NULL)
 				return (DIRTY_HACK(ERR_NO_SUCH_FILE));
-			else if (bin != NULL && is_dir(bin))
+			else if (bin != NULL && is_dir(bin) && hack_free(bin))
 				return (DIRTY_HACK(ERR_IS_A_DIRECTORY));
-			else if (bin != NULL && access(bin, X_OK) == -1)
+			else if (bin != NULL && access(bin, X_OK) == -1 && hack_free(bin))
 				return (DIRTY_HACK(ERR_PERMISSION_DENIED));
 			else if (bin == NULL)
 				return (DIRTY_HACK(ERR_COMMAND_NOT_FOUND));
-			else if (!g_interrupt && (status = forknrun(list, bin)) != -1024)
-				return (status);
+			else if (!g_interrupt && (s = forknrun((t_job *)list, bin)) != -256)
+				return (s);
 		}
 		list = list->next;
 	}

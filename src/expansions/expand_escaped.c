@@ -40,12 +40,12 @@ static void							assign_escaped(char *str, u_int32_t i,
 	size_t						size;
 	int							base;
 
-	base = numstr_base(str);
-	if ((escaped = ft_atoi_base(str, base)) > 0 && escaped < 32)
+	base = numstr_base(str + i);
+	if ((escaped = ft_atoi_base(str + i, base)) > 0 && escaped < 32)
 	{
 		size = ft_nbrlen_base(escaped, base)
-				+ (str[0] == '0' || str[0] == 'x' || str[0] == 'X')
-				+ (str[1] == 'x' || str[1] == 'X');
+				+ (str[i] == '0' || str[i] == 'x' || str[i] == 'X')
+				+ (str[i + 1] == 'x' || str[i + 1] == 'X');
 		ft_memmove(str + i, str + i + size - 1, l - i - size + 1);
 		str[i] = escaped;
 	}
