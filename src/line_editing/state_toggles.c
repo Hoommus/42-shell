@@ -19,7 +19,7 @@ int		toggle_quote(void)
 		return (g_term->input_state = STATE_NORMAL);
 	else if (g_term->input_state == STATE_NORMAL)
 		return (g_term->input_state = STATE_QUOTE);
-	return (0);
+	return (g_term->input_state);
 }
 
 int		toggle_dquote(void)
@@ -28,7 +28,7 @@ int		toggle_dquote(void)
 		return (g_term->input_state = STATE_NORMAL);
 	else if (g_term->input_state == STATE_NORMAL)
 		return (g_term->input_state = STATE_DQUOTE);
-	return (0);
+	return (g_term->input_state);
 }
 
 int		toggle_bquote(void)
@@ -37,7 +37,7 @@ int		toggle_bquote(void)
 		return (g_term->input_state = STATE_NORMAL);
 	else if (g_term->input_state == STATE_NORMAL)
 		return (g_term->input_state = STATE_BQUOTE);
-	return (0);
+	return (g_term->input_state);
 }
 
 int		toggle_escaped(void)
@@ -46,7 +46,7 @@ int		toggle_escaped(void)
 		return (g_term->input_state = STATE_NORMAL);
 	else if (g_term->input_state == STATE_NORMAL)
 		return (g_term->input_state = STATE_ESCAPED);
-	return (0);
+	return (g_term->input_state);
 }
 
 int		toggle_state(const char *c)
@@ -60,5 +60,5 @@ int		toggle_state(const char *c)
 	else if (*c == '\\')
 		return (toggle_escaped());
 	else
-		return (0);
+		return (g_term->input_state);
 }

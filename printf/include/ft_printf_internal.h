@@ -39,8 +39,8 @@ int				g_error;
 /*
 ** Following chars respectively:
 ** '#' - alternate form
-** '0' - For all conversions except n, the converted command is padded on the left
-**       with zeros rather than blanks
+** '0' - For all conversions except n, the converted command is padded on the
+**       left with zeros rather than blanks
 ** '-' - command is to be left adjusted on the field
 ** ' ' - blank before positive number of signed conversion
 ** '+' - always put sign before conversion

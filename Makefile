@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/05/04 16:17:05 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/05/04 16:44:52 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,7 @@ CC = clang
 FDS = shell(ulimit -n)
 
 ##### Remove the -g flag #####
-FLAGS = -DSH=\"$(NAME)\" \
+FLAGS = -g -DSH=\"$(NAME)\" \
                -Wall  \
                -Wextra \
                -Werror  \

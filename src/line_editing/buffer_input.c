@@ -67,6 +67,7 @@ static void			deal_with_newline(const char *arr)
 			|| (g_term->input_state == STATE_ESCAPED &&
 				g_term->buffer->iterator == g_term->buffer->size))
 	{
+		TERM_CLR_LINE;
 		write(STDOUT_FILENO, "\n", 1);
 		buff_insert_single_at(g_term->buffer->iterator, arr);
 		display_prompt(g_term->input_state);

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/06 16:43:04 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/03 18:57:44 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/04 17:58:03 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,25 +31,30 @@ static char		*extract_special(const char *str, u_int32_t *off)
 
 static char		*extract_var(const char *str, u_int32_t *off)
 {
+	const char	tmp[1024] = {0};
 	t_var		*var;
-	char		**array;
 	char		*swap;
-	char		c;
+	int			i;
 
-	c = *(str + *off + 1);
-	if (c == '$' || c == '?' || c == '!' || c == '0')
+	if (*(str + *off + 1) == '$' || *(str + *off + 1) == '?' ||
+		*(str + *off + 1) == '!' || *(str + *off + 1) == '0')
 		return (extract_special(str, off));
-	array = smart_split(str + *off + 1, "\n\t $&()*+,-./:;<=>[\\]^`{|}~\"\'");
-	if (array && array[0] && is_valid_var(array[0]))
+	i = *off + 1;
+	while (str[i] && ft_isalnum(str[i]))
+		i++;
+	ft_memcpy((char *)tmp, str + *off + 1, i - *off);
+	if (is_valid_var(tmp))
 	{
-		var = environ_get_entry(g_term->context_current->environ, array[0]);
+		var = environ_get_entry(g_term->context_current->environ, tmp);
 		swap = strinsert(str, var ? var->value : "", *off,
-			ft_strlen(array[0]) + 1);
+			ft_strlen(tmp) + 1);
 		*off += ft_strlen(var ? var->value : " ") - 1;
 	}
 	else
+	{
 		swap = ft_strdup(str);
-	free_array((void **)array);
+		*off += 1;
+	}
 	return (swap);
 }
 
