@@ -31,16 +31,17 @@ static char		*extract_special(const char *str, u_int32_t *off)
 
 static char		*extract_var(const char *str, u_int32_t *off)
 {
-	const char	tmp[1024] = {0};
+	char		tmp[1024];
 	t_var		*var;
 	char		*swap;
 	int			i;
 
+	ft_bzero(tmp, sizeof(char) * 1024);
 	if (*(str + *off + 1) == '$' || *(str + *off + 1) == '?' ||
 		*(str + *off + 1) == '!' || *(str + *off + 1) == '0')
 		return (extract_special(str, off));
 	i = *off + 1;
-	while (str[i] && ft_isalnum(str[i]))
+	while (str[i] && (ft_isalnum(str[i]) || str[i] == '_'))
 		i++;
 	ft_memcpy((char *)tmp, str + *off + 1, i - *off);
 	if (is_valid_var(tmp))
@@ -51,10 +52,9 @@ static char		*extract_var(const char *str, u_int32_t *off)
 		*off += ft_strlen(var ? var->value : " ") - 1;
 	}
 	else
-	{
 		swap = ft_strdup(str);
+	if (!is_valid_var(tmp))
 		*off += 1;
-	}
 	return (swap);
 }
 
