@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/16 12:28:37 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/28 14:25:16 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/04 12:00:45 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,9 @@ void	handle_up(union u_char key)
 	struct s_history_entry	*entry;
 	char					*tmp;
 
-	if (key.lng == K_UP && (!g_term->buffer->iterator || !g_term->buffer->size
-		|| g_term->buffer->iterator == g_term->buffer->size)
+	if ((key.lng == K_UP || key.lng == K_UP_FALLBACK)
+		&& (!g_term->buffer->iterator || !g_term->buffer->size
+			|| g_term->buffer->iterator == g_term->buffer->size)
 		&& g_history->iterator > 0)
 	{
 		tmp = buff_get_part(0, UINT64_MAX);
@@ -48,7 +49,8 @@ void	handle_down(union u_char key)
 	struct s_history_entry	*entry;
 	char					*tmp;
 
-	if (key.lng == K_DOWN && history_get_entry(g_history->iterator) != NULL)
+	if ((key.lng == K_DOWN || key.lng == K_DOWN_FALLBACK)
+		&& history_get_entry(g_history->iterator) != NULL)
 	{
 		tmp = buff_get_part(0, UINT64_MAX);
 		while ((entry = history_get_entry(++g_history->iterator)))
@@ -67,7 +69,8 @@ void	handle_down(union u_char key)
 
 void	handle_left(union u_char key)
 {
-	if (key.lng == K_LEFT && g_term->buffer->iterator > 0)
+	if ((key.lng == K_LEFT || key.lng == K_LEFT_FALLBACK)
+		&& g_term->buffer->iterator > 0)
 	{
 		if ((g_term->input_state == STATE_HEREDOC ||
 				g_term->input_state == STATE_HEREDOCD)
@@ -80,7 +83,8 @@ void	handle_left(union u_char key)
 
 void	handle_right(union u_char key)
 {
-	if (key.lng == K_RIGHT && g_term->buffer->iterator < g_term->buffer->size
+	if ((key.lng == K_RIGHT || key.lng == K_RIGHT_FALLBACK)
+		&& g_term->buffer->iterator < g_term->buffer->size
 		&& ft_strcmp(buff_char_at(g_term->buffer->iterator), "\0") != 0)
 	{
 		caret_move(1, D_RIGHT);

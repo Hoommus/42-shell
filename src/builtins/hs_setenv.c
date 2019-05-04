@@ -24,7 +24,7 @@ static int		set_tricky(const char *str)
 			set_env_v((t_env_vector *)vector, tmp, str + j + 1, SCOPE_EXPORT);
 		else if (!is_valid_var(tmp))
 		{
-			ft_dprintf(2, "setenv: '%s' is not a valid variable name\n", tmp);
+			ft_dprintf(2, "setenv: `%s' is not a valid variable name\n", tmp);
 			return (1);
 		}
 	return (0);

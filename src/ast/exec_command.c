@@ -61,17 +61,34 @@ static bool	alterate_vars(const struct s_command *command, t_context *context)
 	return (assignments && assignments[0]);
 }
 
-/*
-** TODO: Expand backqoutes and $()
-*/
-
-static void	expand_everything(const struct s_command *command)
+static void	expand_in_rdrs(const struct s_command *command)
 {
 	struct s_io_redirect	*rdrs;
 	char					*swap;
 	int						i;
 
 	rdrs = command->io_redirects;
+	i = -1;
+	while (rdrs[++i].type != TOKEN_NOT_APPLICABLE)
+	{
+		if ((swap = rdrs[i].what.path))
+			rdrs[i].what.path = expand(rdrs[i].what.path);
+		ft_memdel((void **)&swap);
+		if ((swap = rdrs[i].where.path))
+			rdrs[i].where.path = expand(rdrs[i].where.path);
+		ft_memdel((void **)&swap);
+	}
+}
+
+/*
+** TODO: Expand backqoutes and $()
+*/
+
+static void	expand_everything(const struct s_command *command)
+{
+	char					*swap;
+	int						i;
+
 	i = -1;
 	while (command->args[++i])
 	{
@@ -86,16 +103,7 @@ static void	expand_everything(const struct s_command *command)
 		command->assignments[i] = expand(command->assignments[i]);
 		ft_memdel((void **)&swap);
 	}
-	i = -1;
-	while (rdrs[++i].type != TOKEN_NOT_APPLICABLE)
-	{
- 		if ((swap = rdrs[i].what.path))
-			rdrs[i].what.path = expand(rdrs[i].what.path);
-		ft_memdel((void **)&swap);
- 		if ((swap = rdrs[i].where.path))
-			rdrs[i].where.path = expand(rdrs[i].where.path);
-		ft_memdel((void **)&swap);
-	}
+	expand_in_rdrs(command);
 }
 
 /*
@@ -107,7 +115,7 @@ static void	expand_everything(const struct s_command *command)
 ** TODO: optimise (how?..) execution if no variables and fds changes are made
 */
 
-int		exec_command(const t_node *command_node, t_context *new_context)
+int			exec_command(const t_node *command_node, t_context *new_context)
 {
 	const struct s_command	*command = command_node->command;
 	t_context				*context;
@@ -115,10 +123,8 @@ int		exec_command(const t_node *command_node, t_context *new_context)
 	int						status;
 
 	job_class = new_context ? JOB_FG : JOB_PIPE;
-	if (new_context)
-		context = new_context;
-	else
-		context = context_duplicate(g_term->context_original, true);
+	context = new_context ? new_context
+							: context_duplicate(g_term->context_original, true);
 	expand_everything(command);
 	if (alterate_filedes(command, context))
 	{

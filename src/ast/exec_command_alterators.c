@@ -38,7 +38,7 @@ static int		open_at_fd(int what_fd, const char *path, int oflag,
 	return (fd);
 }
 
-static bool		is_fd_valid(int fd)
+static bool		is_fd_valid(t_context *context, int fd)
 {
 	struct s_fd_lst	*list;
 	bool			is_valid;
@@ -46,7 +46,7 @@ static bool		is_fd_valid(int fd)
 	if (fd > MAX_FD || fd == -1)
 		return (false);
 	is_valid = false;
-	list = g_term->context_current->fd_list;
+	list = context->fd_list;
 	while (list && !is_valid)
 	{
 		if (list->original == fd)
@@ -66,7 +66,7 @@ static void		rdr_greatand(t_context *context, const t_io_rdr *rdr)
 		g_rdr_error = 1;
 		return ((void)ft_dprintf(2, ERR_AMBIGUOUS_REDIRECT));
 	}
-	else if (is_fd_valid(rdr->where.fd))
+	else if (is_fd_valid(context, rdr->where.fd))
 		what_to_dup_fd = rdr->where.fd;
 	else
 	{

@@ -40,13 +40,13 @@ static void					construct_redirect(t_token *pivot,
 	rdr->where.fd = 0;
 	if (is_left)
 	{
-		if (is_string_numeric(pivot->prev->value, 10))
+		if (pivot->prev && is_string_numeric(pivot->prev->value, 10))
 			rdr->where.fd = ft_atoi(pivot->prev->value);
 		rdr->what.path = ft_strdup(pivot->next->value);
 	}
 	else
 	{
-		if (is_string_numeric(pivot->prev->value, 10))
+		if (pivot->prev && is_string_numeric(pivot->prev->value, 10))
 			rdr->what.fd = ft_atoi(pivot->prev->value);
 		if (pivot->next && pivot->next->type == TOKEN_WORD)
 		{

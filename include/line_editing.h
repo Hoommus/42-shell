@@ -81,7 +81,6 @@ bool				is_key_hooked(union u_char key);
 */
 void				handle_key(union u_char key);
 
-void			handle_delchar(union u_char key);
 void				handle_home(union u_char key);
 void				handle_end(union u_char key);
 void				handle_del(union u_char key);

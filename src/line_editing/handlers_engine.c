@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/18 11:54:55 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/03 14:18:20 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/04 15:49:40 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ static const struct s_listener	g_key_hooks[] =
 	{{K_ALT_LEFT}, &handle_alt_left},
 	{{K_ALT_RIGHT}, &handle_alt_right},
 	{{K_BSP}, &handle_backspace},
+	{{K_DEL}, &handle_del},
 	{{K_DEL}, &handle_del},
 	{{K_HOME}, &handle_home},
 	{{K_END}, &handle_end},
@@ -86,12 +87,6 @@ void							handle_eot(union u_char key)
 	}
 }
 
-void							handle_delchar(union u_char key)
-{
-	key.lng = 0;
-	tputs(tgetstr("dc", NULL), 1, &ft_putc);
-}
-
 void							handle_key(union u_char key)
 {
 	int		i;
@@ -100,5 +95,4 @@ void							handle_key(union u_char key)
 	while (g_key_hooks[++i].handler != 0)
 		if (g_key_hooks[i].key.lng == key.lng && g_key_hooks[i].handler)
 			g_key_hooks[i].handler(key);
-	write_at(0, 0, key.arr);
 }

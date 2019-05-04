@@ -12,7 +12,10 @@
 
 #include "shell_script.h"
 
-// TODO: Fix global return status to match zsh's
+/*
+** TODO: Fix global return status to match zsh's
+*/
+
 int							exec_and_if(const t_node *parent)
 {
 	int		status_left;

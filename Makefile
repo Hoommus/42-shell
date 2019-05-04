@@ -34,6 +34,7 @@ LIB_NAME = libftprintf.a
 SHELL_SRC = main.c init.c memory.c auxilia.c       \
             service_routines.c args_parsing.c string_hash.c \
             shell_environ.c shell_environ_tools.c shell_environ_vector.c \
+            shell_environ_memory.c \
             syscall_wrappers.c \
             auxiliary_main.c
 

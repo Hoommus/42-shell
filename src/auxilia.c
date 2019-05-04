@@ -49,6 +49,8 @@ ssize_t		ponies_teleported(void)
 
 void		display_prompt(enum e_input_state state)
 {
+	if (carpos_update(POS_CURRENT)->col > 1)
+		ft_printf("\n");
 	if (state == STATE_NORMAL)
 		display_normal_prompt();
 	else if (state == STATE_DQUOTE)

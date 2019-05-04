@@ -143,7 +143,7 @@ struct						s_command
 	char		**args;
 	char		**assignments;
 	t_io_rdr	*io_redirects;
-	bool		is_async; // TODO: Cut this out
+	bool		is_async;
 };
 
 union						u_executor

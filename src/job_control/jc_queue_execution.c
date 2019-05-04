@@ -6,12 +6,28 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/10 16:42:51 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/03 19:04:18 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/04 12:55:10 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell_job_control.h"
 #include "shell_builtins.h"
+
+void					close_redundant_fds(t_context *context)
+{
+	struct s_fd_lst		*list;
+
+	list = context->fd_list;
+	while (list)
+	{
+		if (ft_strcmp(list->label, "rdr_duped_1337"))
+		{
+			if (list->current > 2)
+				close(list->current);
+		}
+		list = list->next;
+	}
+}
 
 static char				*path_to_target(t_job *job)
 {

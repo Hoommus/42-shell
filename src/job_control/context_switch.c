@@ -6,11 +6,16 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/10 12:09:35 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/29 18:47:04 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/04 16:02:45 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "twenty_one_sh.h"
+
+/*
+** TODO: make checks of fds presence in main context to avoid closing
+**  something like history file
+*/
 
 void			context_deep_free(t_context **context)
 {
@@ -22,8 +27,6 @@ void			context_deep_free(t_context **context)
 	while (list)
 	{
 		swap = list->next;
-		// TODO: make checks of fds presence in main context to avoid closing
-		//  something like history file
 		if (list->current > 2)
 			close(list->current);
 		free(list->label);

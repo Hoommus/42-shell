@@ -48,23 +48,6 @@ static char				*g_sigs[31] =
 	"user-defined signal 2"
 };
 
-void					close_redundant_fds(t_context *context)
-{
-	struct s_fd_lst		*list;
-
-	list = context->fd_list;
-	while (list)
-	{
-		if (ft_strcmp(list->label, "rdr_duped_1337"))
-		{
-			if (list->current > 2)
-				close(list->current);
-		}
-		list = list->next;
-	}
-}
-
-
 static void				close_foreign_fds(t_job *jobs, t_job *current)
 {
 	struct s_fd_lst	*list;
@@ -140,8 +123,6 @@ static int				waitnclaim(t_job *last)
 	if (WIFSIGNALED(status) && !WIFEXITED(status)
 		&& WTERMSIG(status) != 1 && WTERMSIG(status) <= 31)
 		handle_signaled(last, status);
-	while (waitpid(-1, &status, WNOHANG) != -1)
-		;
 	return (last->wexitstatus);
 }
 

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/03 20:38:40 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/04 13:29:49 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,9 +73,8 @@
 # define ERR_RUNNING_JOBS       ANSI_RESET SH ": you have running jobs\n"
 # define ERR_AMBIGUOUS_REDIRECT ANSI_RESET SH ": ambiguous redirect\n"
 
-
-# define BUILD 2219
-# define BUILD_DATE "03.05.19 20:38:40 EEST"
+# define BUILD 2231
+# define BUILD_DATE "04.05.19 13:29:49 EEST"
 
 # ifdef MAX_INPUT
 #  undef MAX_INPUT
@@ -83,7 +82,7 @@
 # endif
 
 # ifndef MAX_FD
-#  define MAX_FD 1000
+#  define MAX_FD 4860
 # endif
 
 enum					e_input_state
@@ -120,8 +119,8 @@ struct					s_fd_lst
 ** So context is an entity that controls used environment variables,
 ** term config and filedes table for easy duplications used in
 ** redirects and pipes.
- *
- * This thing is quite "heavy" regarding memory and  usage
+**
+** This thing is quite "heavy" regarding memory and resource usage
 **
 ** TODO: Add info about shell config
 */

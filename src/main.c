@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:32 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/03 20:32:21 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/04 16:05:56 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,6 @@ static int			shell_loop(void)
 		{
 			tcsetpgrp(0, jc_get()->shell_pid);
 			TERM_APPLY_CONFIG(g_term->context_current->term_config);
-			if (carpos_update(POS_CURRENT)->col > 1)
-				ft_printf("\n");
 			display_prompt(g_term->input_state = g_term->fallback_input_state);
 			buff_clear(g_term->last_status = 0);
 			commands = read_arbitrary();
@@ -84,13 +82,6 @@ void				print_messages(void)
 
 	if (g_term->input_state != STATE_NON_INTERACTIVE)
 	{
-		ft_printf("\n%*s\n%*s\n\n%*s%d (%s)\n",
-			g_term->ws_col / 2 + 15, "  Willkommen und bienvenue.  ",
-			g_term->ws_col / 2 + 15, "Welcome to 42sh divided by 2.",
-			5, "Build #", BUILD, BUILD_DATE);
-		var = get_env_v(NULL, "SHLVL");
-		if (var && ft_atoi(var->value) > 2)
-			ft_printf("\nRabbit hole depth: %s\n", var->value);
 		var = get_env_v(NULL, "TERM");
 		if (!var || !var->value || tgetent(NULL, var->value) == ERR)
 			ft_printf("\x1b[41;1m%-53s\x1b[0;0m\n\x1b[41;1m%53s\x1b[0;0m\n",
@@ -105,7 +96,7 @@ void				run_file(const char *path)
 
 	if (access(path, F_OK) == -1)
 		ft_dprintf(2, ERR_NO_SUCH_FILE, path);
-	else if (access(path, F_OK) != -1  && is_dir(path))
+	else if (access(path, F_OK) != -1 && is_dir(path))
 		ft_dprintf(2, ERR_IS_A_DIRECTORY, path);
 	else if (access(path, F_OK) != -1 && access(path, R_OK) == -1)
 		ft_dprintf(2, ERR_PERMISSION_DENIED, path);
