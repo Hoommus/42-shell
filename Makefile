@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/05/02 13:00:28 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/05/04 16:17:05 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,11 +17,10 @@ CC = clang
 FDS = shell(ulimit -n)
 
 ##### Remove the -g flag #####
-FLAGS = -g -DSH=\"$(NAME)\" \
+FLAGS = -DSH=\"$(NAME)\" \
                -Wall  \
                -Wextra \
                -Werror  \
-               -Wno-unknown-pragmas \
                #-fsanitize="address"
 
 HEADER = -I include/ -I printf/include -I libft/
@@ -93,35 +92,9 @@ OBJ = $(addprefix $(OBJ_DIR), $(SHELL_SRC:.c=.o))                         \
       $(addprefix $(OBJ_DIR)$(EXPANSIONS_DIR), $(EXPANSIONS_SRC:.c=.o))   \
       $(addprefix $(OBJ_DIR)$(JOB_CONTROL_DIR), $(JOB_CONTROL_SRC:.c=.o)) \
 
-
-install: all
-	@if [ grep ~/.brew/bin $PATH 2>/dev/null ] ; \
-	then \
-	    mkdir -p ~/.brew/bin/   ; \
-	    cp $(NAME) ~/.brew/bin/ ; \
-	    echo "\n export PATH=\$$PATH:\$$HOME/.brew/bin" >> ~/.zshrc ; \
-	    source ~/.zshrc         ; \
-	    echo "$(NAME) installed"   ; \
-	else \
-	    cp $(NAME) ~/.brew/bin/ ; \
-	    echo "$(NAME) updated"     ; \
-	fi ;
-
 all: $(NAME) 
 
-#                     ** Do not EVER touch rule below **                       #
-#                     ** Do not EVER touch rule below **                       #
-#                     ** Do not EVER touch rule below **                       #
 $(NAME): prepare $(OBJ)
-	@BUILD_NBR=$$(expr $$(grep -E "# define BUILD [0-9]+" \
-			   < ./include/twenty_one_sh.h | \
-			   grep -o -E '[0-9]+') + 1) &&  \
-	BUILD_DATE=$$(date +"%d.%m.%y %T %Z") && \
-	ex -c "%s/define BUILD [0-9]\+/define BUILD $$BUILD_NBR/g|             \
-			%s!define BUILD_DATE .\+!define BUILD_DATE \"$$BUILD_DATE\"!g| \
-			|w|q" include/twenty_one_sh.h
-	rm -f obj/main.o
-	$(CC) $(FLAGS) $(HEADER) -o $(OBJ_DIR)main.o -c $(SRC_DIR)main.c
 	make -C $(LIB_DIR)
 	cp $(LIB_DIR)/$(LIB_NAME) ./$(LIB_NAME)
 	$(CC) $(FLAGS) -o $(NAME) $(OBJ) $(HEADER) $(LIB_NAME) -ltermcap
@@ -138,6 +111,18 @@ prepare:
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
 	$(CC) $(FLAGS) $(HEADER) -o $@ -c $< ;
 
+install:
+	@if [ grep ~/.brew/bin $PATH 2>/dev/null ] ; \
+	then \
+	    mkdir -p ~/.brew/bin/   ; \
+	    cp $(NAME) ~/.brew/bin/ ; \
+	    echo "\n export PATH=\$$PATH:\$$HOME/.brew/bin" >> ~/.zshrc ; \
+	    source ~/.zshrc         ; \
+	    echo "$(NAME) installed"   ; \
+	else \
+	    cp $(NAME) ~/.brew/bin/ ; \
+	    echo "$(NAME) updated"     ; \
+	fi ;
 
 clean:
 	make -C libft clean
@@ -164,7 +149,7 @@ fclean: clean
 	/bin/rm -f $(NAME)
 	/bin/rm -f $(LIB_NAME)
 
-re: fclean install
+re: fclean all
 
 love:
 	@echo "Not all."

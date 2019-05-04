@@ -6,15 +6,12 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/04 13:29:49 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/04 16:14:38 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef TWENTY_ONE_SH_H
 # define TWENTY_ONE_SH_H
-
-# pragma clang diagnostic push
-# pragma ide diagnostic ignored "readability-avoid-const-params-in-decls"
 
 # include <fcntl.h>
 # include <string.h>
@@ -73,8 +70,8 @@
 # define ERR_RUNNING_JOBS       ANSI_RESET SH ": you have running jobs\n"
 # define ERR_AMBIGUOUS_REDIRECT ANSI_RESET SH ": ambiguous redirect\n"
 
-# define BUILD 2231
-# define BUILD_DATE "04.05.19 13:29:49 EEST"
+# define BUILD 2234
+# define BUILD_DATE "04.05.19 16:14:38 EEST"
 
 # ifdef MAX_INPUT
 #  undef MAX_INPUT
@@ -294,7 +291,5 @@ int						close_wrapper(int filedes);
 int						gethostname(char *arr, size_t size);
 
 # endif
-
-# pragma clang diagnostic pop
 
 #endif

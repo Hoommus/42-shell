@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/25 18:31:57 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/03 15:47:17 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/04 16:13:50 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ static void				close_foreign_fds(t_job *jobs, t_job *current)
 	}
 }
 
-static void				handle_signaled(t_job *job, int status)
+void					handle_signaled(t_job *job, int status)
 {
 	char		*swap;
 	t_job		*list;
@@ -120,9 +120,6 @@ static int				waitnclaim(t_job *last)
 	waitpid(last->pid, &status, 0);
 	last->status = status;
 	last->wexitstatus = WEXITSTATUS(last->status);
-	if (WIFSIGNALED(status) && !WIFEXITED(status)
-		&& WTERMSIG(status) != 1 && WTERMSIG(status) <= 31)
-		handle_signaled(last, status);
 	return (last->wexitstatus);
 }
 
