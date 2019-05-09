@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/08 12:40:49 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/27 14:23:19 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/09 13:47:33 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,21 @@ typedef struct			s_job
 	struct s_job			*prev;
 	struct s_job			*next;
 }						t_job;
+
+typedef struct			s_job_alt
+{
+	enum e_job_state	state;
+	struct s_context	*context;
+	struct s_process	*process_list;
+}						t_job_alt;
+
+typedef struct			s_process
+{
+	pid_t				pid;
+	int					wexitstatus;
+	struct s_command	*command;
+	struct s_process	*next;
+}						t_process;
 
 struct					s_job_control
 {

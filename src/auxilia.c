@@ -17,7 +17,7 @@ bool		is_valid_var(const char *var)
 {
 	int		i;
 
-	if (var == NULL || ft_isdigit(*var))
+	if (var == NULL || ft_isdigit(*var) || ft_strlen(var) == 0)
 		return (false);
 	i = 0;
 	while (var[i])
@@ -49,6 +49,8 @@ ssize_t		ponies_teleported(void)
 
 void		display_prompt(enum e_input_state state)
 {
+	if (carpos_update(POS_CURRENT)->col > 1)
+		ft_printf("\n");
 	if (state == STATE_NORMAL)
 		display_normal_prompt();
 	else if (state == STATE_DQUOTE)
@@ -61,7 +63,7 @@ void		display_prompt(enum e_input_state state)
 		ft_printf("hdoc %s> ", g_term->heredoc_word);
 	else if (state == STATE_HEREDOCD)
 		ft_printf("hdocd %s> ", g_term->heredoc_word);
-	else if (state == STATE_EMPTY_PIPE)
+	else if (state == STATE_EMPTY_OPERATOR)
 		ft_printf("pipe> ");
 	else
 		ft_printf("err> ");

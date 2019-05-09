@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/03 16:28:37 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/25 18:49:36 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/05 14:53:17 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,6 @@
 ** *****************************************************************************
 */
 
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "cppcoreguidelines-interfaces-global-init"
-
-
 /*
 ** const t_rule g_complete_commands = {
 ** 	.token = TOKEN_NOT_APPLICABLE,
@@ -36,11 +32,11 @@
 ** };
 */
 
-const t_rule g_complete_command __attribute__((visibility("hidden"))) = {
+const t_rule g_complete_command = {
 	.token = TOKEN_NOT_APPLICABLE,
 	.expands_to = {
-		{&g_list, &g_separator, &g_linebreak},
-		{&g_list, &g_linebreak},
+		{&g_linebreak, &g_list, &g_separator, &g_linebreak},
+		{&g_linebreak, &g_list, &g_linebreak},
 		{&g_linebreak}
 	},
 	.human_readable = "complete_command",
@@ -838,5 +834,3 @@ const t_rule g_clobber_token = {
 	"clobber_t",
 	.tree_builder = NULL
 };
-
-#pragma clang diagnostic pop

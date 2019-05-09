@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/19 15:35:35 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/11/19 15:35:35 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/09 15:58:37 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,28 @@ static void				history_reallocate_vector(void)
 	g_history->entries = tmp;
 }
 
+bool					is_string_empty(const char *str)
+{
+	size_t	len;
+	size_t	i;
+
+	len = ft_strlen(str);
+	i = 0;
+	while (i < len)
+	{
+		if (ft_strchr(LIBFT_WHTSP, str[i]) == NULL)
+			return (false);
+		i++;
+	}
+	return (true);
+}
+
 void					history_push_entry(const char *cmd, time_t timestamp)
 {
 	struct s_history_entry	*entry;
 
+	if (!cmd || is_string_empty(cmd))
+		return ;
 	if (g_history->size >= g_history->capacity - 1)
 		history_reallocate_vector();
 	entry = (struct s_history_entry *)
@@ -56,9 +74,4 @@ struct s_history_entry	*history_get_entry(u_int64_t index)
 	if (index >= g_history->size)
 		return (NULL);
 	return (g_history->entries[index]);
-}
-
-struct s_history_entry	*history_pop_entry(void)
-{
-	return (g_history->entries[g_history->size - 1]);
 }

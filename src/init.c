@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/16 12:28:13 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/29 14:41:36 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/03 17:35:24 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ struct termios	*init_term(void)
 		g_term->ws_row = window.ws_row;
 		close_wrapper(g_term->tty_fd);
 	}
-	init_buffer_vector(MAX_INPUT);
+	g_term->fallback_input_state = g_term->input_state;
 	return (newterm);
 }
 
@@ -89,10 +89,14 @@ void			init_files(void)
 	g_term->history_file = init_fd_at_home(HISTORY_FILE, 0);
 }
 
-void			parse_args(int argc, char **argv)
+int				parse_args(int argc, char **argv)
 {
 	environ_push_entry(g_term->context_original->environ, "0",
 		argv[0], SCOPE_SHELL_LOCAL);
 	if (argc > 1)
-	argc = 0;
+	{
+		g_term->input_state = STATE_NON_INTERACTIVE;
+		g_term->fallback_input_state = STATE_NON_INTERACTIVE;
+	}
+	return (0);
 }

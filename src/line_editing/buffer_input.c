@@ -6,16 +6,15 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/18 16:28:45 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/29 13:12:17 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/09 17:04:25 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "twenty_one_sh.h"
 #include "line_editing.h"
 
-void				deal_with_printable(const char *arr)
+static void			deal_with_printable(const char *arr)
 {
-	g_term->input_state = update_state(arr);
 	buff_insert_single_at(g_term->buffer->iterator, arr);
 	carpos_update(POS_LAST);
 	write(1, arr, ft_strlen((char *)arr));
@@ -33,13 +32,12 @@ void				deal_with_printable(const char *arr)
 		buffer_redraw();
 }
 
-void				deal_with_heredoc_nl(const char *input)
+static void			deal_with_heredoc_nl(const char *arr)
 {
 	int64_t	offset;
 	char	*swap;
 
 	offset = buff_rchr("\n", g_term->buffer->size);
-	offset = offset < 0 ? 0 : offset;
 	swap = buff_get_part((u_int64_t)offset + 1, g_term->buffer->size);
 	if (swap && ft_strcmp(swap, g_term->heredoc_word) == 0)
 	{
@@ -49,50 +47,46 @@ void				deal_with_heredoc_nl(const char *input)
 	}
 	else
 	{
-		TERM_CLR_LINE;
+		handle_end((union u_char){K_END});
 		write(STDOUT_FILENO, "\n", 1);
-		buff_insert_single_at(g_term->buffer->iterator, input);
+		buff_insert_single_at(g_term->buffer->iterator, arr);
 		display_prompt(g_term->input_state);
 		buffer_redraw();
 	}
 	free(swap);
 }
 
-void				deal_with_newline(const char *arr)
+static void			deal_with_newline(const char *arr)
 {
 	if (g_term->input_state == STATE_HEREDOC)
-		deal_with_heredoc_nl(arr);
-	else if (g_term->input_state == STATE_QUOTE
-			|| g_term->input_state == STATE_DQUOTE
-			|| (g_term->input_state == STATE_ESCAPED &&
-				g_term->buffer->iterator == g_term->buffer->size))
+		return (deal_with_heredoc_nl(arr));
+	recheck_state(0);
+	if (g_term->input_state > STATE_NON_INTERACTIVE)
 	{
+		TERM_CLR_LINE;
 		write(STDOUT_FILENO, "\n", 1);
 		buff_insert_single_at(g_term->buffer->iterator, arr);
 		display_prompt(g_term->input_state);
-		if (g_term->input_state == STATE_ESCAPED)
-			g_term->input_state = STATE_NORMAL;
 		buffer_redraw();
 	}
 	else
 	{
-		caret_move(g_term->buffer->size - g_term->buffer->iterator, D_RIGHT);
+		handle_end((union u_char){K_END});
 		write(STDOUT_FILENO, "\n", 1);
 		g_term->input_state = STATE_COMMIT;
 	}
 }
 
-void				deal_with_pasted(char *str)
+static void			deal_with_pasted(char *str)
 {
-	size_t		len;
-	uint32_t	i;
-
-	i = 0;
-	len = ft_strlen(str);
-	while (i < len)
-		toggle_state(str + i++);
 	buff_insert_string_at(g_term->buffer->iterator, str);
-	write(1, str, len);
+	write(1, str, ft_strlen(str));
+	if (carpos_update(POS_CURRENT)->col >= g_term->ws_col - 1)
+	{
+		tputs(tgetstr("sf", NULL), 1, &ft_putc);
+		caret_move(1, D_RIGHT);
+	}
+	recheck_state(0);
 }
 
 char				*read_arbitrary(void)
@@ -116,7 +110,7 @@ char				*read_arbitrary(void)
 			deal_with_newline(swap);
 		else if (is_single_symbol(swap) && swap[0] != '\n')
 			deal_with_printable(swap);
-		else
+		else if (!is_single_symbol(swap))
 			deal_with_pasted(swap);
 	}
 	g_term->heredoc_word = NULL;

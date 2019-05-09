@@ -51,8 +51,7 @@ static void	clear_history_hard(void)
 	free(g_history->entries);
 	free(g_history);
 	history_init_vector(capacity);
-	close_wrapper(g_term->history_file);
-	g_term->history_file = init_fd_at_home(HISTORY_FILE, O_TRUNC);
+	close_wrapper(init_fd_at_home(HISTORY_FILE, O_TRUNC));
 }
 
 /*

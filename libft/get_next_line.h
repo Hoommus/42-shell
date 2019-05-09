@@ -13,7 +13,7 @@
 #ifndef GNL_GET_NEXT_LINE_H
 # define GNL_GET_NEXT_LINE_H
 
-# define BUFF_SIZE 255
+# define BUFF_SIZE 4096
 
 # include "libft.h"
 

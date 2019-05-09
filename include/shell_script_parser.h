@@ -13,9 +13,6 @@
 #ifndef SHELL_SCRIPT_PARSER_H
 # define SHELL_SCRIPT_PARSER_H
 
-# pragma clang diagnostic push
-# pragma ide diagnostic ignored "readability-avoid-const-params-in-decls"
-
 # define INDENT_0 "│ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │"
 # define INDENT INDENT_0 INDENT_0 INDENT_0 INDENT_0 INDENT_0 INDENT_0 INDENT_0
 # define IS_TERMINAL(rule) (!(rule)->expands_to[0] || !(rule)->expands_to[0][0])
@@ -114,8 +111,6 @@ struct							s_result
 
 t_token							*offset_list(t_token *list, int offset);
 struct s_result					is_syntax_valid(t_state const prev);
-bool							check_rule(struct s_result *result,
-							t_state *state, const t_rule *restrict const rule);
 
 /*
 ** Rule builders
@@ -143,9 +138,9 @@ t_bresult						*list_build(const t_state *state,
 /*
 ** Simple command builder auxiliary
 */
+
 bool							is_redirect(t_token *t);
 struct s_io_redirect			*get_redirects(t_token *list, int length);
-
 
 t_node							*ast_new_node(void *value,
 												enum e_node_type node_type);
@@ -176,7 +171,7 @@ extern const t_rule				g_while_clause;
 
 /*
 ** some rules are omitted because I am a bad programmer. But here they are:
-8* extern const t_rule	g_name;
+** extern const t_rule	g_name;
 ** extern const t_rule	g_in;
 ** extern const t_rule	g_wordlist;
 ** extern const t_rule	g_wordlist_dash;
@@ -252,7 +247,5 @@ extern const t_rule				g_greatand_token;
 extern const t_rule				g_dgreat_token;
 extern const t_rule				g_lessgreat_token;
 extern const t_rule				g_clobber_token;
-
-# pragma clang diagnostic pop
 
 #endif

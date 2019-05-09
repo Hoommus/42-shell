@@ -17,10 +17,11 @@ static bool			is_name(const char *str)
 {
 	if (!str)
 		return (false);
-	if (!ft_isdigit(str[0]))
-		while (*(++str))
-			if (!ft_isalnum(*str) && *str != '_')
-				return (false);
+	if (ft_isdigit(str[0]))
+		return (false);
+	while (*(++str))
+		if (!ft_isalnum(*str) && *str != '_')
+			return (false);
 	return (true);
 }
 

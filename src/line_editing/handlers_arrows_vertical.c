@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/18 11:54:48 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/25 18:19:50 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/09 16:57:50 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,28 +15,45 @@
 
 void	handle_alt_up(union u_char key)
 {
-	t_carpos	start;
-	t_carpos	tmp;
-	int64_t		i;
+	const u_int64_t	threshold = g_term->ws_col;
+	u_int32_t		i;
 
 	if (key.lng != K_ALT_UP)
 		return ;
-	start = *carpos_update(POS_CUSTOM2);
+	if (g_term->buffer->iterator < threshold)
+		handle_home((union u_char){.lng = K_HOME});
+	carpos_update(POS_CUSTOM2);
 	i = 0;
-	while (g_term->buffer->iterator - i > 0)
+	while (i < threshold && g_term->buffer->iterator != 0)
 	{
-		tmp = caret_move(1, D_LEFT);
+		caret_move(1, D_LEFT);
+		g_term->buffer->iterator--;
+		if ((carpos_get(POS_CURRENT)->col <= carpos_get(POS_CUSTOM2)->col &&
+				carpos_get(POS_CURRENT)->row < carpos_get(POS_CUSTOM2)->row))
+			return ;
 		i++;
-		if ((tmp.col <= start.col && tmp.row < start.row))
-			break ;
 	}
-	g_term->buffer->iterator -= i;
 }
 
 void	handle_alt_down(union u_char key)
 {
-	int64_t		i;
+	const u_int64_t	threshold = g_term->ws_col;
+	u_int32_t		i;
 
-	i = g_term->buffer->iterator;
-	key.lng = 0;
+	if (key.lng != K_ALT_DOWN)
+		return ;
+	if (g_term->buffer->size - g_term->buffer->iterator < threshold)
+		handle_home((union u_char){.lng = K_END});
+	carpos_update(POS_CUSTOM2);
+	i = 0;
+	while (i < threshold && g_term->buffer->iterator != g_term->buffer->size)
+	{
+		caret_move(1, D_RIGHT);
+		g_term->buffer->iterator++;
+		if (carpos_update(POS_CURRENT)->col == carpos_get(POS_CUSTOM2)->col
+			|| (carpos_get(POS_CURRENT)->col > carpos_get(POS_CUSTOM2)->col &&
+				carpos_get(POS_CURRENT)->row > carpos_get(POS_CUSTOM2)->row))
+			return ;
+		i++;
+	}
 }

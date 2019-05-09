@@ -6,14 +6,14 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:57:06 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/25 14:54:35 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/06 17:14:03 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell_script.h"
 #include "shell_script_parser.h"
 
-static bool					is_valid_rdr_fd(const char *token_value)
+bool					is_valid_rdr_fd(const char *token_value)
 {
 	int		atoi;
 
@@ -31,10 +31,11 @@ static bool					is_token_an_arg(t_token *pivot)
 {
 	if (pivot->type != TOKEN_WORD)
 		return (false);
-	if ((!is_redirect(pivot->prev) && !is_redirect(pivot->next))
-		|| (is_redirect(pivot->next) && !is_valid_rdr_fd(pivot->value)))
-		return (true);
-	return (false);
+	if (is_redirect(pivot->prev))
+		return (false);
+	if ((is_redirect(pivot->next) && is_string_numeric(pivot->value, 10)))
+		return (false);
+	return (true);
 }
 
 static char					**get_args(t_token *list, int length)

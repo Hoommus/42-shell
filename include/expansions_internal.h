@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef EXPANSIONS_H
-# define EXPANSIONS_H
+#ifndef EXPANSIONS_INTERNAL_H
+# define EXPANSIONS_INTERNAL_H
 
 struct						s_escape_map
 {

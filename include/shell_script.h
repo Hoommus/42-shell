@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 14:44:44 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/25 17:26:02 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/05 16:23:58 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,8 +133,8 @@ struct						s_io_rdr_param
 
 typedef struct				s_io_redirect
 {
-	struct s_io_rdr_param	what;
-	struct s_io_rdr_param	where;
+	struct s_io_rdr_param	left;
+	struct s_io_rdr_param	right;
 	enum e_token_type		type;
 }							t_io_rdr;
 
@@ -143,7 +143,7 @@ struct						s_command
 	char		**args;
 	char		**assignments;
 	t_io_rdr	*io_redirects;
-	bool		is_async; // TODO: Cut this out
+	bool		is_async;
 };
 
 union						u_executor
@@ -195,6 +195,8 @@ void						run_heredocs(t_node *node);
 void						run_script(t_token *list_head, bool log_recursion);
 int							exec_command(const t_node *command_node,
 	struct s_context *new_context);
+int							exec_subshell(const t_node *node,
+	struct s_context *new_context);
 int							exec_semicolon_iterative(t_node *parent);
 int							exec_semicolon_recursive(const t_node *parent);
 int							exec_and_if(const t_node *parent);
@@ -211,7 +213,7 @@ int							read_filename(const char *file, char **data);
 
 void						rdr_heredocs(t_context *context, t_io_rdr *rdrs);
 int							alterate_filedes(const struct s_command *command,
-	t_context *contxt);
+	t_context *cntxt);
 
 /*
 ** Expansions

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/09 15:39:07 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/27 16:38:59 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/04 12:57:51 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,14 +57,20 @@ t_job						*jc_dequeue_job(pid_t pid, t_job *job)
 	return (NULL);
 }
 
+/*
+** That wait() call will break when implementing correct Job Control
+*/
+
 void						jc_destroy_queue(void)
 {
 	t_job		*next;
 	t_job		*list;
+	int			status;
 
 	list = jc_get()->job_queue;
 	while (list)
 	{
+		wait(&status);
 		next = list->next;
 		context_deep_free(&(list->context));
 		ft_memdel((void **)&list);

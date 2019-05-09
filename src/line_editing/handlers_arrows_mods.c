@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/18 15:19:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/02/22 13:18:46 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/02 16:32:37 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,8 +64,6 @@ void			handle_alt_right(union u_char key)
 	g_term->buffer->iterator = i;
 }
 
-// TODO: add word to paste_board
-
 void			handle_ctrl_w(union u_char key)
 {
 	int64_t				i;
@@ -74,21 +72,17 @@ void			handle_ctrl_w(union u_char key)
 		return ;
 	i = g_term->buffer->iterator - 1;
 	while (i >= 0 && is_buffer_symbol_at_index_wsp(i))
-		buff_del_symbol(i--);
+		i--;
 	while (i >= 0)
 	{
 		if (is_buffer_symbol_at_index_wsp(i))
-		{
-			buff_del_symbol(i);
 			break ;
-		}
-		toggle_state(buff_char_at(i));
-		buff_del_symbol(i--);
+		i--;
 	}
-	if (i == -1)
-		caret_move(ABS(g_term->buffer->iterator - i) - 1, D_LEFT);
-	else
-		caret_move(ABS(g_term->buffer->iterator - i), D_LEFT);
-	g_term->buffer->iterator = i == -1 ? 0 : i;
+	i = i == -1 ? 0 : i;
+	caret_move(ABS(g_term->buffer->iterator - i + 1), D_LEFT);
+	pb_copy(g_term->buffer->iterator - i + 1, g_term->buffer->iterator);
+	buff_clear_part(g_term->buffer->iterator - i, g_term->buffer->iterator);
+	g_term->buffer->iterator = i;
 	buffer_redraw();
 }

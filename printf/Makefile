@@ -12,7 +12,7 @@
 
 NAME = libftprintf.a
 
-FLAGS = -std=c99 -Wall -Wextra -Werror
+FLAGS = -Wall -Wextra -Werror
 
 CC = clang
 

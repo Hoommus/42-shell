@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:56:56 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/16 13:21:57 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/05 16:21:32 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,10 +46,10 @@ void	ast_free_command_node_internals(t_node *node)
 	i = 0;
 	while (cmd->io_redirects[i].type != TOKEN_NOT_APPLICABLE)
 	{
-		if (cmd->io_redirects[i].what.path)
-			ft_memdel((void **)&(cmd->io_redirects[i].what.path));
-		if (cmd->io_redirects[i].where.path)
-			ft_memdel((void **)&(cmd->io_redirects[i].where.path));
+		if (cmd->io_redirects[i].left.path)
+			ft_memdel((void **)&(cmd->io_redirects[i].left.path));
+		if (cmd->io_redirects[i].right.path)
+			ft_memdel((void **)&(cmd->io_redirects[i].right.path));
 		i++;
 	}
 	ft_memdel((void **)&(cmd->io_redirects));

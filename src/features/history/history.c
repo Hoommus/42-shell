@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/16 14:53:24 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/11/19 15:23:01 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/09 12:08:09 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,9 +61,11 @@ void		history_load(int fd)
 
 void		history_save_entry(int fd)
 {
+	struct s_history_entry	*last;
+
+	last = g_history->entries[g_history->size - 1];
 	g_history->iterator = g_history->size;
-	ft_dprintf(fd, ": %10.0ld:0;%s\n", history_pop_entry()->timestamp,
-				history_pop_entry()->command);
+	ft_dprintf(fd, ": %10.0ld:0;%s\n", last->timestamp, last->command);
 }
 
 char		*history_write(char *command, int history_file)

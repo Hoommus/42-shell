@@ -17,11 +17,12 @@
 # include <stdarg.h>
 # include <stdlib.h>
 # include <limits.h>
-# define PRTF ft_printf(const char *restrict format, ...) __printflike(1, 2)
-# define DRTF ft_dprintf(int fd, const char *format, ...) __printflike(2, 3)
 
-int				PRTF;
-int				DRTF;
+# define PRTF int ft_printf(const char *restrict format, ...) __printflike(1, 2)
+# define DRTF int ft_dprintf(int fd, const char *format, ...) __printflike(2, 3)
+
+PRTF;
+DRTF;
 
 /*
 ** Printf variations

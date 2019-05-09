@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/04/26 12:32:42 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/05/08 17:43:24 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,11 +16,10 @@ CC = clang
 
 FDS = shell(ulimit -n)
 
-##### Remove the -g flag #####
-FLAGS = -g -Wall  \
+FLAGS = -g -DSH=\"$(NAME)\" \
+               -Wall  \
                -Wextra \
                -Werror  \
-               -Wno-unknown-pragmas \
                #-fsanitize="address"
 
 HEADER = -I include/ -I printf/include -I libft/
@@ -33,10 +32,12 @@ LIB_NAME = libftprintf.a
 SHELL_SRC = main.c init.c memory.c auxilia.c       \
             service_routines.c args_parsing.c string_hash.c \
             shell_environ.c shell_environ_tools.c shell_environ_vector.c \
-            syscall_wrappers.c
+            shell_environ_memory.c \
+            syscall_wrappers.c \
+            auxiliary_main.c shell_errors.c
 
 LEXER_DIR = lexer/
-LEXER_SRC = smart_split.c tokenizer.c tokens_mem.c token_word_types.c \
+LEXER_SRC = tokenizer.c tokens_mem.c token_word_types.c \
             tokenizer_preprocess.c
 
 AST_DIR = ast/
@@ -60,15 +61,17 @@ INTERFACE_DIR = line_editing/
 INTERFACE_SRC = buffer_drawing.c buffer_input.c  \
                 cursor_control.c cursor_positions.c \
                 buffer_vector.c buffer_vector_tools1.c buffer_vector_tools2.c  \
+                buffer_vector_insertions.c buffer_vector_parts.c \
                 state_toggles.c state_updates.c \
                 handlers_arrows.c handlers_editing.c handlers_engine.c \
                 handlers_arrows_mods.c handlers_arrows_vertical.c \
                 handlers_clipboard.c \
+                pasteboard_interface.c \
                 auxiliary_buffer.c auxiliary_le.c
 
 JOB_CONTROL_DIR = job_control/
 JOB_CONTROL_SRC = signals_basic.c \
-                  context_manipulations.c context_switch.c command_lookup.c \
+                  context_manipulations.c context_switch.c \
                   jc_headquaters.c  \
                   jc_queue_execution.c jc_queue_forknrun.c jc_queue_interface.c
 
@@ -88,11 +91,8 @@ OBJ = $(addprefix $(OBJ_DIR), $(SHELL_SRC:.c=.o))                         \
       $(addprefix $(OBJ_DIR)$(EXPANSIONS_DIR), $(EXPANSIONS_SRC:.c=.o))   \
       $(addprefix $(OBJ_DIR)$(JOB_CONTROL_DIR), $(JOB_CONTROL_SRC:.c=.o)) \
 
-all: $(NAME)
+all: $(NAME) 
 
-#                     ** Do not EVER touch rule below **                       #
-#                     ** Do not EVER touch rule below **                       #
-#                     ** Do not EVER touch rule below **                       #
 $(NAME): prepare $(OBJ)
 	@BUILD_NBR=$$(expr $$(grep -E "# define BUILD [0-9]+" \
 			   < ./include/twenty_one_sh.h | \
@@ -119,17 +119,17 @@ prepare:
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
 	$(CC) $(FLAGS) $(HEADER) -o $@ -c $< ;
 
-install: all
+install:
 	@if [ grep ~/.brew/bin $PATH 2>/dev/null ] ; \
 	then \
 	    mkdir -p ~/.brew/bin/   ; \
 	    cp $(NAME) ~/.brew/bin/ ; \
 	    echo "\n export PATH=\$$PATH:\$$HOME/.brew/bin" >> ~/.zshrc ; \
 	    source ~/.zshrc         ; \
-	    echo "21sh installed"   ; \
+	    echo "$(NAME) installed"   ; \
 	else \
 	    cp $(NAME) ~/.brew/bin/ ; \
-	    echo "21sh updated"     ; \
+	    echo "$(NAME) updated"     ; \
 	fi ;
 
 clean:
@@ -157,7 +157,7 @@ fclean: clean
 	/bin/rm -f $(NAME)
 	/bin/rm -f $(LIB_NAME)
 
-re: fclean $(NAME)
+re: fclean all
 
 love:
 	@echo "Not all."

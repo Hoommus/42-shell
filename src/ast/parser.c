@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:38 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/25 16:30:56 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/03 21:45:56 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include "shell_script_parser.h"
 #include "shell_script.h"
 
-t_token			*offset_list(t_token *list, int offset)
+t_token					*offset_list(t_token *list, int offset)
 {
 	int		i;
 
@@ -26,39 +26,24 @@ t_token			*offset_list(t_token *list, int offset)
 	return (list);
 }
 
-struct s_result	*handle_terminal(struct s_result *result, const t_state *state)
+static struct s_result	*handle_terminal(struct s_result *result,
+	const t_state *state)
 {
-	if (state->logging)
-		ft_printf(LOG_TERMINAL, 2 + (state->depth) * 2, INDENT, "└─",
-			state->rule->human_readable,
-			g_tokens[state->list_offset->type].token_name,
-			state->list_offset->type == TOKEN_NEWLINE ? "\\n" :
-			state->list_offset->value);
 	if (state->rule->token == TOKEN_EMPTY)
 	{
-		if (state->logging)
-			ft_printf(LOG_EMPTY, 2 + (state->depth) * 2, INDENT, "└─");
 		result->valid = true;
 		result->consumed = 0;
 	}
-	else
+	else if (state->list_offset->type == state->rule->token)
 	{
-		if (state->rule->token == state->list_offset->type && state->logging)
-			ft_printf(LOG_EXPECT, 2 + (state->depth) * 2, INDENT, "└─",
-				g_tokens[state->rule->token].token_name,
-				state->list_offset->type == TOKEN_NEWLINE ? "\\n" :
-				g_tokens[state->list_offset->type].token_name);
-		if (state->list_offset->type == state->rule->token)
-		{
-			result->valid = true;
-			result->consumed = 1;
-		}
+		result->valid = true;
+		result->consumed = 1;
 	}
 	return (result);
 }
 
-bool			check_rule(struct s_result *result, t_state *state,
-								const t_rule *restrict const rule)
+static bool				check_rule(struct s_result *result, t_state *state,
+	const t_rule *restrict const rule)
 {
 	struct s_result tmp;
 
@@ -85,8 +70,7 @@ bool			check_rule(struct s_result *result, t_state *state,
 	return (tmp.valid);
 }
 
-// TODO: Remove logging
-struct s_result	is_syntax_valid(t_state const prev)
+struct s_result			is_syntax_valid(t_state const prev)
 {
 	struct s_result		result;
 	t_state				state;
@@ -95,9 +79,6 @@ struct s_result	is_syntax_valid(t_state const prev)
 
 	state = prev;
 	ft_bzero(&result, sizeof(struct s_result));
-	if (state.logging)
-		ft_printf(LOG_INSIDE, (state.depth += 2) * 2, INDENT, "└─",
-			state.rule->human_readable);
 	if (state.rule != NULL && state.list_offset == NULL)
 		;
 	else if (IS_TERMINAL(state.rule))
