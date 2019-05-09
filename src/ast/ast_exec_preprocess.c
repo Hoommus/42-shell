@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/23 18:06:24 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/03 15:40:32 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/05 16:21:11 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,13 +27,13 @@ void				run_heredocs(t_node *node)
 			if (!IS_HEREWORD(rdr->type) && IS_HEREDOC(rdr->type)
 				&& g_term->input_state != STATE_NON_INTERACTIVE)
 			{
-				g_term->heredoc_word = rdr->what.path;
+				g_term->heredoc_word = rdr->right.path;
 				g_term->input_state = STATE_HEREDOC;
 				swap = read_arbitrary();
 				if (swap == NULL)
 					return ((void)(exec_abort(0)));
-				free(rdr->what.path);
-				rdr->what.path = swap;
+				free(rdr->right.path);
+				rdr->right.path = swap;
 			}
 	}
 	if (node && node->left != NULL)

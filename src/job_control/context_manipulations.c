@@ -36,31 +36,6 @@ void	context_add_fd(t_context *context,
 	}
 }
 
-void	context_mark_fd_closed(t_context *context, const int fd, bool is_orig)
-{
-	struct s_fd_lst	*ultimate;
-	struct s_fd_lst	*penultimate;
-
-	penultimate = context->fd_list;
-	ultimate = context->fd_list->next;
-	if (fd == is_orig ? penultimate->original : penultimate->current)
-	{
-		close(penultimate->current);
-		penultimate->current = -1;
-		return ;
-	}
-	while (ultimate)
-	{
-		if (fd == is_orig ? ultimate->original : ultimate->current)
-		{
-			close(ultimate->current);
-			ultimate->current = -1;
-			return ;
-		}
-		ultimate = ultimate->next;
-	}
-}
-
 void	context_remove_ofd(t_context *context, const int original)
 {
 	struct s_fd_lst	*ultimate;

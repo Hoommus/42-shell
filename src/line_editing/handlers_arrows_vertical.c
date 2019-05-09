@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/18 11:54:48 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/03 20:25:10 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/09 16:57:50 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,7 @@ void	handle_alt_up(union u_char key)
 	{
 		caret_move(1, D_LEFT);
 		g_term->buffer->iterator--;
-		if (carpos_update(POS_CURRENT)->col == carpos_get(POS_CUSTOM2)->col
-			|| (carpos_get(POS_CURRENT)->col < carpos_get(POS_CUSTOM2)->col &&
+		if ((carpos_get(POS_CURRENT)->col <= carpos_get(POS_CUSTOM2)->col &&
 				carpos_get(POS_CURRENT)->row < carpos_get(POS_CUSTOM2)->row))
 			return ;
 		i++;

@@ -43,12 +43,11 @@ static char		*extract_var(const char *str, u_int32_t *off)
 	i = *off + 1;
 	while (str[i] && (ft_isalnum(str[i]) || str[i] == '_'))
 		i++;
-	ft_memcpy((char *)tmp, str + *off + 1, i - *off);
+	ft_memcpy((char *)tmp, str + *off + 1, i - *off - 1);
 	if (is_valid_var(tmp))
 	{
 		var = environ_get_entry(g_term->context_current->environ, tmp);
-		swap = strinsert(str, var ? var->value : "", *off,
-			ft_strlen(tmp) + 1);
+		swap = strinsert(str, var ? var->value : "", *off, ft_strlen(tmp) + 1);
 		*off += ft_strlen(var ? var->value : " ") - 1;
 	}
 	else

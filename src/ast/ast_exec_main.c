@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:56:01 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/28 13:38:34 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/09 11:52:43 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,14 +61,16 @@ void				run_script(t_token *list_head, bool log_recursion)
 		state.list_offset->prev->type == TOKEN_NEWLINE)
 		state.list_offset = state.list_offset->next;
 	if (state.list_offset != NULL)
-		ft_dprintf(2, ERR_SYNTAX_AT_LINE,
+		g_term->last_status = (ft_dprintf(2, ERR_SYNTAX_AT_LINE,
 			ft_strcmp(state.list_offset->value, "\n") == 0 ? "\\n" :
-			state.list_offset->value, state.list_offset->line_nbr);
+			state.list_offset->value, state.list_offset->line_nbr) & 0) | 1;
 	if (result.ast && state.list_offset == NULL)
 	{
 		run_heredocs(result.ast->root);
 		if (!g_interrupt)
 			g_term->last_status = exec_semicolon_iterative(result.ast->root);
+		else
+			g_term->last_status = 1;
 	}
 	free_all(&state, &result);
 }

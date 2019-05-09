@@ -94,5 +94,8 @@ void							handle_key(union u_char key)
 	i = -1;
 	while (g_key_hooks[++i].handler != 0)
 		if (g_key_hooks[i].key.lng == key.lng && g_key_hooks[i].handler)
+		{
 			g_key_hooks[i].handler(key);
+			break ;
+		}
 }

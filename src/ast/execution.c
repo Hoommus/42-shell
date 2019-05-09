@@ -20,8 +20,8 @@ const struct s_executor		g_executors_table[] = {
 	{ NODE_PIPE, {&exec_pipeline} },
 	{ NODE_OR_IF, {&exec_or_if} },
 	{ NODE_AND_IF, {&exec_and_if} },
-	{ NODE_SUBSHELL, {&exec_subshell} },
-	{ 0, {NULL }}
+	{ NODE_SUBSHELL, {.exec_alt_context = &exec_subshell} },
+	{ 0, {NULL}}
 };
 
 int							exec_abort(int dummy)

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/04 16:14:38 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/09 17:04:42 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,8 +70,8 @@
 # define ERR_RUNNING_JOBS       ANSI_RESET SH ": you have running jobs\n"
 # define ERR_AMBIGUOUS_REDIRECT ANSI_RESET SH ": ambiguous redirect\n"
 
-# define BUILD 2234
-# define BUILD_DATE "04.05.19 16:14:38 EEST"
+# define BUILD 2289
+# define BUILD_DATE "09.05.19 17:04:42 EEST"
 
 # ifdef MAX_INPUT
 #  undef MAX_INPUT
@@ -85,23 +85,25 @@
 enum					e_input_state
 {
 	STATE_NORMAL = 1,
-	STATE_QUOTE = 2,
-	STATE_DQUOTE = 4,
-	STATE_BQUOTE = 8,
+	STATE_NON_INTERACTIVE = 2,
+	STATE_QUOTE = 4,
+	STATE_DQUOTE = 8,
 	STATE_HEREDOC = 16,
 	STATE_HEREDOCD = 32,
 	STATE_ESCAPED = 64,
-	STATE_EMPTY_PIPE = 128,
+	STATE_EMPTY_OPERATOR = 128,
 	STATE_PIPE_HEREDOC = 256,
 	STATE_NEXT_ESCAPED = 512,
 	STATE_COMMIT = 1024,
 	STATE_SEARCH = 2048,
 	STATE_PARTIAL_EXPAND = 4096,
-	STATE_NON_INTERACTIVE = 8192,
+	STATE_BQUOTE = 8192,
 	STATE_JOB_IN_FG = 16384,
 	STATE_EXPANSION = 32768,
 	STATE_BREAK = 65536,
 	STATE_LIMITED = 131072,
+	STATE_VIM = 262144,
+	STATE_EMACS = 524288
 };
 
 struct					s_fd_lst
@@ -223,8 +225,6 @@ void					context_remove_ofd(t_context *context,
 	const int original);
 bool					context_is_fd_present(const t_context *context,
 	const int original);
-void					context_mark_fd_closed(t_context *context,
-	const int fd, bool is_orig);
 
 /*
 ** Main Loop (main.c, )
@@ -240,7 +240,6 @@ int						display_normal_prompt(void);
 */
 u_int64_t				hash_sdbm(const char *str);
 ssize_t					ponies_teleported(void);
-char					**smart_split(const char *str, const char *delims);
 int						read_fd(const int fd, char **result);
 bool					is_dir(const char *path);
 bool					is_string_numeric(const char *str, const int base);
@@ -282,6 +281,11 @@ bool					flag_plus_short_present(const char **args,
 int						open_wrapper(const char *path, int oflag);
 int						openm_wrapper(const char *path, int oflag, mode_t mode);
 int						close_wrapper(int filedes);
+
+/*
+** Errors
+*/
+int						puterr(const char *format, const char *cause);
 
 /*
 ** Compatibility

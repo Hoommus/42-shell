@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:56:36 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/02 16:20:25 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/07 15:16:14 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,12 +103,8 @@ void				handle_alt_right(union u_char key);
 ** State machine (state_machine.c, state_updates.c)
 */
 
-enum e_input_state	update_state(const char *input);
-int					toggle_state(const char *c);
-int					toggle_quote(void);
-int					toggle_bquote(void);
-int					toggle_dquote(void);
-int					toggle_escaped(void);
+enum e_input_state	toggle_quotes(enum e_input_state current, u_int64_t i);
+enum e_input_state	recheck_state(u_int64_t from_index);
 
 /*
 ** Caret positions manipulation (cursor_positions.c)

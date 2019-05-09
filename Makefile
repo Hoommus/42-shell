@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/05/04 19:12:41 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/05/08 17:43:24 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,7 @@ CC = clang
 
 FDS = shell(ulimit -n)
 
-FLAGS = -DSH=\"$(NAME)\" \
+FLAGS = -g -DSH=\"$(NAME)\" \
                -Wall  \
                -Wextra \
                -Werror  \
@@ -34,10 +34,10 @@ SHELL_SRC = main.c init.c memory.c auxilia.c       \
             shell_environ.c shell_environ_tools.c shell_environ_vector.c \
             shell_environ_memory.c \
             syscall_wrappers.c \
-            auxiliary_main.c
+            auxiliary_main.c shell_errors.c
 
 LEXER_DIR = lexer/
-LEXER_SRC = smart_split.c tokenizer.c tokens_mem.c token_word_types.c \
+LEXER_SRC = tokenizer.c tokens_mem.c token_word_types.c \
             tokenizer_preprocess.c
 
 AST_DIR = ast/
@@ -94,6 +94,15 @@ OBJ = $(addprefix $(OBJ_DIR), $(SHELL_SRC:.c=.o))                         \
 all: $(NAME) 
 
 $(NAME): prepare $(OBJ)
+	@BUILD_NBR=$$(expr $$(grep -E "# define BUILD [0-9]+" \
+			   < ./include/twenty_one_sh.h | \
+			   grep -o -E '[0-9]+') + 1) &&  \
+	BUILD_DATE=$$(date +"%d.%m.%y %T %Z") && \
+	ex -c "%s/define BUILD [0-9]\+/define BUILD $$BUILD_NBR/g|             \
+			%s!define BUILD_DATE .\+!define BUILD_DATE \"$$BUILD_DATE\"!g| \
+			|w|q" include/twenty_one_sh.h
+	rm -f obj/main.o
+	$(CC) $(FLAGS) $(HEADER) -o $(OBJ_DIR)main.o -c $(SRC_DIR)main.c
 	make -C $(LIB_DIR)
 	cp $(LIB_DIR)/$(LIB_NAME) ./$(LIB_NAME)
 	$(CC) $(FLAGS) -o $(NAME) $(OBJ) $(HEADER) $(LIB_NAME) -ltermcap

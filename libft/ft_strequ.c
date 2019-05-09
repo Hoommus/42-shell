@@ -16,8 +16,5 @@ int		ft_strequ(char const *a, char const *b)
 {
 	if (a == NULL || b == NULL)
 		return (0);
-	if (ft_strlen((char *)a) == ft_strlen((char *)b) && ft_strcmp(a, b) != 0)
-		return (0);
-	else
-		return (1);
+	return (ft_strcmp(a, b) == 0);
 }

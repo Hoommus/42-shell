@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/05 17:50:36 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/03 20:57:26 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/05 16:23:58 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,23 +15,21 @@
 
 static char	**split_to_var(const char *str)
 {
-	t_token		*swap;
-	t_token		*tokens;
-	char		**splitted;
+	char				tmp[1024];
+	int					j;
+	char				**splitted;
 
-	tokens = tokenize((char *)str, "=");
+	ft_bzero(tmp, sizeof(char) * 1024);
 	splitted = ft_memalloc(sizeof(char *) * 3);
-	splitted[0] = (char *)(tokens->value);
-	if (tokens->next)
-		splitted[1] = (char *)(tokens->next->value);
-	else
-		splitted[1] = NULL;
-	while (tokens)
-	{
-		swap = tokens->next;
-		free(tokens);
-		tokens = swap;
-	}
+	j = -1;
+	while (str[++j])
+		if (str[j] == '=')
+		{
+			splitted[0] = ft_strsub(str, 0, j - 1);
+			splitted[1] = ft_strsub(str, j + 1, ft_strlen(str + j + 1));
+			break ;
+		}
+	//if (splitted[0] )
 	return (splitted);
 }
 
@@ -71,11 +69,11 @@ static void	expand_in_rdrs(const struct s_command *command)
 	i = -1;
 	while (rdrs[++i].type != TOKEN_NOT_APPLICABLE)
 	{
-		if ((swap = rdrs[i].what.path))
-			rdrs[i].what.path = expand(rdrs[i].what.path);
+		if ((swap = rdrs[i].left.path))
+			rdrs[i].left.path = expand(rdrs[i].left.path);
 		ft_memdel((void **)&swap);
-		if ((swap = rdrs[i].where.path))
-			rdrs[i].where.path = expand(rdrs[i].where.path);
+		if ((swap = rdrs[i].right.path))
+			rdrs[i].right.path = expand(rdrs[i].right.path);
 		ft_memdel((void **)&swap);
 	}
 }

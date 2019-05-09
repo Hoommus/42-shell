@@ -77,7 +77,6 @@ void			handle_ctrl_w(union u_char key)
 	{
 		if (is_buffer_symbol_at_index_wsp(i))
 			break ;
-		toggle_state(buff_char_at(i));
 		i--;
 	}
 	i = i == -1 ? 0 : i;

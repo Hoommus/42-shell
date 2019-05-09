@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:58 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/03 18:54:03 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/07 19:06:23 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ static int		try_cd(const char *path, t_var *oldpwd)
 	else if (ft_strcmp(path, "-") == 0)
 	{
 		if (oldpwd == NULL)
-			oldpwd = home;
+			return ((ft_dprintf(2, ANSI_RESET SH "OLDPWD not set\n") & 0) | 2);
 		ft_printf("%s\n", oldpwd->value);
 		status = try_access_and_cd(oldpwd->value);
 	}
@@ -56,25 +56,23 @@ int				hs_cd(const char **args)
 {
 	const t_env_vector	*vector = g_term->context_original->environ;
 	t_var				*var;
-	char				currpwd[1025];
-	char				pwd[1025];
+	char				currpwd[1024];
+	char				pwd[1024];
 	int					status;
 
 	var = get_env_v(NULL, "OLDPWD");
-	getcwd(currpwd, 1024);
+	getcwd(currpwd, 1023);
 	status = try_cd(args[0], var);
 	if (status == 0)
 	{
-		getcwd(pwd, 1024);
+		getcwd(pwd, 1023);
 		set_env_v((t_env_vector *)vector, "PWD", pwd, SCOPE_EXPORT);
 		set_env_v((t_env_vector *)vector, "OLDPWD", currpwd, SCOPE_EXPORT);
 		return (0);
 	}
 	else if (status == 1348)
 		return ((ft_dprintf(2, "cd: permission denied: %s\n", *args) & 0) | 1);
-	else
-	{
+	else if (status == 1)
 		ft_dprintf(2, "cd: no such file or directory: %s\n", args[0]);
-		return (1);
-	}
+	return (status);
 }

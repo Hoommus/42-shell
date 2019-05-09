@@ -1,64 +1,60 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   state_machine.c                                    :+:      :+:    :+:   */
+/*   state_toggles.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/16 13:48:01 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/16 13:48:01 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/09 16:00:15 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/twenty_one_sh.h"
+#include "twenty_one_sh.h"
 #include "line_editing.h"
 
-int		toggle_quote(void)
+bool				is_operator(void)
 {
-	if (g_term->input_state == STATE_QUOTE)
-		return (g_term->input_state = STATE_NORMAL);
-	else if (g_term->input_state == STATE_NORMAL)
-		return (g_term->input_state = STATE_QUOTE);
-	return (g_term->input_state);
+	return (false);
 }
 
-int		toggle_dquote(void)
+enum e_input_state	toggle_quotes(enum e_input_state current, u_int64_t i)
 {
-	if (g_term->input_state == STATE_DQUOTE)
-		return (g_term->input_state = STATE_NORMAL);
-	else if (g_term->input_state == STATE_NORMAL)
-		return (g_term->input_state = STATE_DQUOTE);
-	return (g_term->input_state);
+	if (current < STATE_QUOTE && buff_char_at_equals(i, "'"))
+		return (STATE_QUOTE);
+	else if (current < STATE_QUOTE && buff_char_at_equals(i, "\""))
+		return (STATE_DQUOTE);
+	else if (current == STATE_QUOTE && buff_char_at_equals(i, "'"))
+		return (g_term->fallback_input_state);
+	else if (current == STATE_DQUOTE && buff_char_at_equals(i, "\""))
+		return (g_term->fallback_input_state);
+	return (current);
 }
 
-int		toggle_bquote(void)
+enum e_input_state	recheck_state(u_int64_t from_index)
 {
-	if (g_term->input_state == STATE_BQUOTE)
-		return (g_term->input_state = STATE_NORMAL);
-	else if (g_term->input_state == STATE_NORMAL)
-		return (g_term->input_state = STATE_BQUOTE);
-	return (g_term->input_state);
-}
+	register enum e_input_state	current;
+	register u_int64_t			i;
 
-int		toggle_escaped(void)
-{
-	if (g_term->input_state == STATE_ESCAPED)
-		return (g_term->input_state = STATE_NORMAL);
-	else if (g_term->input_state == STATE_NORMAL)
-		return (g_term->input_state = STATE_ESCAPED);
-	return (g_term->input_state);
-}
-
-int		toggle_state(const char *c)
-{
-	if (*c == '\'')
-		return (toggle_quote());
-	else if (*c == '"')
-		return (toggle_dquote());
-	else if (*c == '`')
-		return (toggle_bquote());
-	else if (*c == '\\')
-		return (toggle_escaped());
-	else
+	if (g_term->input_state == STATE_HEREDOC ||
+		g_term->input_state == STATE_HEREDOCD)
 		return (g_term->input_state);
+	current = g_term->fallback_input_state;
+	i = from_index;
+	while (i < g_term->buffer->size)
+	{
+		if (current == STATE_EMPTY_OPERATOR
+			&& !buff_char_at_equals_any(i, LIBFT_WHTSP))
+			current = g_term->fallback_input_state;
+		if (current < STATE_QUOTE && buff_char_at_equals(i, "\\"))
+			current = STATE_ESCAPED;
+		else if (current == STATE_ESCAPED)
+			current = g_term->fallback_input_state;
+		else if (current < STATE_QUOTE && buff_char_at_equals(i, "|"))
+			current = STATE_EMPTY_OPERATOR;
+		else
+			current = toggle_quotes(current, i);
+		i++;
+	}
+	return (g_term->input_state = current);
 }

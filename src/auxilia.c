@@ -63,7 +63,7 @@ void		display_prompt(enum e_input_state state)
 		ft_printf("hdoc %s> ", g_term->heredoc_word);
 	else if (state == STATE_HEREDOCD)
 		ft_printf("hdocd %s> ", g_term->heredoc_word);
-	else if (state == STATE_EMPTY_PIPE)
+	else if (state == STATE_EMPTY_OPERATOR)
 		ft_printf("pipe> ");
 	else
 		ft_printf("err> ");

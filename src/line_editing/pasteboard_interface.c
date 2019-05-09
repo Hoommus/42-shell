@@ -22,7 +22,6 @@ int					pb_paste(void)
 	i = -1;
 	while (g_pasteboard && g_pasteboard[++i].s[0] != 0)
 	{
-		toggle_state(g_pasteboard[i].s);
 		buff_insert_symbol_at(g_term->buffer->iterator, g_pasteboard + i);
 		write(1, g_pasteboard[i].s, ft_strlen(g_pasteboard[i].s));
 	}

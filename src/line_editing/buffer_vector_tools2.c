@@ -39,7 +39,7 @@ char			*buff_char_at(const u_int64_t index)
 
 int				buff_char_at_equals(const u_int64_t index, const char *c)
 {
-	if (c == NULL || ft_strlen((char *)c) > 8)
+	if (c == NULL || ft_strlen((char *)c) > 5)
 		return (false);
 	return (!ft_strcmp(g_buffer->array[index].s, c));
 }

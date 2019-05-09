@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/10 16:42:51 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/04 12:55:10 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/09 11:43:47 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,16 +102,17 @@ int						jc_execute_pipeline_queue(void)
 		{
 			if ((bin = path_to_target((t_job *)list)) != NULL
 				&& access(bin, F_OK) == -1 && ft_strchr(bin, '/') != NULL)
-				return (DIRTY_HACK(ERR_NO_SUCH_FILE));
+				(DIRTY_HACK(ERR_NO_SUCH_FILE));
 			else if (bin != NULL && is_dir(bin) && hack_free(bin))
-				return (DIRTY_HACK(ERR_IS_A_DIRECTORY));
+				(DIRTY_HACK(ERR_IS_A_DIRECTORY));
 			else if (bin != NULL && access(bin, X_OK) == -1 && hack_free(bin))
-				return (DIRTY_HACK(ERR_PERMISSION_DENIED));
+				(DIRTY_HACK(ERR_PERMISSION_DENIED));
 			else if (bin == NULL)
-				return (DIRTY_HACK(ERR_COMMAND_NOT_FOUND));
+				(DIRTY_HACK(ERR_COMMAND_NOT_FOUND));
 			else if (!g_interrupt && (s = forknrun((t_job *)list, bin)) != -256)
 				return (s);
 		}
+		close_redundant_fds(list->context);
 		list = list->next;
 	}
 	return (-1024);

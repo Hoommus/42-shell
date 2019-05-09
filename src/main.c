@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:32 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/04 16:05:56 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/09 16:11:33 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ static int			shell_loop(void)
 			(commands = ft_itoa(g_term->last_status)), SCOPE_SHELL_LOCAL);
 		ft_strdel(&commands);
 		if (g_term->input_state == STATE_NON_INTERACTIVE)
-			return (0);
+			return (g_term->last_status);
 	}
 	return (0);
 }
@@ -125,5 +125,5 @@ int					main(int argc, char **argv)
 		shell_loop();
 	else
 		run_file(argv[1]);
-	return (0);
+	return (g_term->last_status);
 }

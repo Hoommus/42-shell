@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/09 15:45:40 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/29 18:46:08 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/07 18:48:55 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,13 +29,19 @@ static int		open_at_fd(int what_fd, const char *path, int oflag,
 		ft_dprintf(2, ERR_IS_A_DIRECTORY, path);
 		return (-(g_rdr_error = 1));
 	}
-	fd = open_wrapper(path, oflag);
-	if (fd != what_fd)
+	if ((fd = open_wrapper(path, oflag)) == -1 && (oflag & O_EXCL) == O_EXCL)
 	{
-		context_add_fd(context, what_fd, fd, path);
-		return (what_fd);
+		ft_dprintf(2, ANSI_RESET SH ": clobber error: `%s' exists\n", path);
+		return (-(g_rdr_error = 1));
 	}
-	return (fd);
+	else if (fd == -1)
+	{
+		ft_dprintf(2, ANSI_RESET SH ": could not open file %s\n", path);
+		return (-(g_rdr_error = 1));
+	}
+	if (fd != what_fd)
+		context_add_fd(context, what_fd, fd, path);
+	return (what_fd);
 }
 
 static bool		is_fd_valid(t_context *context, int fd)
@@ -61,48 +67,44 @@ static void		rdr_greatand(t_context *context, const t_io_rdr *rdr)
 	int		into_which_fd;
 	int		what_to_dup_fd;
 
-	if (rdr->where.path != NULL)
+	if (rdr->right.path != NULL && ft_strcmp(rdr->right.path, "-"))
 	{
 		g_rdr_error = 1;
 		return ((void)ft_dprintf(2, ERR_AMBIGUOUS_REDIRECT));
 	}
-	else if (is_fd_valid(context, rdr->where.fd))
-		what_to_dup_fd = rdr->where.fd;
+	else if (rdr->right.path != NULL && !ft_strcmp(rdr->right.path, "-"))
+		what_to_dup_fd = -1;
+	else if (is_fd_valid(context, rdr->right.fd))
+		what_to_dup_fd = rdr->right.fd;
 	else
 	{
 		g_rdr_error = 1;
-		return ((void)ft_dprintf(2, ERR_BAD_FD, rdr->where.fd));
+		return ((void)ft_dprintf(2, ERR_BAD_FD, rdr->right.fd));
 	}
-	into_which_fd = rdr->what.fd;
+	into_which_fd = rdr->left.fd;
 	context_add_fd(context, into_which_fd, what_to_dup_fd, "rdr_duped_1337");
 }
 
 int				alterate_filedes(const struct s_command *command,
-	t_context *contxt)
+	t_context *cntxt)
 {
-	const t_io_rdr	*rdr = (const t_io_rdr *)command->io_redirects;
+	const t_io_rdr	*rdr = (const t_io_rdr *)command->io_redirects - 1;
 
 	g_rdr_error = 0;
-	while (rdr && rdr->type != TOKEN_NOT_APPLICABLE)
+	while (++rdr && rdr->type != TOKEN_NOT_APPLICABLE)
 	{
-		if (rdr->type == TOKEN_GREATAND && rdr->where.path
-			&& !ft_strcmp(rdr->where.path, "-"))
-			context_mark_fd_closed(contxt, rdr->what.fd, true);
-		else if (rdr->type == TOKEN_LESSAND && rdr->where.path
-			&& !ft_strcmp(rdr->what.path, "-"))
-			context_mark_fd_closed(contxt, rdr->where.fd, true);
-		else if (rdr->type == TOKEN_GREAT || rdr->type == TOKEN_CLOBBER ||
-				rdr->type == TOKEN_DGREAT)
-			open_at_fd(rdr->what.fd, rdr->where.path, O_CREAT | O_WRONLY |
-				(rdr->type == TOKEN_DGREAT ? O_APPEND : O_TRUNC), contxt);
+		if (rdr->type == TOKEN_GREAT || rdr->type == TOKEN_DGREAT)
+			open_at_fd(rdr->left.fd, rdr->right.path, O_CREAT | O_WRONLY |
+				(rdr->type == TOKEN_DGREAT ? O_APPEND : O_TRUNC), cntxt);
+		else if (rdr->type == TOKEN_CLOBBER)
+			open_at_fd(rdr->left.fd, rdr->right.path, O_CREAT | O_WRONLY | O_EXCL, cntxt);
 		else if (rdr->type == TOKEN_LESS)
-			open_at_fd(rdr->where.fd, rdr->what.path, O_RDONLY, contxt);
+			open_at_fd(rdr->left.fd, rdr->right.path, O_RDONLY, cntxt);
 		else if (rdr->type == TOKEN_LESSGREAT)
-			open_at_fd(rdr->where.fd, rdr->what.path, O_CREAT | O_RDWR, contxt);
+			open_at_fd(rdr->left.fd, rdr->right.path, O_CREAT | O_RDWR, cntxt);
 		else if (rdr->type == TOKEN_LESSAND || rdr->type == TOKEN_GREATAND)
-			rdr_greatand(contxt, rdr);
-		rdr++;
+			rdr_greatand(cntxt, rdr);
 	}
-	rdr_heredocs(contxt, command->io_redirects);
+	rdr_heredocs(cntxt, command->io_redirects);
 	return (g_rdr_error);
 }

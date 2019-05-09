@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/25 18:31:57 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/04 16:13:50 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/06 17:01:06 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,17 +97,16 @@ static void				write_heredocs(t_job *job)
 		if ((io_rdrs->type == TOKEN_DLESS || io_rdrs->type == TOKEN_DLESSDASH))
 		{
 			if (g_term->fallback_input_state != STATE_NON_INTERACTIVE)
-				write(io_rdrs->what.fd, io_rdrs->what.path,
-					ft_strlen(io_rdrs->what.path));
-			write(io_rdrs->what.fd, "\n", 1);
-			close(io_rdrs->what.fd);
+				write(io_rdrs->right.fd, io_rdrs->right.path,
+					ft_strlen(io_rdrs->right.path));
+			close(io_rdrs->right.fd);
 		}
 		else if (io_rdrs->type == TOKEN_TRILESS)
 		{
-			write(io_rdrs->what.fd, io_rdrs->what.path,
-					ft_strlen(io_rdrs->what.path));
-			write(io_rdrs->what.fd, "\n", 1);
-			close(io_rdrs->what.fd);
+			write(io_rdrs->right.fd, io_rdrs->right.path,
+					ft_strlen(io_rdrs->right.path));
+			write(io_rdrs->right.fd, "\n", 1);
+			close(io_rdrs->right.fd);
 		}
 		io_rdrs++;
 	}
@@ -135,6 +134,7 @@ int						forknrun(t_job *job, char *path)
 			SCOPE_EXPORT | SCOPE_COMMAND_LOCAL | SCOPE_SCRIPT_GLOBAL));
 		context_switch(jc_get()->shell_context);
 		ft_dprintf(2, "21sh: execve error: %s\n", job->cmd->args[0]);
+		exit(1);
 	}
 	else if (job->pid == -1)
 		ft_dprintf(2, "21sh: fork error: %s\n", job->cmd->args[0]);
