@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/10 16:42:51 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/09 11:43:47 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/10 18:36:05 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,19 +80,33 @@ static int				run_builtin(t_job *job)
 	return (-512);
 }
 
-#define DIRTY_HACK(err) ((ft_dprintf(2, err, list->cmd->args[0]) & 0) | -1024)
+#define DIRTY_HACK(err) ((ft_dprintf(2, err, job->cmd->args[0]) & 0) | -1024)
 
-static bool				hack_free(void *ptr)
+static int				run_regular(const t_job *job)
 {
-	free(ptr);
-	return (true);
+	int				status;
+	char			*bin;
+
+	status = -256;
+	if ((bin = path_to_target((t_job *)job)) != NULL
+		&& access(bin, F_OK) == -1 && ft_strchr(bin, '/') != NULL)
+		(DIRTY_HACK(ERR_NO_SUCH_FILE));
+	else if (bin != NULL && is_dir(bin))
+		(DIRTY_HACK(ERR_IS_A_DIRECTORY));
+	else if (bin != NULL && access(bin, X_OK) == -1)
+		(DIRTY_HACK(ERR_PERMISSION_DENIED));
+	else if (bin == NULL)
+		(DIRTY_HACK(ERR_COMMAND_NOT_FOUND));
+	else if (!g_interrupt)
+		status = forknrun((t_job *)job, bin);
+	ft_memdel((void **)&bin);
+	return (status);
 }
 
 int						jc_execute_pipeline_queue(void)
 {
 	const t_job		*list = jc_get()->job_queue;
 	int				s;
-	char			*bin;
 
 	while (list)
 	{
@@ -100,16 +114,7 @@ int						jc_execute_pipeline_queue(void)
 			return (s);
 		else if (s == -512)
 		{
-			if ((bin = path_to_target((t_job *)list)) != NULL
-				&& access(bin, F_OK) == -1 && ft_strchr(bin, '/') != NULL)
-				(DIRTY_HACK(ERR_NO_SUCH_FILE));
-			else if (bin != NULL && is_dir(bin) && hack_free(bin))
-				(DIRTY_HACK(ERR_IS_A_DIRECTORY));
-			else if (bin != NULL && access(bin, X_OK) == -1 && hack_free(bin))
-				(DIRTY_HACK(ERR_PERMISSION_DENIED));
-			else if (bin == NULL)
-				(DIRTY_HACK(ERR_COMMAND_NOT_FOUND));
-			else if (!g_interrupt && (s = forknrun((t_job *)list, bin)) != -256)
+			if ((s = run_regular(list)) != -256)
 				return (s);
 		}
 		close_redundant_fds(list->context);

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/05 17:50:36 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/05 16:23:58 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/11 13:23:48 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,11 +25,10 @@ static char	**split_to_var(const char *str)
 	while (str[++j])
 		if (str[j] == '=')
 		{
-			splitted[0] = ft_strsub(str, 0, j - 1);
+			splitted[0] = ft_strsub(str, 0, j);
 			splitted[1] = ft_strsub(str, j + 1, ft_strlen(str + j + 1));
 			break ;
 		}
-	//if (splitted[0] )
 	return (splitted);
 }
 
@@ -111,6 +110,7 @@ static void	expand_everything(const struct s_command *command)
 ** when the last process in the pipeline is passed for execution.
 **
 ** TODO: optimise (how?..) execution if no variables and fds changes are made
+** TODO: Make copy-on-write-style environ arrays in contexts
 */
 
 int			exec_command(const t_node *command_node, t_context *new_context)

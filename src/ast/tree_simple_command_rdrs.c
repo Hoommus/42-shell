@@ -35,7 +35,8 @@ static void					construct_redirect(t_token *pivot,
 												struct s_io_redirect *rdr)
 {
 	rdr->type = pivot->type;
-	rdr->left.fd = IS_HEREDOC(pivot->type) || rdr->type == TOKEN_LESS ? 0 : 1;
+	rdr->left.fd = IS_HEREDOC(pivot->type) || rdr->type == TOKEN_LESS ||
+		rdr->type == TOKEN_LESSAND ? 0 : 1;
 	rdr->right.fd = 0;
 	if (pivot->prev && is_string_numeric(pivot->prev->value, 10))
 		rdr->left.fd = ft_atoi(pivot->prev->value);

@@ -6,26 +6,12 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:57:06 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/06 17:14:03 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/10 12:37:41 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell_script.h"
 #include "shell_script_parser.h"
-
-bool					is_valid_rdr_fd(const char *token_value)
-{
-	int		atoi;
-
-	atoi = ft_atoi(token_value);
-	while (*token_value)
-	{
-		if (!ft_isdigit(*token_value))
-			break ;
-		token_value++;
-	}
-	return ((atoi && !(*token_value)) || (!atoi && !(*token_value)));
-}
 
 static bool					is_token_an_arg(t_token *pivot)
 {

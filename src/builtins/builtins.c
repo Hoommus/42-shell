@@ -6,12 +6,14 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:42 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/26 14:58:05 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/10 20:15:49 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "twenty_one_sh.h"
 #include "shell_builtins.h"
+
+extern bool			g_is_subshell_env;
 
 struct s_builtin	g_builtins[] = {
 	{"cd", &hs_cd},
@@ -62,6 +64,23 @@ int					hs_help(const char **args)
 int					hs_exit(const char **args)
 {
 	TERM_APPLY_CONFIG(g_term->context_original->term_config);
-	exit(0);
-	*args = args[0];
+	if (args && *args)
+	{
+		if (!is_string_numeric(*args, 10))
+		{
+			ft_dprintf(2, SH ": exit: %s: numeric argument required\n", *args);
+			if (g_is_subshell_env)
+				return (2);
+			else
+				exit(2);
+		}
+		else if (g_is_subshell_env)
+			return (ft_atoi(*args));
+		else
+			exit(ft_atoi(*args));
+	}
+	if (g_is_subshell_env)
+		return (0);
+	else
+		exit(0);
 }

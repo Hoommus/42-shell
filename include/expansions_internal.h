@@ -28,7 +28,6 @@ struct						s_expansion
 char						*expand_tilde(char *str);
 char						*expand_vars(char *str);
 char						*expand_escaped(char *string);
-char						*expand_quote(char *string);
-char						*expand_dquote(char *string);
+char						*expand_quotes(char *str);
 
 #endif

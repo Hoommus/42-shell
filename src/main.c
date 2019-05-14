@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:32 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/09 16:11:33 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/10 18:04:57 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,7 +122,10 @@ int					main(int argc, char **argv)
 	print_messages();
 	setup_signal_handlers();
 	if (argc == 1)
+	{
+		tcsetpgrp(0, jc_get()->shell_pid);
 		shell_loop();
+	}
 	else
 		run_file(argv[1]);
 	return (g_term->last_status);

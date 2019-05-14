@@ -62,7 +62,7 @@ INTERFACE_SRC = buffer_drawing.c buffer_input.c  \
                 cursor_control.c cursor_positions.c \
                 buffer_vector.c buffer_vector_tools1.c buffer_vector_tools2.c  \
                 buffer_vector_insertions.c buffer_vector_parts.c \
-                state_toggles.c state_updates.c \
+                state_toggles.c \
                 handlers_arrows.c handlers_editing.c handlers_engine.c \
                 handlers_arrows_mods.c handlers_arrows_vertical.c \
                 handlers_clipboard.c \
