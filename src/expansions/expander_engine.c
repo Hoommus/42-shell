@@ -21,8 +21,8 @@ static const struct s_expansion		g_expansions[] =
 {
 	{"", expand_tilde},
 	{"", expand_vars},
-	{"", expand_quotes},
 	{"", expand_escaped},
+	{"", expand_quotes},
 	{NULL, NULL},
 	{"$(", NULL},
 	{"${", NULL},

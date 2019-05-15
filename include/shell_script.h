@@ -34,7 +34,7 @@
 **         lifespan control
 */
 
-/**
+/*
 ** Do not change order in which these entries appear. They provide easy random
 ** access to a specific token entry in recognisable by this shell token table.
 ** @see g_tokens[] src/lexer/tokenizer.c

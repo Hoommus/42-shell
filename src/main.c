@@ -72,7 +72,7 @@ void				init_variables(void)
 		set_env_v(g_term->context_current->environ, "SHLVL", "1", SCOPE_EXPORT);
 	else
 		set_env_v(g_term->context_current->environ, "SHLVL",
-				(swap = ft_itoa(ft_atoi(var->value) + 1)), SCOPE_EXPORT);
+			(swap = ft_itoa((u_int32_t)ft_atoi(var->value) + 1)), SCOPE_EXPORT);
 	ft_memdel((void **)&swap);
 }
 

@@ -88,9 +88,9 @@ static size_t				is_separate(const char *str)
 
 static u_int64_t			get_quoted_size(const char *str, const char *delims)
 {
-	u_int64_t	i;
-	int			state;
-	char		quote;
+	register u_int64_t	i;
+	int					state;
+	char				quote;
 
 	i = 0;
 	quote = str[i];
@@ -116,9 +116,9 @@ static u_int64_t			get_quoted_size(const char *str, const char *delims)
 
 static char					*next_token(const char *str, const char *delims)
 {
-	u_int64_t	i;
-	size_t		len;
-	char		c;
+	register u_int64_t	i;
+	size_t				len;
+	char				c;
 
 	i = 0;
 	c = str[i];
@@ -164,11 +164,11 @@ static struct s_token		*create_token(const char *str, t_token *last,
 
 struct s_token				*tokenize(char *string, const char *delimiters)
 {
-	struct s_token	*head;
-	struct s_token	*tail;
-	char			*token_value;
-	u_int64_t		i;
-	int				line;
+	register u_int64_t	i;
+	struct s_token		*head;
+	struct s_token		*tail;
+	char				*token_value;
+	int					line;
 
 	head = NULL;
 	tail = NULL;

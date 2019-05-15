@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/05/08 17:43:24 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/05/14 20:42:19 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,6 +20,7 @@ FLAGS = -g -DSH=\"$(NAME)\" \
                -Wall  \
                -Wextra \
                -Werror  \
+               #-fprofile-instr-generate \
                #-fsanitize="address"
 
 HEADER = -I include/ -I printf/include -I libft/

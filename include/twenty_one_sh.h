@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/14 16:35:34 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/15 13:29:08 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,8 +70,8 @@
 # define ERR_RUNNING_JOBS       ANSI_RESET SH ": you have running jobs\n"
 # define ERR_AMBIGUOUS_REDIRECT ANSI_RESET SH ": ambiguous redirect\n"
 
-# define BUILD 2383
-# define BUILD_DATE "14.05.19 16:35:33 EEST"
+# define BUILD 2424
+# define BUILD_DATE "15.05.19 13:29:08 EEST"
 
 # ifdef MAX_INPUT
 #  undef MAX_INPUT
@@ -191,8 +191,6 @@ struct					s_term
 };
 extern volatile sig_atomic_t	g_interrupt;
 extern struct s_term			*g_term;
-
-int						execute(const char **args, const bool does_wait);
 
 /*
 ** Init (init.c)

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/03 16:28:37 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/05 14:53:17 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/14 17:30:00 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,7 +129,6 @@ const t_rule g_command = {
 	.token = TOKEN_NOT_APPLICABLE,
 	.expands_to = {
 		{&g_simple_command},
-		{&g_compound_command, &g_redirect_list},
 		{&g_compound_command}
 	},
 	.human_readable = "command",

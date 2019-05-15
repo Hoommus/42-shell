@@ -36,7 +36,7 @@ static int		open_at_fd(int what_fd, const char *path, int oflag,
 	}
 	else if (fd == -1)
 	{
-		ft_dprintf(2, SH ": could not open file %s\n", path);
+		ft_dprintf(2, ERR_NO_SUCH_FILE, path);
 		return (-(g_rdr_error = 1));
 	}
 	if (fd != what_fd)
