@@ -86,7 +86,7 @@ char			*expand_vars(char *str)
 	while (i < len)
 	{
 		ignore = check_ignore(str, i, ignore);
-		if (ignore != QUOTE && str[i] == '$' && i + 1 != len && 
+		if (ignore != QUOTE && str[i] == '$' && i + 1 != len &&
 			ft_isascii(str[i + 1]))
 		{
 			swap = str;
