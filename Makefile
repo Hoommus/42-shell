@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/05/16 13:05:03 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/05/16 13:05:07 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -93,15 +93,6 @@ OBJ = $(addprefix $(OBJ_DIR), $(SHELL_SRC:.c=.o))                         \
 all: $(NAME) 
 
 $(NAME): prepare $(OBJ)
-	@BUILD_NBR=$$(expr $$(grep -E "# define BUILD [0-9]+" \
-			   < ./include/twenty_one_sh.h | \
-			   grep -o -E '[0-9]+') + 1) &&  \
-	BUILD_DATE=$$(date +"%d.%m.%y %T %Z") && \
-	ex -c "%s/define BUILD [0-9]\+/define BUILD $$BUILD_NBR/g|             \
-			%s!define BUILD_DATE .\+!define BUILD_DATE \"$$BUILD_DATE\"!g| \
-			|w|q" include/twenty_one_sh.h
-	rm -f obj/main.o
-	$(CC) $(FLAGS) $(HEADER) -o $(OBJ_DIR)main.o -c $(SRC_DIR)main.c
 	make -C $(LIB_DIR)
 	cp $(LIB_DIR)/$(LIB_NAME) ./$(LIB_NAME)
 	$(CC) $(FLAGS) -o $(NAME) $(OBJ) $(HEADER) $(LIB_NAME) -ltermcap
