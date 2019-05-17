@@ -56,7 +56,7 @@ insert]`
 builtin. 
 > `where [command name]`
 
-**set** — print _all_ variables - both exportable and local, but without
+**set** — print _all_ variables - both exportable and local. Does not support
 any shell options config.
 
 **env** — same as **export** without arguments.
@@ -68,10 +68,12 @@ any shell options config.
 name (without variable name validation).
 > `unsetenv [KEY ...]`
 
-**echo** — echo some text, will work just as you'd expect. Does not have
-any arguments yet.
+**echo** — echo some text, will work just as you'd expect.
 
-**exit** — exit shell. Does not support return code specification yet. 
+**exit** — exit shell. Supports numeric code argument. If the string is not numeric,
+prints diagnostic message and shell exits with error code. If `exit` is executed in a
+subshell environment, it does not invoke system call with the same name, but rather just
+return control to AST executor.
 
 **help** — prints supported builtins. 
 
@@ -93,7 +95,43 @@ hotkeys are:
 | Home     | Move cursor to the beginning of the command|
 | End      | Move cursor to the end of the command |
 
+## The differences between Bash and my shell
+#### Syntax differences
+Most notable and, possibly, critical to some users difference is in redirects syntax.
+In command of form `cat 123 > foobar` redirect will use 'WORD' on its left 
+as a filedes number and will not pass it as an argument for `cat`. To avoid this
+kind of behaviour, user must enclose `123` in quotes, either double or single. 
 
+So if you want to `cat` file with numeric name as `123` and redirect output to file
+with name `foobar`, the command must look like `cat "123" > foobar`
+
+#### Script execution differences
+The main and only difference is that this shell tries to validate syntax of whole file
+before executing it as a one big syntax tree. So it will take some time to validate 
+and emit error message, if there are syntax errors.
+
+## Implementation specifics
+I personally highlight a LL(0) parser for AST in my shell. Syntax analysis and binary AST
+creation are built on simple recursive descent (see `src/ast/parser.c`) based on 
+rules declared in `include/shell_script_parser.c` and defined in `src/ast/syntax_rules.c`.
+The main problem with this kind of parser is its dependence on stack size and number
+of recursive functions calls. As far as I tested, my parser can take up to 100 000 tokens
+in one run. And it takes about 7 seconds (without compile-time optimisations) 
+to parse and build a tree for a test file of 260 KB (about 6600 lines) with some simple commands.
+ 
+So probably, finite automata can work better in some cases, providing more optimisations and 
+checks on the fly to determine best fitting syntax rule for given token stream. 
+But in my case, I chose recursive descent because it looked like it's easier to implement — 
+the algorithm itself takes up about 60 lines of code.
+Moreover, to alter parser's behaviour and ASTs it returns I don't have to change that much code.
+For example, to make any redirects invalid, I can just alter corresponding rule 
+in `src/ast/syntax_rules.c` file and commands with redirects will momentarily become invalid.
+
+Also, answering the question why I didn't use Bison or YACC, that's because here
+at School 42 students aren't allowed to use such libraries, unless task states otherwise.
+
+And hey, that was really a great journey. While you write your own parses, you learn many
+interesting things and have to read tons of theory on the matter.
 ## Compilation
 To build a project, just clone it somewhere and `make` it. But have in
 mind that it was developed on macOS and compiled using __clang__, so
