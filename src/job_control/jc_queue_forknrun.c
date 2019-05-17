@@ -142,7 +142,6 @@ int						forknrun(t_job *job, char *path)
 	{
 		write_heredocs(job);
 		close_redundant_fds(job->context);
-		ft_memdel((void **)&path);
 		if (job->next == NULL)
 			return (waitnclaim(job));
 	}

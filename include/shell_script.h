@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 14:44:44 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/05 16:23:58 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/14 12:49:35 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,11 +21,12 @@
 # define TOKEN_DELIMITERS " \t\r\a"
 # define ISQT(x) (((x) == '\'' || (x) == '"' || (x) == '`') ? (1) : (0))
 
-# define LEXER_OUTSIDE_QUOTE       0
-# define LEXER_INSIDE_QUOTE        1
-# define LEXER_NEXT_ESCAPED        2
-# define LEXER_NEXT_UNQUOTED_DELIM 4
-# define LEXER_NEXT_UNQUOTED_PRINT 8
+# define LEXER_OUTSIDE_QUOTE       1
+# define LEXER_INSIDE_QUOTE        2
+# define LEXER_NEXT_ESCAPED        4
+# define LEXER_NEXT_UNQUOTED_DELIM 8
+# define LEXER_UNQUOTED_PRINT      16
+# define LEXER_BREAK               32
 
 /*
 ** TODO: Add functions capability:
@@ -36,7 +37,7 @@
 /*
 ** Do not change order in which these entries appear. They provide easy random
 ** access to a specific token entry in recognisable by this shell token table.
-** @see g_tokens[] src/lexer/smart_split.c
+** @see g_tokens[] src/lexer/tokenizer.c
 */
 
 enum						e_token_type

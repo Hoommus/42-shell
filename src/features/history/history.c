@@ -72,7 +72,7 @@ char		*history_write(char *command, int history_file)
 {
 	time_t		timestamp;
 
-	if (!command || ft_strlen(command) == 0)
+	if (!command || ft_strlen(command) == 0 || ft_strlen(command) > 4096)
 		return (command);
 	time(&timestamp);
 	history_push_entry(command, timestamp);

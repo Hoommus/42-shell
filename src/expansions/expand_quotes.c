@@ -6,56 +6,51 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/06 16:42:04 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/22 18:49:09 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/14 20:32:37 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "expansions_internal.h"
 #include "twenty_one_sh.h"
 
-char	*expand_quote(char *string)
+char	*expand_dquote_internals(char *str, u_int32_t from, u_int32_t to)
 {
-	u_int32_t	i;
-	const char	q = '\'';
+	char	*partial;
+	char	*swap;
 
-	if (ft_strchr(string, q) == NULL)
-		return (ft_strdup(string));
-	string = ft_strdup(string);
-	i = 0;
-	while (string[i] && string[i] != q)
-		i++;
-	ft_memmove(string + i, string + i + 1, ft_strlen(string + i) + 1);
-	while (string[i] && string[i] != q)
-		i++;
-	ft_memmove(string + i, string + i + 1, ft_strlen(string + i) + 1);
-	return (string);
+	partial = ft_strsub(str, from + 1, to - 1);
+	swap = expand_escaped(partial);
+	free(partial);
+	partial = strinsert(str, swap, from, (to) - from + 1);
+	free(str);
+	free(swap);
+	return (partial);
 }
 
-char	*expand_dquote(char *string)
+char	*expand_quotes(char *str)
 {
-	char		*swap;
-	char		*tmp;
-	u_int32_t	i;
-	u_int32_t	k;
-	const char	q = '\"';
+	register u_int32_t	i;
+	register u_int32_t	k;
+	size_t				len;
 
-	if (ft_strchr(string, q) == NULL)
-		return (ft_strdup(string));
-	string = ft_strdup(string);
-	i = 0;
-	while (string[i] && string[i] != q)
-		i += string[i] == '\\' ? 2 : 1;
-	k = i + 1;
-	while (string[k] && string[k] != q)
-		k += string[k] == '\\' ? 2 : 1;
-	if (string[k] == '\0')
-		return (ft_strdup(string));
-	swap = ft_strsub(string + i + 1, 0, k - i - 1);
-	tmp = expand_vars(swap);
-	ft_memdel((void **)&swap);
-	string[i] = 0;
-	swap = ft_strings_join(3, "", string, tmp, string + k + 1);
-	ft_memdel((void **)&tmp);
-	ft_memdel((void **)&string);
-	return (swap);
+	len = ft_strlen(str);
+	str = ft_strdup(str);
+	i = -1;
+	while (++i < len)
+		if (ft_strchr("\"'", str[i]) != NULL)
+		{
+			k = i + 1;
+			while (str[k] != str[i] && k < len)
+				k += str[k] == '\\' ? 2 : 1;
+			if ((str[i] == '"' && str[k] == '"'))
+				str = expand_dquote_internals(str, i, k);
+			else if (str[i] == '\'' && str[k] == '\'')
+			{
+				ft_memmove(str + i, str + i + 1, ft_strlen(str + i));
+				ft_memmove(str + k - 1, str + k, ft_strlen(str + k - 1));
+				i = k - 2;
+			}
+			len = ft_strlen(str);
+		}
+	return (str);
 }

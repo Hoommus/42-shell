@@ -25,7 +25,7 @@ static int			exec_pipeline_terminator(const t_node *node,
 	if (node->left->node_type == NODE_SUBSHELL ||
 		node->right->node_type == NODE_SUBSHELL)
 	{
-		ft_dprintf(2, ANSI_RESET SH ": subshells inside pipes are illegal\n");
+		ft_dprintf(2, SH ": subshells inside pipes are illegal\n");
 		return (127);
 	}
 	if (context_right == NULL)
@@ -47,6 +47,12 @@ static int			exec_pipeline_inner(const t_node *node,
 	int			pp[2];
 	t_context	*context_left;
 
+	if (node->left->node_type == NODE_SUBSHELL ||
+		node->right->node_type == NODE_SUBSHELL)
+	{
+		ft_dprintf(2, SH ": subshells inside pipes are illegal\n");
+		return (127);
+	}
 	if (node->left->node_type == NODE_COMMAND &&
 		node->right->node_type == NODE_COMMAND)
 		return (exec_pipeline_terminator(node, context_right));

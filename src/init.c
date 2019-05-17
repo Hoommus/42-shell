@@ -86,7 +86,13 @@ short			init_fd_at_home(char *filename, int flags)
 
 void			init_files(void)
 {
-	g_term->history_file = init_fd_at_home(HISTORY_FILE, 0);
+	t_var	*var;
+
+	var = get_env_v(NULL, "HISTFILE");
+	if (var == NULL || var->value == NULL || ft_strlen(var->value) == 0)
+		g_term->history_file = init_fd_at_home(HISTORY_FILE, 0);
+	else
+		g_term->history_file = init_fd_at_home(var->value, 0);
 }
 
 int				parse_args(int argc, char **argv)

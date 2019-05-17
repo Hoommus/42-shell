@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/18 16:28:45 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/09 17:04:25 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/14 20:42:08 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ static void			deal_with_newline(const char *arr)
 	recheck_state(0);
 	if (g_term->input_state > STATE_NON_INTERACTIVE)
 	{
+		handle_end((union u_char){K_END});
 		TERM_CLR_LINE;
 		write(STDOUT_FILENO, "\n", 1);
 		buff_insert_single_at(g_term->buffer->iterator, arr);

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:36 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/19 13:22:23 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/14 16:49:29 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,17 +73,13 @@ void		display_prompt(enum e_input_state state)
 bool		is_string_numeric(const char *str, const int base)
 {
 	static char		*numbers = "0123456789ABCDEF";
-	bool			is_found;
-	int				i;
+	char			numbers_base[17];
 
-	is_found = false;
+	ft_bzero(numbers_base, sizeof(numbers_base));
+	ft_memcpy(numbers_base, numbers, base * sizeof(char));
 	while (*str)
 	{
-		i = 0;
-		while (i < base && !is_found)
-			if (*str == numbers[i++])
-				is_found = true;
-		if (!is_found)
+		if (ft_strchr(numbers_base, *str) == NULL)
 			return (false);
 		str++;
 	}

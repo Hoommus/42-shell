@@ -8,4 +8,4 @@ CMakeLists.txt
 *.a
 21sh
 42sh
-
+test/

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/06 16:43:04 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/04 17:58:03 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/13 13:35:02 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,28 +57,41 @@ static char		*extract_var(const char *str, u_int32_t *off)
 	return (swap);
 }
 
+#define NORMAL 0
+#define DQUOTE 1
+#define QUOTE 2
+
+static int		check_ignore(const char *str, u_int32_t i, int ignore)
+{
+	if (i > 0 && str[i - 1] == '\\')
+		return (ignore);
+	if (str[i] == '"' && ((i > 0 && str[i - 1] != '\\') || i == 0))
+		ignore = (ignore == DQUOTE) ? NORMAL : DQUOTE;
+	else if (str[i] == '\'' && ((i > 0 && str[i - 1] != '\\') || i == 0))
+		ignore = (ignore == NORMAL) ? QUOTE : ignore;
+	return (ignore);
+}
+
 char			*expand_vars(char *str)
 {
 	u_int32_t	i;
 	size_t		len;
 	char		*swap;
-	bool		ignore;
+	int			ignore;
 
 	str = ft_strdup(str);
-	ignore = false;
+	ignore = NORMAL;
 	i = 0;
 	len = ft_strlen(str);
 	while (i < len)
 	{
-		if (str[i] == '\'' && ((i > 0 && str[i - 1] != '\\') || i == 0))
-			ignore = !ignore;
-		if (!ignore && str[i] == '$' && i + 1 != len && ft_isascii(str[i + 1]))
+		ignore = check_ignore(str, i, ignore);
+		if (ignore != QUOTE && str[i] == '$' && i + 1 != len &&
+			ft_isascii(str[i + 1]))
 		{
 			swap = str;
 			str = extract_var(str, &i);
 			ft_memdel((void **)&swap);
-			if ((len = ft_strlen(str)) == 0)
-				break ;
 		}
 		else
 			i += (str[i] == '\\') ? 2 : 1;

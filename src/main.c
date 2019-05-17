@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:32 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/09 16:11:33 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/10 18:04:57 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ void				init_variables(void)
 		set_env_v(g_term->context_current->environ, "SHLVL", "1", SCOPE_EXPORT);
 	else
 		set_env_v(g_term->context_current->environ, "SHLVL",
-				(swap = ft_itoa(ft_atoi(var->value) + 1)), SCOPE_EXPORT);
+			(swap = ft_itoa((u_int32_t)ft_atoi(var->value) + 1)), SCOPE_EXPORT);
 	ft_memdel((void **)&swap);
 }
 
@@ -122,7 +122,10 @@ int					main(int argc, char **argv)
 	print_messages();
 	setup_signal_handlers();
 	if (argc == 1)
+	{
+		tcsetpgrp(0, jc_get()->shell_pid);
 		shell_loop();
+	}
 	else
 		run_file(argv[1]);
 	return (g_term->last_status);

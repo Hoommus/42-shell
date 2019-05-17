@@ -31,12 +31,12 @@ static int		open_at_fd(int what_fd, const char *path, int oflag,
 	}
 	if ((fd = open_wrapper(path, oflag)) == -1 && (oflag & O_EXCL) == O_EXCL)
 	{
-		ft_dprintf(2, ANSI_RESET SH ": clobber error: `%s' exists\n", path);
+		ft_dprintf(2, SH ": clobber error: `%s' exists\n", path);
 		return (-(g_rdr_error = 1));
 	}
 	else if (fd == -1)
 	{
-		ft_dprintf(2, ANSI_RESET SH ": could not open file %s\n", path);
+		ft_dprintf(2, ERR_NO_SUCH_FILE, path);
 		return (-(g_rdr_error = 1));
 	}
 	if (fd != what_fd)
@@ -97,7 +97,8 @@ int				alterate_filedes(const struct s_command *command,
 			open_at_fd(rdr->left.fd, rdr->right.path, O_CREAT | O_WRONLY |
 				(rdr->type == TOKEN_DGREAT ? O_APPEND : O_TRUNC), cntxt);
 		else if (rdr->type == TOKEN_CLOBBER)
-			open_at_fd(rdr->left.fd, rdr->right.path, O_CREAT | O_WRONLY | O_EXCL, cntxt);
+			open_at_fd(rdr->left.fd, rdr->right.path, O_CREAT | O_WRONLY |
+				O_EXCL, cntxt);
 		else if (rdr->type == TOKEN_LESS)
 			open_at_fd(rdr->left.fd, rdr->right.path, O_RDONLY, cntxt);
 		else if (rdr->type == TOKEN_LESSGREAT)

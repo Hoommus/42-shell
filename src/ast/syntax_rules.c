@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/03 16:28:37 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/05 14:53:17 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/15 19:32:02 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,7 +129,6 @@ const t_rule g_command = {
 	.token = TOKEN_NOT_APPLICABLE,
 	.expands_to = {
 		{&g_simple_command},
-		{&g_compound_command, &g_redirect_list},
 		{&g_compound_command}
 	},
 	.human_readable = "command",
@@ -155,7 +154,7 @@ const t_rule g_compound_command = {
 const t_rule g_subshell = {
 	.token = TOKEN_NOT_APPLICABLE,
 	.expands_to = {
-		{&g_lbracket_token, &g_compound_list, &g_rbracket_token}
+		{&g_lbracket_token, &g_list, &g_rbracket_token}
 	},
 	.human_readable = "subshell",
 	.tree_builder = &subshell_build
@@ -359,7 +358,7 @@ const t_rule g_term_rule_dash = {
 const t_rule g_brace_group = {
 	.token = TOKEN_NOT_APPLICABLE,
 	.expands_to = {
-		{&g_lbrace_token, &g_compound_list, &g_rbrace_token}
+		{&g_lbrace_token, &g_list, &g_rbrace_token}
 	},
 	.human_readable = "brace_group",
 	.tree_builder = NULL

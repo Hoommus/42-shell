@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:55:49 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/25 17:26:02 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/13 21:54:20 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,26 +88,27 @@ static size_t				is_separate(const char *str)
 
 static u_int64_t			get_quoted_size(const char *str, const char *delims)
 {
-	u_int64_t	i;
-	int			state;
-	char		quote;
+	register u_int64_t	i;
+	int					state;
+	char				quote;
 
 	i = 0;
 	quote = str[i];
 	state = LEXER_INSIDE_QUOTE;
-	while (str[++i] && state != LEXER_NEXT_UNQUOTED_DELIM)
+	while (str[++i] && state != LEXER_BREAK)
 	{
-		if (ft_strchr(delims, str[i + 1]) == NULL
-			&& str[i + 1] != '\n' && state != LEXER_INSIDE_QUOTE)
-			break ;
-		else if (str[i] == '\\')
+		if (str[i] == '\\')
 			i++;
+		else if (state == LEXER_UNQUOTED_PRINT &&
+			(ft_strchr(delims, str[i + 1]) != NULL || str[i + 1] == '\n'))
+			state = LEXER_BREAK;
 		else if (str[i] == quote)
 		{
-			if (ft_strchr(delims, str[i + 1]) == NULL && str[i + 1] != '\n')
-				state = LEXER_OUTSIDE_QUOTE;
+			if (ft_strchr(delims, str[i + 1]) == NULL && str[i + 1] != '\n'
+				&& !ISQT(str[i + 1]))
+				state = LEXER_UNQUOTED_PRINT;
 			else
-				state = LEXER_NEXT_UNQUOTED_DELIM;
+				state = LEXER_BREAK;
 		}
 	}
 	return (i);
@@ -115,9 +116,9 @@ static u_int64_t			get_quoted_size(const char *str, const char *delims)
 
 static char					*next_token(const char *str, const char *delims)
 {
-	u_int64_t	i;
-	size_t		len;
-	char		c;
+	register u_int64_t	i;
+	size_t				len;
+	char				c;
 
 	i = 0;
 	c = str[i];
@@ -163,11 +164,11 @@ static struct s_token		*create_token(const char *str, t_token *last,
 
 struct s_token				*tokenize(char *string, const char *delimiters)
 {
-	struct s_token	*head;
-	struct s_token	*tail;
-	char			*token_value;
-	u_int64_t		i;
-	int				line;
+	register u_int64_t	i;
+	struct s_token		*head;
+	struct s_token		*tail;
+	char				*token_value;
+	int					line;
 
 	head = NULL;
 	tail = NULL;

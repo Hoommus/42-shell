@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/06 16:40:46 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/06 17:46:37 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/14 20:29:42 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,19 +60,26 @@ static void							assign_escaped(char *str, u_int32_t i,
 				map++;
 }
 
-char								*expand_escaped(char *string)
+char								*expand_escaped(char *str)
 {
-	size_t						len;
-	u_int32_t					i;
+	size_t		len;
+	u_int32_t	i;
+	char		quote;
 
 	i = -1;
-	len = ft_strlen(string);
-	string = ft_strdup(string);
-	while (++i < len && string[i])
-		if (string[i] == '\\')
+	len = ft_strlen(str);
+	str = ft_strdup(str);
+	quote = 0;
+	while (++i < len && str[i])
+	{
+		if ((str[i] == '\'' || str[i] == '"') && (str[i] == quote || !quote) &&
+			((i > 0 && str[i - 1] != '\\') || i == 0))
+			quote = quote == 0 ? str[i] : 0;
+		if (!quote && str[i] == '\\')
 		{
-			ft_memmove(string + i, string + i + 1, len - i + 1);
-			assign_escaped(string, i, len);
+			ft_memmove(str + i, str + i + 1, len - i + 1);
+			assign_escaped(str, i, len);
 		}
-	return (string);
+	}
+	return (str);
 }

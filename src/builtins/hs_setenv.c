@@ -6,22 +6,30 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/25 15:35:53 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/08 14:24:26 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/11 12:40:42 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "twenty_one_sh.h"
 
+extern bool		g_is_subshell_env;
+
 static int		set_tricky(const char *str)
 {
-	const t_env_vector	*vector = g_term->context_original->environ;
+	t_env_vector		*vector;
 	char				tmp[1024];
 	int					j;
 
+	vector = g_is_subshell_env ? g_term->context_current->environ
+								: g_term->context_original->environ;
 	ft_bzero(tmp, sizeof(char) * 1024);
 	j = -1;
 	while (str[++j])
-		if ((str[j] == '=' || !str[j]) && is_valid_var(ft_memcpy(tmp, str, j & 1024)))
+		if (j >= 1024)
+			return ((ft_dprintf(2, ANSI_RESET
+			"setenv: variable name is too long\n") & 0) | 1);
+		else if ((str[j] == '=' || !str[j]) &&
+			is_valid_var(ft_memcpy(tmp, str, j)))
 		{
 			set_env_v((t_env_vector *)vector, tmp, str + j + 1, SCOPE_EXPORT);
 			break ;

@@ -19,8 +19,8 @@
 
 char	*strip_escaped_nl_and_comments(char *string)
 {
-	size_t	length;
-	size_t	i;
+	register size_t	i;
+	size_t			length;
 
 	if (!string)
 		return (string);

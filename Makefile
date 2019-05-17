@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/05/08 17:43:24 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/05/16 13:05:07 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,11 +16,10 @@ CC = clang
 
 FDS = shell(ulimit -n)
 
-FLAGS = -g -DSH=\"$(NAME)\" \
+FLAGS = -DSH=\"$(NAME)\" \
                -Wall  \
                -Wextra \
-               -Werror  \
-               #-fsanitize="address"
+               -Werror
 
 HEADER = -I include/ -I printf/include -I libft/
 SRC_DIR = ./src/
@@ -62,7 +61,7 @@ INTERFACE_SRC = buffer_drawing.c buffer_input.c  \
                 cursor_control.c cursor_positions.c \
                 buffer_vector.c buffer_vector_tools1.c buffer_vector_tools2.c  \
                 buffer_vector_insertions.c buffer_vector_parts.c \
-                state_toggles.c state_updates.c \
+                state_toggles.c \
                 handlers_arrows.c handlers_editing.c handlers_engine.c \
                 handlers_arrows_mods.c handlers_arrows_vertical.c \
                 handlers_clipboard.c \
@@ -94,15 +93,6 @@ OBJ = $(addprefix $(OBJ_DIR), $(SHELL_SRC:.c=.o))                         \
 all: $(NAME) 
 
 $(NAME): prepare $(OBJ)
-	@BUILD_NBR=$$(expr $$(grep -E "# define BUILD [0-9]+" \
-			   < ./include/twenty_one_sh.h | \
-			   grep -o -E '[0-9]+') + 1) &&  \
-	BUILD_DATE=$$(date +"%d.%m.%y %T %Z") && \
-	ex -c "%s/define BUILD [0-9]\+/define BUILD $$BUILD_NBR/g|             \
-			%s!define BUILD_DATE .\+!define BUILD_DATE \"$$BUILD_DATE\"!g| \
-			|w|q" include/twenty_one_sh.h
-	rm -f obj/main.o
-	$(CC) $(FLAGS) $(HEADER) -o $(OBJ_DIR)main.o -c $(SRC_DIR)main.c
 	make -C $(LIB_DIR)
 	cp $(LIB_DIR)/$(LIB_NAME) ./$(LIB_NAME)
 	$(CC) $(FLAGS) -o $(NAME) $(OBJ) $(HEADER) $(LIB_NAME) -ltermcap

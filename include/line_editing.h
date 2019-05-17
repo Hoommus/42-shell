@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:56:36 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/07 15:16:14 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/14 13:48:57 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,10 +65,16 @@ enum				e_direction
 	D_NOWHERE
 };
 
+/*
+** .states field is a bitwise-OR separated value of states in which
+** this specific listener will be executed.
+*/
+
 struct				s_listener
 {
 	const union u_char	key;
 	void				(*const handler) (union u_char);
+	enum e_input_state	states;
 };
 
 int					ft_putc(int c);

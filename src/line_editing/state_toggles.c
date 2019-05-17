@@ -6,20 +6,17 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/16 13:48:01 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/09 16:00:15 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/14 21:15:12 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "twenty_one_sh.h"
 #include "line_editing.h"
 
-bool				is_operator(void)
-{
-	return (false);
-}
-
 enum e_input_state	toggle_quotes(enum e_input_state current, u_int64_t i)
 {
+	if (i > 0 && current != STATE_ESCAPED && buff_char_at_equals(i - 1, "\\"))
+		return (current);
 	if (current < STATE_QUOTE && buff_char_at_equals(i, "'"))
 		return (STATE_QUOTE);
 	else if (current < STATE_QUOTE && buff_char_at_equals(i, "\""))
@@ -48,10 +45,11 @@ enum e_input_state	recheck_state(u_int64_t from_index)
 			current = g_term->fallback_input_state;
 		if (current < STATE_QUOTE && buff_char_at_equals(i, "\\"))
 			current = STATE_ESCAPED;
+		else if (current < STATE_QUOTE && buff_char_at_equals(i, "|") &&
+			!buff_char_at_equals(i - 1, ">"))
+			current = STATE_EMPTY_OPERATOR;
 		else if (current == STATE_ESCAPED)
 			current = g_term->fallback_input_state;
-		else if (current < STATE_QUOTE && buff_char_at_equals(i, "|"))
-			current = STATE_EMPTY_OPERATOR;
 		else
 			current = toggle_quotes(current, i);
 		i++;

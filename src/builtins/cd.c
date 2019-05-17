@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:58 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/07 19:06:23 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/10 12:33:20 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ static int		try_cd(const char *path, t_var *oldpwd)
 	else if (ft_strcmp(path, "-") == 0)
 	{
 		if (oldpwd == NULL)
-			return ((ft_dprintf(2, ANSI_RESET SH "OLDPWD not set\n") & 0) | 2);
+			return ((ft_dprintf(2, ANSI_RESET "cd: OLDPWD not set\n") & 0) | 2);
 		ft_printf("%s\n", oldpwd->value);
 		status = try_access_and_cd(oldpwd->value);
 	}
@@ -55,14 +55,12 @@ static int		try_cd(const char *path, t_var *oldpwd)
 int				hs_cd(const char **args)
 {
 	const t_env_vector	*vector = g_term->context_original->environ;
-	t_var				*var;
 	char				currpwd[1024];
 	char				pwd[1024];
 	int					status;
 
-	var = get_env_v(NULL, "OLDPWD");
 	getcwd(currpwd, 1023);
-	status = try_cd(args[0], var);
+	status = try_cd(args[0], get_env_v(NULL, "OLDPWD"));
 	if (status == 0)
 	{
 		getcwd(pwd, 1023);

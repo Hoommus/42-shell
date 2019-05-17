@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/16 12:28:37 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/04 12:00:45 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/05/10 17:45:41 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,10 @@
 #include "shell_history.h"
 #include "twenty_one_sh.h"
 
+extern t_history		*g_history;
+
 void	handle_up(union u_char key)
 {
-	extern t_history		*g_history;
 	struct s_history_entry	*entry;
 	char					*tmp;
 
@@ -45,7 +46,6 @@ void	handle_up(union u_char key)
 
 void	handle_down(union u_char key)
 {
-	extern t_history		*g_history;
 	struct s_history_entry	*entry;
 	char					*tmp;
 
