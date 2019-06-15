@@ -37,7 +37,7 @@
 # include "shell_environ.h"
 
 # ifndef SH
-#  define SH "21sh"
+#  define SH "42sh"
 # endif
 
 # define ANSI_RESET "\x1b[0m"
@@ -131,6 +131,7 @@ typedef struct			s_context
 	t_env_vector		*environ;
 	struct termios		*term_config;
 	struct s_fd_lst		*fd_list;
+	bool				is_bgjob;
 }						t_context;
 
 /*
@@ -189,6 +190,7 @@ struct					s_term
 
 	t_buffer			*buffer;
 };
+
 extern volatile sig_atomic_t	g_interrupt;
 extern struct s_term			*g_term;
 

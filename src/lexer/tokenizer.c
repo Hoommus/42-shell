@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:55:49 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/13 21:54:20 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/12 13:13:43 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,20 +19,8 @@
 ** {"case",          "case",        TOKEN_CASE,            false},
 ** {"esac",          "esac",        TOKEN_ESAC,            false},
 ** {";;",            "DSEMI",       TOKEN_DSEMI,           true },
-** {"if", "IF", TOKEN_IF, false},
-** {"then", "THEN", TOKEN_THEN, false},
-** {"else", "ELSE", TOKEN_ELSE, false},
-** {"elif", "ELIF", TOKEN_ELIF, false},
-** {"fi", "FI", TOKEN_FI, false},
-** {"do", "DO", TOKEN_DO, false},
-** {"done", "DONE", TOKEN_DONE, false},
-** {"while", "WHILE", TOKEN_WHILE, false},
-** {"until", "UNTIL", TOKEN_UNTIL, false},
 ** {"for", "FOR", TOKEN_FOR, false},
 ** {"in", "IN", TOKEN_IN, false},
-** {"[", "LSQBRACKET", TOKEN_LSQBRACKET, true },
-** {"]", "RSQBRACKET", TOKEN_RSQBRACKET, true },
-** {"!", "BANG", TOKEN_BANG, true },
 */
 
 const struct s_lexer_token	g_tokens[] = {
@@ -58,6 +46,17 @@ const struct s_lexer_token	g_tokens[] = {
 	{"<", "LESS", TOKEN_LESS, true },
 	{">", "GREAT", TOKEN_GREAT, true },
 	{"&", "AMPERSAND", TOKEN_AMPERSAND, true },
+	{"!", "BANG", TOKEN_BANG, true },
+
+	{"if", "IF", TOKEN_IF, false},
+	{"then", "THEN", TOKEN_THEN, false},
+	{"else", "ELSE", TOKEN_ELSE, false},
+	{"elif", "ELIF", TOKEN_ELIF, false},
+	{"fi", "FI", TOKEN_FI, false},
+	{"do", "DO", TOKEN_DO, false},
+	{"done", "DONE", TOKEN_DONE, false},
+	{"while", "WHILE", TOKEN_WHILE, false},
+	{"until", "UNTIL", TOKEN_UNTIL, false},
 
 	{"^~/?[\\/\\w]*", "WORD", TOKEN_WORD, false},
 	{"^\\D\\w+", "NAME", TOKEN_NAME, false},

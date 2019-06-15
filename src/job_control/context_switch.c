@@ -13,8 +13,7 @@
 #include "twenty_one_sh.h"
 
 /*
-** TODO: make checks of fds presence in main context to avoid closing
-**  something like history file
+** TODO: make environ context switches more intelligent - make diffs possible
 */
 
 void			context_deep_free(t_context **context)

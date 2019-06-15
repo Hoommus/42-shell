@@ -97,7 +97,6 @@ t_bresult					*simple_command_build(const t_state *state,
 	command->args = get_args(list, size);
 	command->assignments = get_assignments(list, size);
 	command->io_redirects = get_redirects(list, size);
-	command->is_async = false;
 	node = ast_new_node(command, NODE_COMMAND);
 	result->root = node;
 	result->request = state->rule;

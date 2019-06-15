@@ -18,7 +18,6 @@ extern bool			g_is_subshell_env;
 struct s_builtin	g_builtins[] = {
 	{"cd", &hs_cd},
 	{"echo", &hs_echo},
-	{"env", &hs_env},
 	{"export", &hs_export},
 	{"exit", &hs_exit},
 	{"history", &hs_history},
@@ -26,9 +25,8 @@ struct s_builtin	g_builtins[] = {
 	{"jobs", &hs_jobs},
 	{"quit", &hs_exit},
 	{"set", &hs_set},
-	{"setenv", &hs_setenv},
 	{"tokenizer", &hs_tokenizer},
-	{"unsetenv", &hs_unsetenv},
+	{"unset", &hs_unsetenv},
 	{"where", &hs_where},
 	{NULL, NULL}
 };
