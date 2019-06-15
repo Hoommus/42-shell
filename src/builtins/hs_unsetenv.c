@@ -22,7 +22,7 @@ int				hs_unsetenv(const char **args)
 	while (args[len])
 		len++;
 	if (len == 0)
-		ft_printf("usage:\nunsetenv KEY [KEY ...]\n");
+		ft_printf("usage:\nunset KEY [KEY ...]\n");
 	else
 		while (i < len)
 			unset_env_v(g_term->context_original->environ, args[i++]);

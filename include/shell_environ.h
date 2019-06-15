@@ -73,6 +73,9 @@ void						environ_from_array(t_env_vector *vector,
 	const char **environ);
 char						**environ_to_array(t_env_vector *vector,
 	u_int32_t scopes);
+char						**environ_to_array_diff(t_env_vector *valt,
+	const t_env_vector *vshell, u_int32_t scopes);
+
 void						environ_import(t_env_vector *dst,
 	const t_env_vector *src, const u_int32_t scopes);
 

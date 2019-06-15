@@ -122,7 +122,7 @@ int			exec_command(const t_node *command_node, t_context *new_context)
 
 	job_class = new_context ? JOB_FG : JOB_PIPE;
 	context = new_context ? new_context
-							: context_duplicate(g_term->context_original, true);
+							: context_duplicate(g_term->context_current, true);
 	expand_everything(command);
 	if (alterate_filedes(command, context))
 	{

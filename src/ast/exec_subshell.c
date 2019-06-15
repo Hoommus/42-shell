@@ -27,7 +27,8 @@ int					exec_subshell(const t_node *node, t_context *new_context)
 	g_is_subshell_env = true;
 	context_switch(context);
 	wexitstatus = exec_node((t_node *)node->left);
-	context_deep_free(&context);
+	if (!new_context)
+		context_deep_free(&context);
 	context_switch(jc_get()->shell_context);
 	g_is_subshell_env = false;
 	return (wexitstatus);

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 14:44:44 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/14 12:49:35 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/12 16:40:36 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,17 @@ enum						e_token_type
 	TOKEN_LESS,
 	TOKEN_GREAT,
 	TOKEN_AMPERSAND,
+	TOKEN_BANG,
+
+	TOKEN_IF,
+	TOKEN_THEN,
+	TOKEN_ELSE,
+	TOKEN_ELIF,
+	TOKEN_FI,
+	TOKEN_DO,
+	TOKEN_DONE,
+	TOKEN_WHILE,
+	TOKEN_UNTIL,
 
 	TOKEN_WORD,
 	TOKEN_NAME,
@@ -87,6 +98,7 @@ enum						e_node_type
 	NODE_PIPE,
 	NODE_SUBSHELL,
 	NODE_SEPARATOR,
+	NODE_AMPERSAND,
 	NODE_OR_IF,
 	NODE_AND_IF,
 	NODE_LOOP_WHILE,
@@ -122,6 +134,7 @@ typedef struct				s_node
 {
 	struct s_command		*command;
 	enum e_node_type		node_type;
+	bool					is_async;
 	struct s_node			*left;
 	struct s_node			*right;
 }							t_node;
@@ -139,13 +152,12 @@ typedef struct				s_io_redirect
 	enum e_token_type		type;
 }							t_io_rdr;
 
-struct						s_command
+typedef struct				s_command
 {
 	char		**args;
 	char		**assignments;
 	t_io_rdr	*io_redirects;
-	bool		is_async;
-};
+}							t_command;
 
 union						u_executor
 {
