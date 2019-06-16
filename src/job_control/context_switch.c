@@ -21,6 +21,8 @@ void			context_deep_free(t_context **context)
 	struct s_fd_lst		*list;
 	struct s_fd_lst		*swap;
 
+	if (context == NULL || *context == NULL)
+		return ;
 	environ_deallocate_vector((*context)->environ);
 	list = (*context)->fd_list;
 	while (list)

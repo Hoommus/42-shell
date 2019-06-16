@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:38 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/03 21:45:56 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/15 21:33:04 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,9 +79,7 @@ struct s_result			is_syntax_valid(t_state const prev)
 
 	state = prev;
 	ft_bzero(&result, sizeof(struct s_result));
-	if (state.rule != NULL && state.list_offset == NULL)
-		;
-	else if (IS_TERMINAL(state.rule))
+	if (state.list_offset != NULL && IS_TERMINAL(state.rule))
 		return (*handle_terminal(&result, &state));
 	if (result.error != NULL)
 		return (result);

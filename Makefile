@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/05/16 13:05:07 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/06/15 16:26:05 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,7 +20,7 @@ FLAGS = -DSH=\"$(NAME)\" \
                -Wall  \
                -Wextra \
                -Werror \
-               -g
+               -g -fsanitize=address
 
 HEADER = -I include/ -I printf/include -I libft/
 SRC_DIR = ./src/
@@ -54,7 +54,7 @@ AST_SRC = ast_exec_main.c ast_exec_preprocess.c \
 
 BUILTIN_DIR = builtins/
 BUILTIN_SRC = cd.c where.c builtins.c hs_history.c tokenizer_test.c \
-              syntax_test.c hs_set.c hs_env.c hs_setenv.c hs_unsetenv.c \
+              syntax_test.c hs_set.c hs_setenv.c hs_unsetenv.c \
               hs_export.c hs_jobs.c
 
 INTERFACE_DIR = line_editing/

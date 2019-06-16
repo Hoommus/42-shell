@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/10 16:42:51 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/10 18:36:05 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/16 13:26:31 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ void					close_redundant_fds(t_context *context)
 {
 	struct s_fd_lst		*list;
 
+	if (context == NULL)
+		return ;
 	list = context->fd_list;
 	while (list)
 	{
@@ -105,9 +107,12 @@ static int				run_regular(const t_job *job)
 
 int						jc_execute_pipeline_queue(void)
 {
+	extern bool		g_is_subshell_env;
 	const t_job		*list = jc_get()->job_queue;
 	int				s;
 
+	if (list && list->next)
+		g_is_subshell_env = true;
 	while (list)
 	{
 		if ((s = run_builtin((t_job *)list)) != -512 && !list->next)
@@ -120,5 +125,6 @@ int						jc_execute_pipeline_queue(void)
 		close_redundant_fds(list->context);
 		list = list->next;
 	}
+	g_is_subshell_env = false;
 	return (-1024);
 }
