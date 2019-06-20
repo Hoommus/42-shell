@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:56:22 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/04 15:56:33 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/20 20:55:55 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,5 +49,7 @@ int						hs_fg(const char **args);
 int						hs_bg(const char **args);
 
 int						hs_set(const char **args);
+
+int						hs_alias(const char **args);
 
 #endif

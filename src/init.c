@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/16 12:28:13 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/03 17:35:24 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/20 19:52:05 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,9 @@
 void			init_shell_context(void)
 {
 	extern const char	**environ;
+	extern t_env_vector	*g_alias_vector;
 
+	g_alias_vector = environ_create_vector(VARIABLES_VECTOR_INITIAL_SIZE);
 	g_term = (struct s_term *)ft_memalloc(sizeof(struct s_term));
 	g_term->context_original = ft_memalloc(sizeof(t_context));
 	g_term->context_original->environ =

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:42 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/10 20:15:49 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/20 21:02:16 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ struct s_builtin	g_builtins[] = {
 	{"tokenizer", &hs_tokenizer},
 	{"unset", &hs_unsetenv},
 	{"where", &hs_where},
+	{"alias", &hs_alias},
 	{NULL, NULL}
 };
 
