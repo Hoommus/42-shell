@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/06/21 11:58:32 by obamzuro         ###   ########.fr        #
+#    Updated: 2019/06/21 12:00:32 by obamzuro         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -54,13 +54,8 @@ AST_SRC = ast_exec_main.c ast_exec_preprocess.c \
 
 BUILTIN_DIR = builtins/
 BUILTIN_SRC = cd.c where.c builtins.c hs_history.c tokenizer_test.c \
-<<<<<<< HEAD
-              syntax_test.c hs_set.c hs_env.c hs_setenv.c hs_unsetenv.c \
-              hs_export.c hs_jobs.c hs_alias.c
-=======
               syntax_test.c hs_set.c hs_setenv.c hs_unsetenv.c \
-              hs_export.c hs_jobs.c
->>>>>>> a9d756ec80849f424035b6d898aeec4c0e46e942
+              hs_export.c hs_jobs.c hs_alias.c 
 
 INTERFACE_DIR = line_editing/
 INTERFACE_SRC = buffer_drawing.c buffer_input.c  \
