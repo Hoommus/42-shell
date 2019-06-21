@@ -6,7 +6,7 @@
 /*   By: obamzuro <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/17 14:36:09 by obamzuro          #+#    #+#             */
-/*   Updated: 2019/06/20 20:59:41 by obamzuro         ###   ########.fr       */
+/*   Updated: 2019/06/21 12:27:49 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,10 @@ static void	hs_alias_print_all(void)
 	uint32_t		i;
 	t_var			*var;
 
-	i = -1;
+	i = 0;
 	while (++i < g_alias_vector->size)
 	{
-		var = ((t_var *)g_alias_vector) + i;
+		var = ((t_var *)g_alias_vector->array) + i;
 		print_var(var);
 	}
 }
@@ -69,7 +69,7 @@ int			hs_alias(const char **args)
 		hs_alias_print_all();
 	else
 	{
-		i = 0;
+		i = -1;
 		while (args[++i])
 			hs_alias_kernel(args[i]);
 	}

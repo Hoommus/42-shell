@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:42 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/21 11:58:15 by obamzuro         ###   ########.fr       */
+/*   Updated: 2019/06/21 12:34:06 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ struct s_builtin	g_builtins[] = {
 	{"unset", &hs_unsetenv},
 	{"where", &hs_where},
 	{"alias", &hs_alias},
+	{"unalias", &hs_unalias},
 	{NULL, NULL}
 };
 
