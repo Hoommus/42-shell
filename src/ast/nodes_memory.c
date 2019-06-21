@@ -13,13 +13,13 @@
 #include "shell_script.h"
 #include "shell_script_parser.h"
 
-t_node	*ast_new_node(void *value, enum e_node_type node_type)
+t_node	*ast_new_node(void *command, enum e_node_type node_type)
 {
 	t_node	*node;
 
 	node = ft_memalloc(sizeof(t_node));
 	node->node_type = node_type;
-	node->command = value;
+	node->command = command;
 	return (node);
 }
 

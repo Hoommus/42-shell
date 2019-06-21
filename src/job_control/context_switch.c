@@ -6,15 +6,14 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/10 12:09:35 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/04 16:02:45 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/18 16:53:39 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "twenty_one_sh.h"
 
 /*
-** TODO: make checks of fds presence in main context to avoid closing
-**  something like history file
+** TODO: make environ context switches more intelligent - make diffs possible
 */
 
 void			context_deep_free(t_context **context)
@@ -22,6 +21,8 @@ void			context_deep_free(t_context **context)
 	struct s_fd_lst		*list;
 	struct s_fd_lst		*swap;
 
+	if (context == NULL || *context == NULL)
+		return ;
 	environ_deallocate_vector((*context)->environ);
 	list = (*context)->fd_list;
 	while (list)
@@ -60,7 +61,10 @@ void			context_switch(t_context *to_which)
 		if (list->current == -1)
 			close(list->original);
 		else
+		{
 			dup2(list->current, list->original);
+			fcntl(list->current, F_SETFL, O_CLOEXEC);
+		}
 		list = list->next;
 	}
 	TERM_APPLY_CONFIG(to_which->term_config);
@@ -104,6 +108,7 @@ static void		duplicate_fds(t_context *new, const t_context *context,
 			tmp->label = ft_strdup("cloned");
 		tmp->original = list->original;
 		tmp->current = with_dup ? dup(list->current) : list->current;
+		//fcntl(tmp->current, F_SETFL, O_CLOEXEC);
 		if (!new->fd_list && !new_list)
 		{
 			new->fd_list = tmp;

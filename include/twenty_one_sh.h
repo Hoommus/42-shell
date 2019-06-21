@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/16 13:05:17 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/18 15:30:09 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@
 # include "shell_environ.h"
 
 # ifndef SH
-#  define SH "21sh"
+#  define SH "42sh"
 # endif
 
 # define ANSI_RESET "\x1b[0m"
@@ -116,6 +116,12 @@ struct					s_fd_lst
 	struct s_fd_lst		*next;
 };
 
+# define CNTXT_DUP_NOTHING 0b0000
+# define CNTXT_DUP_FDS     0b0001
+# define CNTXT_DUP_ENV     0b0010
+# define CNTXT_DUP_TERM    0b0100
+# define CNTXT_DUP_ALL     0b0111
+
 /*
 ** So context is an entity that controls used environment variables,
 ** term config and filedes table for easy duplications used in
@@ -126,7 +132,7 @@ struct					s_fd_lst
 ** TODO: Add info about shell config
 */
 
-typedef struct			s_context
+typedef struct
 {
 	t_env_vector		*environ;
 	struct termios		*term_config;
@@ -154,7 +160,7 @@ enum					e_position
 ** Alright, it's carpos for 'caret position'
 */
 
-typedef struct			s_position
+typedef struct
 {
 	short				col;
 	short				row;
@@ -180,15 +186,18 @@ struct					s_term
 
 	short				flags;
 
+	pid_t				shell_pgid;
+
 	int					last_status;
 	pid_t				running_process;
 
-	struct s_context	*context_original;
-	struct s_context	*context_current;
-	struct s_context	*context_backup;
+	t_context			*context_original;
+	t_context			*context_current;
+	t_context			*context_backup;
 
 	t_buffer			*buffer;
 };
+
 extern volatile sig_atomic_t	g_interrupt;
 extern struct s_term			*g_term;
 

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/10 13:17:59 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/23 16:16:56 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/12 13:07:28 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,7 +142,7 @@ t_bresult						*list_build(const t_state *state,
 bool							is_redirect(t_token *t);
 struct s_io_redirect			*get_redirects(t_token *list, int length);
 
-t_node							*ast_new_node(void *value,
+t_node							*ast_new_node(void *command,
 												enum e_node_type node_type);
 void							ast_free_recursive(t_node *node);
 
@@ -177,8 +177,8 @@ extern const t_rule				g_while_clause;
 ** extern const t_rule	g_wordlist_dash;
 ** extern const t_rule	g_for_clause;
 ** extern const t_rule	g_until_clause;
-** extern const t_rule	g_function_definition;
-** extern const t_rule	g_function_body;
+**
+**
 ** extern const t_rule	g_fname;
 ** extern const t_rule	g_case_clause;
 ** extern const t_rule	g_case_list;
@@ -194,8 +194,13 @@ extern const t_rule				g_while_clause;
 ** extern const t_rule	g_until_token;
 ** extern const t_rule	g_do_token;
 ** extern const t_rule	g_done_token;
-** extern const t_rule	g_bang_token;
+**
 */
+
+extern const t_rule				g_bang_token;
+
+extern const t_rule				g_function_definition;
+extern const t_rule				g_function_body;
 
 extern const t_rule				g_brace_group;
 extern const t_rule				g_do_group;

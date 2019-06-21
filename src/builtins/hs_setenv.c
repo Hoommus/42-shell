@@ -27,7 +27,7 @@ static int		set_tricky(const char *str)
 	while (str[++j])
 		if (j >= 1024)
 			return ((ft_dprintf(2, ANSI_RESET
-			"setenv: variable name is too long\n") & 0) | 1);
+			"export: variable name is too long\n") & 0) | 1);
 		else if ((str[j] == '=' || !str[j]) &&
 			is_valid_var(ft_memcpy(tmp, str, j)))
 		{
@@ -36,7 +36,7 @@ static int		set_tricky(const char *str)
 		}
 		else if (str[j] == '=' && !is_valid_var(tmp))
 		{
-			ft_dprintf(2, "setenv: '%s' is not a valid variable name\n",
+			ft_dprintf(2, "export: '%s' is not a valid variable name\n",
 				ft_strlen(tmp) == 0 ? str : tmp);
 			return (1);
 		}
@@ -47,9 +47,10 @@ int				hs_setenv(const char **args)
 {
 	int					i;
 
+	// TODO: set variable's scope to SCOPE_EXPORT, if value is not specified
 	i = 0;
 	if (args[0] == NULL)
-		ft_printf("usage:\nsetenv [KEY=VALUE ...]\n");
+		ft_printf("usage:\nexport [-p] [KEY=VALUE ...]\n");
 	while (args[i])
 		if (set_tricky(args[i++]) == 1)
 			return (1);

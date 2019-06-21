@@ -39,6 +39,8 @@ void				environ_deallocate_vector(t_env_vector *vector)
 	t_var		*vars;
 	u_int32_t	i;
 
+	if (!vector)
+		return ;
 	vars = vector->array;
 	i = 0;
 	while (i < vector->size)

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/10 20:37:44 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/25 16:43:36 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/16 13:15:32 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 #include "twenty_one_sh.h"
 #include "ft_printf.h"
 
-char	**environ_to_array(t_env_vector *vector, u_int32_t scopes)
+char		**environ_to_array(t_env_vector *vector, u_int32_t scopes)
 {
 	const t_var *const	vars = (const t_var *)vector->array;
 	char				**array;
@@ -47,7 +47,52 @@ char	**environ_to_array(t_env_vector *vector, u_int32_t scopes)
 	return (array);
 }
 
-void	environ_from_array(t_env_vector *vector, const char **environ)
+static char	**append_rogue_env(t_env_vector *valt, char **env, size_t offset)
+{
+	const t_var		*vars = valt->array;
+	size_t			i;
+
+	i = -1;
+	while (++i < valt->size)
+		if (vars[i].key != NULL)
+			env[offset++] = ft_strings_join(2, "=", vars[i].key, vars[i].value);
+	return (env);
+}
+
+/*
+** checks if vector from argument has any alterations of original environ
+** and populates final array taking into account these alterations
+*/
+
+char		**environ_to_array_diff(t_env_vector *valt, const t_env_vector *vshell, u_int32_t scopes)
+{
+	t_var				*valt_var;
+	char				**env;
+	size_t				i;
+	size_t				j;
+
+	env = (char **)ft_memalloc(sizeof(char *) * (vshell->size + valt->size));
+	i = -1;
+	j = 0;
+	while (++i < vshell->size)
+	{
+		if (!(scopes & ((t_var *)vshell->array + i)->scope))
+			continue ;
+		valt_var = environ_get_entry(valt, ((t_var *)vshell->array + i)->key);
+		if (valt_var && (valt_var->key))
+		{
+			env[j++] = ft_strings_join(2, "=", valt_var->key, valt_var->value);
+			environ_remove_entry(valt, valt_var->key);
+		}
+		else
+			env[j++] = ft_strings_join(2, "=",
+				((t_var *)vshell->array + i)->key,
+				((t_var *)vshell->array + i)->value);
+	}
+	return (append_rogue_env(valt, env, j));
+}
+
+void		environ_from_array(t_env_vector *vector, const char **environ)
 {
 	char	**splitted;
 	int		i;

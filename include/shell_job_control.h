@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/08 12:40:49 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/09 13:47:33 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/20 16:19:58 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,23 +39,31 @@ enum					e_job_state
 
 extern const char		*g_state_names[];
 
-typedef struct			s_job
+/*
+** needs_wait field indicates if you have to wait for this segment to finish.
+** It exists to make pipelines inside subshells and subshells inside pipelines possible.
+*/
+
+typedef struct			s_segment
 {
-	pid_t					pid;
-	enum e_job_state		state;
-	int						status;
-	int						wexitstatus;
-	const struct s_command	*cmd;
-	t_context				*context;
-	struct s_job			*prev;
-	struct s_job			*next;
-}						t_job;
+	int					status;
+	pid_t				pid;
+	bool				is_completed : 1;
+	bool				is_stopped : 1;
+	t_context			*context;
+	struct s_command	*command;
+	struct s_segment	*next;
+}						t_pipe_segment;
 
 typedef struct			s_job_alt
 {
+	char				*command;
+	t_pipe_segment		*pipeline;
+	pid_t				pgid;
+	bool				notified;
+	int					id;
 	enum e_job_state	state;
-	struct s_context	*context;
-	struct s_process	*process_list;
+	struct s_job_alt	*next;
 }						t_job_alt;
 
 typedef struct			s_process
@@ -68,30 +76,33 @@ typedef struct			s_process
 
 struct					s_job_control
 {
-	t_job			*jobs;
-	t_job			*job_queue;
 	t_context		*shell_context;
 	pid_t			shell_pid;
-	int				queue_size;
+	t_job_alt		*active_jobs;
+	t_job_alt		*tmp_job;
 };
 
 void					jc_init(t_context *context);
 struct s_job_control	*jc_get(void);
-void					jc_register_job(t_job *job);
+void					jc_register_job(t_job_alt *job);
 void					jc_unregister_job(pid_t id);
-t_job					*jc_create_job(const struct s_command *cmd,
-	t_context *context, enum e_job_state job_class);
 
-void					jc_enqueue_job(t_job *job);
-t_job					*jc_dequeue_job(pid_t pid, t_job *job);
-int						jc_execute_pipeline_queue(void);
-void					jc_destroy_queue(void);
+t_pipe_segment			*pipe_segment_new(t_command *command, t_context *context, bool is_subshell);
+t_pipe_segment			*pipeline_add_segment(t_pipe_segment **pipeline, t_pipe_segment *segment);
+void					pipeline_destroy(t_pipe_segment **pipeline);
+int						pipeline_execute(t_pipe_segment *pipeline);
+int						pipeline_execute_segment(t_pipe_segment *segment);
 
+int						launch_job(t_job_alt *job, bool is_async);
+
+t_job_alt				*jc_tmp_add(t_pipe_segment *segment);
+int						jc_tmp_finalize(bool is_async);
+void					jc_job_dealloc(t_job_alt **job);
 /*
 ** Auxiliary
 */
 
-int						forknrun(t_job *job, char *path);
+int						forknrun(t_job_alt *job, t_pipe_segment *process, char *path, bool is_async);
 void					close_redundant_fds(t_context *context);
 
 #endif

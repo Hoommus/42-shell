@@ -25,6 +25,7 @@ void	context_add_fd(t_context *context,
 		tmp->label = ft_strdup(label);
 	tmp->original = (short)original;
 	tmp->current = (short)actual;
+	fcntl(actual, F_SETFL, O_CLOEXEC);
 	swap = context->fd_list;
 	if (!swap)
 		context->fd_list = tmp;

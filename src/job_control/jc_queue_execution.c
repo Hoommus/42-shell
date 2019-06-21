@@ -6,17 +6,19 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/10 16:42:51 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/10 18:36:05 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/18 15:06:48 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell_job_control.h"
 #include "shell_builtins.h"
-
+/*
 void					close_redundant_fds(t_context *context)
 {
 	struct s_fd_lst		*list;
 
+	if (context == NULL)
+		return ;
 	list = context->fd_list;
 	while (list)
 	{
@@ -28,7 +30,8 @@ void					close_redundant_fds(t_context *context)
 		list = list->next;
 	}
 }
-
+ */
+/*
 static char				*path_to_target(t_job *job)
 {
 	const char	**args = (const char **)job->cmd->args;
@@ -56,7 +59,8 @@ static char				*path_to_target(t_job *job)
 	free_array((void **)paths);
 	return (swap);
 }
-
+ */
+/*
 static int				run_builtin(t_job *job)
 {
 	extern struct s_builtin	g_builtins[];
@@ -79,46 +83,50 @@ static int				run_builtin(t_job *job)
 	}
 	return (-512);
 }
-
+*/
 #define DIRTY_HACK(err) ((ft_dprintf(2, err, job->cmd->args[0]) & 0) | -1024)
 
-static int				run_regular(const t_job *job)
-{
-	int				status;
-	char			*bin;
+//static int				run_regular(const t_job *job)
+//{
+//	int				status;
+//	char			*bin;
+//
+//	status = -256;
+//	if ((bin = path_to_target((t_job *)job)) != NULL
+//		&& access(bin, F_OK) == -1 && ft_strchr(bin, '/') != NULL)
+//		(DIRTY_HACK(ERR_NO_SUCH_FILE));
+//	else if (bin != NULL && is_dir(bin))
+//		(DIRTY_HACK(ERR_IS_A_DIRECTORY));
+//	else if (bin != NULL && access(bin, X_OK) == -1)
+//		(DIRTY_HACK(ERR_PERMISSION_DENIED));
+//	else if (bin == NULL)
+//		(DIRTY_HACK(ERR_COMMAND_NOT_FOUND));
+//	else if (!g_interrupt)
+//		status = forknrun(NULL, (t_job *) job, bin);
+//	ft_memdel((void **)&bin);
+//	return (status);
+//}
 
-	status = -256;
-	if ((bin = path_to_target((t_job *)job)) != NULL
-		&& access(bin, F_OK) == -1 && ft_strchr(bin, '/') != NULL)
-		(DIRTY_HACK(ERR_NO_SUCH_FILE));
-	else if (bin != NULL && is_dir(bin))
-		(DIRTY_HACK(ERR_IS_A_DIRECTORY));
-	else if (bin != NULL && access(bin, X_OK) == -1)
-		(DIRTY_HACK(ERR_PERMISSION_DENIED));
-	else if (bin == NULL)
-		(DIRTY_HACK(ERR_COMMAND_NOT_FOUND));
-	else if (!g_interrupt)
-		status = forknrun((t_job *)job, bin);
-	ft_memdel((void **)&bin);
-	return (status);
-}
-
-int						jc_execute_pipeline_queue(void)
-{
-	const t_job		*list = jc_get()->job_queue;
-	int				s;
-
-	while (list)
-	{
-		if ((s = run_builtin((t_job *)list)) != -512 && !list->next)
-			return (s);
-		else if (s == -512)
-		{
-			if ((s = run_regular(list)) != -256)
-				return (s);
-		}
-		close_redundant_fds(list->context);
-		list = list->next;
-	}
-	return (-1024);
-}
+//int						jc_execute_pipeline_queue(void)
+//{
+//	extern bool		g_is_subshell_env;
+//	const t_job		*list = jc_get()->job_queue;
+//	int				s;
+//
+//	if (list && list->next)
+//		g_is_subshell_env = true;
+//	while (list)
+//	{
+//		if ((s = run_builtin((t_job *)list)) != -512 && !list->next)
+//			return (s);
+//		else if (s == -512)
+//		{
+//			if ((s = run_regular(list)) != -256)
+//				return (s);
+//		}
+//		close_redundant_fds(list->context);
+//		list = list->next;
+//	}
+//	g_is_subshell_env = false;
+//	return (-1024);
+//}

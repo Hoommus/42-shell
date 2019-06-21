@@ -6,10 +6,11 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:42 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/10 20:15:49 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/21 11:24:58 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "shell_job_control.h"
 #include "twenty_one_sh.h"
 #include "shell_builtins.h"
 
@@ -18,7 +19,6 @@ extern bool			g_is_subshell_env;
 struct s_builtin	g_builtins[] = {
 	{"cd", &hs_cd},
 	{"echo", &hs_echo},
-	{"env", &hs_env},
 	{"export", &hs_export},
 	{"exit", &hs_exit},
 	{"history", &hs_history},
@@ -26,9 +26,8 @@ struct s_builtin	g_builtins[] = {
 	{"jobs", &hs_jobs},
 	{"quit", &hs_exit},
 	{"set", &hs_set},
-	{"setenv", &hs_setenv},
 	{"tokenizer", &hs_tokenizer},
-	{"unsetenv", &hs_unsetenv},
+	{"unset", &hs_unsetenv},
 	{"where", &hs_where},
 	{NULL, NULL}
 };
@@ -52,7 +51,7 @@ int					hs_help(const char **args)
 {
 	int		i;
 
-	ft_printf("help: prints all existing builtins\n42sh/2 builtins:\n");
+	ft_printf("help: prints all existing builtins\n42sh builtins:\n");
 	i = 0;
 	while (g_builtins[i + 1].name != NULL)
 		ft_printf("%s, ", g_builtins[i++].name);
@@ -76,11 +75,15 @@ int					hs_exit(const char **args)
 		}
 		else if (g_is_subshell_env)
 			return (ft_atoi(*args));
+		else if (jc_get()->active_jobs != NULL)
+			return ((ft_dprintf(2, "You have running jobs.\n") & 0) | 1);
 		else
 			exit(ft_atoi(*args));
 	}
 	if (g_is_subshell_env)
 		return (0);
+	else if (jc_get()->active_jobs != NULL)
+		return ((ft_dprintf(2, "You have running jobs.\n") & 0) | 1);
 	else
 		exit(0);
 }
