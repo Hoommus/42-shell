@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/27 18:59:20 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/11 21:00:11 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/21 13:56:27 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ static const struct s_expansion		g_expansions[] =
 	{"", expand_tilde},
 	{"", expand_vars},
 	{"", expand_escaped},
+	{"", expand_history},
 	{"", expand_quotes},
 	{NULL, NULL},
 	{"$(", NULL},

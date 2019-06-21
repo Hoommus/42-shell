@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/03 14:19:20 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/06 16:40:43 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/21 13:56:25 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,5 +29,6 @@ char						*expand_tilde(char *str);
 char						*expand_vars(char *str);
 char						*expand_escaped(char *str);
 char						*expand_quotes(char *str);
+char						*expand_history(char *str);
 
 #endif

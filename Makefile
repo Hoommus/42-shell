@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/06/21 12:34:49 by obamzuro         ###   ########.fr        #
+#    Updated: 2019/06/21 18:13:14 by obamzuro         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -78,7 +78,7 @@ JOB_CONTROL_SRC = signals_basic.c \
 
 EXPANSIONS_DIR = expansions/
 EXPANSIONS_SRC = expander_engine.c expand_escaped.c expand_quotes.c \
-                 expand_vars.c
+                 expand_vars.c expand_history.c
 
 HISTORY_DIR = features/history/
 HISTORY_SRC = history.c history_vector.c

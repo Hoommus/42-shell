@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/16 12:28:10 by vtarasiu          #+#    #+#             */
-/*   Updated: 2018/12/17 18:05:24 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/21 14:07:13 by obamzuro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 # include "ft_printf.h"
 
 # define INITIAL_HISTORY_SIZE 256
+# define HISTORY_EXPANSION_OLDEST 100
 
 struct						s_history_entry
 {
