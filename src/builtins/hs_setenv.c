@@ -47,6 +47,7 @@ int				hs_setenv(const char **args)
 {
 	int					i;
 
+	// TODO: set variable's scope to SCOPE_EXPORT, if value is not specified
 	i = 0;
 	if (args[0] == NULL)
 		ft_printf("usage:\nexport [-p] [KEY=VALUE ...]\n");

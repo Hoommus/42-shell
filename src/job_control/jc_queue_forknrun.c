@@ -6,14 +6,14 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/25 18:31:57 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/06 17:01:06 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/20 18:05:14 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell_job_control.h"
 #include "shell_builtins.h"
 
-static char				*g_sigs[31] =
+char					*g_sigs[31] =
 {
 	"hangup",
 	"interrupted",
@@ -48,15 +48,38 @@ static char				*g_sigs[31] =
 	"user-defined signal 2"
 };
 
-static void				close_foreign_fds(t_job *jobs, t_job *current)
+void					handle_signaled(t_pipe_segment *process, int status)
+{
+	char			*swap;
+	t_job_alt		*list;
+	int				i;
+
+	i = 1;
+	list = jc_get()->active_jobs;
+	while (list && ++i)
+		list = list->next;
+	swap = ft_strarr_join(" ", process->command->args);
+	if (ft_strlen(swap) < 45)
+		ft_printf("\n[%d]    %d %s   %s\n", i, process->pid,
+				  g_sigs[WTERMSIG(status) - 1], swap);
+	else
+		ft_printf("\n[%d]    %d %s   %.*s...\n", i, process->pid,
+				  g_sigs[WTERMSIG(status) - 1], 45, swap);
+	ft_memdel((void **)&swap);
+}
+
+static void				close_foreign_fds(t_pipe_segment *processes,
+											t_pipe_segment *current)
 {
 	struct s_fd_lst	*list;
 
-	while (jobs)
+	while (processes)
 	{
-		if (jobs != current)
+		if (processes != current)
 		{
-			list = jobs->context->fd_list;
+			list = processes->
+				context->
+				fd_list;
 			while (list)
 			{
 				if (list->current > 2)
@@ -64,34 +87,12 @@ static void				close_foreign_fds(t_job *jobs, t_job *current)
 				list = list->next;
 			}
 		}
-		jobs = jobs->next;
+		processes = processes->next;
 	}
 }
 
-void					handle_signaled(t_job *job, int status)
+static void				write_heredocs(const t_io_rdr *io_rdrs)
 {
-	char		*swap;
-	t_job		*list;
-	int			i;
-
-	i = 1;
-	list = jc_get()->jobs;
-	while (list && ++i)
-		list = list->next;
-	swap = ft_strarr_join(" ", job->cmd->args);
-	if (ft_strlen(swap) < 45)
-		ft_printf("\n[%d]    %d %s   %s\n", i, job->pid,
-				g_sigs[WTERMSIG(status) - 1], swap);
-	else
-		ft_printf("\n[%d]    %d %s   %.*s...\n", i, job->pid,
-				g_sigs[WTERMSIG(status) - 1], 45, swap);
-	ft_memdel((void **)&swap);
-}
-
-static void				write_heredocs(t_job *job)
-{
-	const t_io_rdr		*io_rdrs = job->cmd->io_redirects;
-
 	while (io_rdrs->type != TOKEN_NOT_APPLICABLE)
 	{
 		if ((io_rdrs->type == TOKEN_DLESS || io_rdrs->type == TOKEN_DLESSDASH))
@@ -112,38 +113,56 @@ static void				write_heredocs(t_job *job)
 	}
 }
 
-static int				waitnclaim(t_job *last)
+static int				waitnclaim(t_pipe_segment *last)
 {
 	int			status;
 
 	waitpid(last->pid, &status, 0);
+	if (WIFSIGNALED(status))
+		handle_signaled(last, status);
+	tcsetpgrp(0, g_term->shell_pgid);
 	last->status = status;
-	last->wexitstatus = WEXITSTATUS(last->status);
-	return (last->wexitstatus);
+	return (WEXITSTATUS(last->status));
 }
 
-int						forknrun(t_job *job, char *path)
+int forknrun(t_job_alt *job, t_pipe_segment *process, char *path, bool is_async)
 {
-	job->pid = fork();
-	if (job->pid == 0)
+	process->pid = fork();
+	if (process->pid == 0)
 	{
-		context_switch(job->context);
-		close_redundant_fds(job->context);
-		close_foreign_fds(jc_get()->job_queue, job);
-		execve(path, job->cmd->args, environ_to_array(job->context->environ,
+		job->pgid == 0 ? getpid() : job->pgid;
+		setpgid(getpid(), job->pgid);
+		signal(SIGINT, SIG_DFL);
+		signal(SIGTSTP, SIG_DFL);
+		signal(SIGTTOU, SIG_IGN);
+		context_switch(process->context);
+		if (!is_async)
+			tcsetpgrp(0, job->pgid);
+		signal(SIGTTOU, SIG_DFL);
+		close_redundant_fds(process->context);
+		close_foreign_fds(job->pipeline, process);
+//		environ_to_array_diff(process->context->environ, jc_get()->shell_context->environ,
+//			SCOPE_EXPORT | SCOPE_COMMAND_LOCAL | SCOPE_SCRIPT_GLOBAL);
+		execve(path, process->command->args, environ_to_array(process->context->environ,
 			SCOPE_EXPORT | SCOPE_COMMAND_LOCAL | SCOPE_SCRIPT_GLOBAL));
 		context_switch(jc_get()->shell_context);
-		ft_dprintf(2, "21sh: execve error: %s\n", job->cmd->args[0]);
+		ft_dprintf(2, "42sh: execve error: %s\n", process->command->args[0]);
 		exit(1);
 	}
-	else if (job->pid == -1)
-		ft_dprintf(2, "21sh: fork error: %s\n", job->cmd->args[0]);
+	else if (process->pid == -1)
+		ft_dprintf(2, "42sh: fork error: %s\n", process->command->args[0]);
 	else
 	{
-		write_heredocs(job);
-		close_redundant_fds(job->context);
-		if (job->next == NULL)
-			return (waitnclaim(job));
+		if (job->pgid == 0)
+			job->pgid = process->pid;
+		setpgid(process->pid, job->pgid);
+		write_heredocs(process->command->io_redirects);
+		close_redundant_fds(process->context);
+		environ_deallocate_vector(process->context->environ);
+		process->context->environ = NULL;
+//		context_deep_free(&process->context);
+		if (process->next == NULL && !is_async)
+			return (waitnclaim(process));
 	}
 	return (-256);
 }

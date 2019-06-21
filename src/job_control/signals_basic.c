@@ -29,35 +29,13 @@ static void				resize(int sig)
 {
 	struct winsize	size;
 
-	if (sig == SIGWINCH && jc_get()->queue_size == 0)
+	if (sig == SIGWINCH && jc_get()->active_jobs == NULL)
 	{
 		ioctl(STDOUT_FILENO, TIOCGWINSZ, &size);
 		g_term->ws_row = size.ws_row;
 		g_term->ws_col = size.ws_col;
 		carpos_update(POS_CURRENT);
 	}
-}
-
-void					sigchild_alt(int sig, siginfo_t *info,
-										void *smthng)
-{
-	t_job	*list;
-	int		status;
-
-	list = jc_get()->job_queue;
-	while (list)
-	{
-		if (list->pid == info->si_pid &&
-			(WIFEXITED(info->si_status) || WIFSIGNALED(info->si_status)))
-		{
-			list->wexitstatus = WEXITSTATUS(status);
-			list->state = JOB_TERMINATED;
-			break ;
-		}
-		list = list->next;
-	}
-	sig = 0;
-	smthng = 0;
 }
 
 void					setup_signal_handlers(void)

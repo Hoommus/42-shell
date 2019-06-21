@@ -20,7 +20,7 @@ FLAGS = -DSH=\"$(NAME)\" \
                -Wall  \
                -Wextra \
                -Werror \
-               -g -fsanitize=address
+               -g
 
 HEADER = -I include/ -I printf/include -I libft/
 SRC_DIR = ./src/
@@ -74,7 +74,7 @@ JOB_CONTROL_SRC = signals_basic.c \
                   context_manipulations.c context_switch.c \
                   jc_headquaters.c  \
                   jc_queue_execution.c jc_queue_forknrun.c jc_queue_interface.c \
-                  pipeline.c
+                  pipeline.c jc_job_launcher.c
 
 EXPANSIONS_DIR = expansions/
 EXPANSIONS_SRC = expander_engine.c expand_escaped.c expand_quotes.c \

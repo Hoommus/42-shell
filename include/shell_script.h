@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 14:44:44 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/12 16:40:36 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/16 14:59:54 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,7 +134,8 @@ typedef struct				s_node
 {
 	struct s_command		*command;
 	enum e_node_type		node_type;
-	bool					is_async;
+	bool					lasync;
+	bool					rasync;
 	struct s_node			*left;
 	struct s_node			*right;
 }							t_node;
@@ -161,8 +162,8 @@ typedef struct				s_command
 
 union						u_executor
 {
-	int		(*exec)(const t_node *node);
-	int		(*exec_alt_context)(const t_node *node, struct s_context *context);
+	int		(*exec)(const t_node *node, bool is_async);
+	int		(*exec_with_context)(const t_node *node, t_context *context, bool is_async);
 };
 
 struct						s_executor
@@ -206,17 +207,15 @@ void						run_heredocs(t_node *node);
 */
 
 void						run_script(t_token *list_head, bool log_recursion);
-int							exec_command(const t_node *command_node,
-	struct s_context *new_context);
-int							exec_subshell(const t_node *node,
-	struct s_context *new_context);
+int exec_command(const t_node *command_node, t_context *new_context, bool is_async);
+int exec_subshell(const t_node *node, t_context *new_context, bool is_async);
 int							exec_semicolon_iterative(t_node *parent);
-int							exec_semicolon_recursive(const t_node *parent);
-int							exec_and_if(const t_node *parent);
-int							exec_or_if(const t_node *parent);
-int							exec_node(const t_node *node);
+int exec_semicolon_recursive(const t_node *parent, bool is_async);
+int exec_and_if(const t_node *parent, bool is_async);
+int exec_or_if(const t_node *parent, bool is_async);
+int exec_node(const t_node *node, t_context *context, bool is_async);
 int							exec_abort(int dummy);
-int							exec_pipeline(const t_node *node);
+int exec_pipeline(const t_node *node, bool is_async);
 
 /*
 ** File reading and executing

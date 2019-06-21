@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/05 17:50:36 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/11 13:23:48 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/20 13:02:54 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,7 @@ static void	expand_everything(const struct s_command *command)
 ** TODO: Make copy-on-write-style environ arrays in contexts
 */
 
-int			exec_command(const t_node *command_node, t_context *new_context)
+int exec_command(const t_node *command_node, t_context *new_context, bool is_async)
 {
 	const struct s_command	*command = command_node->command;
 	t_context				*context;
@@ -133,10 +133,12 @@ int			exec_command(const t_node *command_node, t_context *new_context)
 	status = 0;
 	if (!g_interrupt && command->args != NULL && command->args[0] != NULL)
 	{
-		jc_enqueue_job(jc_create_job(command, context, job_class));
-		status = !new_context ? jc_execute_pipeline_queue() : 0;
-		if (!new_context)
-			jc_destroy_queue();
+		jc_tmp_add(pipe_segment_new((t_command *)command, context, is_async));
+		if (new_context == NULL)
+		{
+			ft_printf("Calling finalization from command node\n");
+			status = jc_tmp_finalize(is_async);
+		}
 	}
 	return (status);
 }
