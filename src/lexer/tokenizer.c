@@ -46,7 +46,7 @@ const struct s_lexer_token	g_tokens[] = {
 	{"<", "LESS", TOKEN_LESS, true },
 	{">", "GREAT", TOKEN_GREAT, true },
 	{"&", "AMPERSAND", TOKEN_AMPERSAND, true },
-	{"!", "BANG", TOKEN_BANG, true },
+	{"!", "BANG", TOKEN_BANG, false },
 
 	{"if", "IF", TOKEN_IF, false},
 	{"then", "THEN", TOKEN_THEN, false},

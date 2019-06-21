@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/10 20:37:44 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/14 13:04:00 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/16 13:15:32 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ char		**environ_to_array(t_env_vector *vector, u_int32_t scopes)
 	return (array);
 }
 
-static char	**append_rogue_env(t_env_vector *valt, char **env_arr, size_t arr_offset)
+static char	**append_rogue_env(t_env_vector *valt, char **env, size_t offset)
 {
 	const t_var		*vars = valt->array;
 	size_t			i;
@@ -55,16 +55,14 @@ static char	**append_rogue_env(t_env_vector *valt, char **env_arr, size_t arr_of
 	i = -1;
 	while (++i < valt->size)
 		if (vars[i].key != NULL)
-			env_arr[arr_offset++] = ft_strings_join(2, "=",
-				vars[i].key,
-				vars[i].value);
-	return (env_arr);
+			env[offset++] = ft_strings_join(2, "=", vars[i].key, vars[i].value);
+	return (env);
 }
 
 /*
- * checks if vector from argument has any alterations of original environ
- * and populates final array with these alterations
- */
+** checks if vector from argument has any alterations of original environ
+** and populates final array taking into account these alterations
+*/
 
 char		**environ_to_array_diff(t_env_vector *valt, const t_env_vector *vshell, u_int32_t scopes)
 {

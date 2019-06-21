@@ -6,20 +6,19 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/15 13:49:06 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/15 13:51:06 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/18 15:09:52 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell_job_control.h"
 
-t_pipe_segment		*pipe_segment_new(t_command *command, t_context *context, bool is_subshell)
+t_pipe_segment		*pipe_segment_new(t_command *command, t_context *context, __unused bool is_subshell)
 {
 	t_pipe_segment	*segment;
 
 	segment = ft_memalloc(sizeof(t_pipe_segment));
 	segment->command = command;
 	segment->context = context;
-	segment->needs_wait = is_subshell; // Seems like redundant
 	return (segment);
 }
 
@@ -58,8 +57,8 @@ void				pipeline_destroy(t_pipe_segment **pipeline)
 	while (list)
 	{
 		next = list->next;
-		context_deep_free(&list->context);
-		ft_memdel((void **)list);
+		context_deep_free(&(list->context));
+		ft_memdel((void **)&list);
 		list = next;
 	}
 	*pipeline = NULL;
