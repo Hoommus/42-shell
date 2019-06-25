@@ -1,20 +1,25 @@
 
+#include <errno.h>
 #include "shell_job_control.h"
 #include "shell_builtins.h"
 
-void				jc_job_dealloc(t_job_alt **job)
+extern bool				g_is_subshell_env;
+extern bool				g_is_forked_shell;
+
+void				jc_job_dealloc(t_job **job)
 {
 	pipeline_destroy(&(*job)->pipeline);
+	free((*job)->command);
 	free(*job);
 	*job = NULL;
 }
 
-t_job_alt			*jc_tmp_add(t_pipe_segment *segment)
+t_job			*jc_tmp_add(t_pipe_segment *segment)
 {
 	struct s_job_control	*jc = jc_get();
 
 	if (jc->tmp_job == NULL)
-		jc->tmp_job = ft_memalloc(sizeof(t_job_alt));
+		jc->tmp_job = ft_memalloc(sizeof(t_job));
 	pipeline_add_segment(&jc->tmp_job->pipeline, segment);
 	return (jc->tmp_job);
 }
@@ -97,7 +102,7 @@ static int				run_builtin(t_pipe_segment *segment, bool is_async)
 				context_switch(segment->context);
 				segment->status = g_builtins[i].
 					function((const char **)segment->command->args + 1);
-				context_switch(NULL);
+				context_switch(jc_get()->shell_context);
 				return (segment->status);
 			}
 			else
@@ -108,7 +113,7 @@ static int				run_builtin(t_pipe_segment *segment, bool is_async)
 
 #define DIRTY_HACK(err) (ft_dprintf(2, err, process->command->args[0]), -1024)
 
-static int				run_regular(t_job_alt *job, const t_pipe_segment *process, bool is_async)
+static int				run_regular(t_job *job, const t_pipe_segment *process, bool is_async)
 {
 	int				status;
 	char			*bin;
@@ -116,22 +121,21 @@ static int				run_regular(t_job_alt *job, const t_pipe_segment *process, bool is
 	status = -256;
 	if ((bin = path_to_target((t_pipe_segment *)process)) != NULL
 		&& access(bin, F_OK) == -1 && ft_strchr(bin, '/') != NULL)
-		(DIRTY_HACK(ERR_NO_SUCH_FILE));
+		ft_dprintf(2, ERR_NO_SUCH_FILE, process->command->args[0]);
 	else if (bin != NULL && is_dir(bin))
-		(DIRTY_HACK(ERR_IS_A_DIRECTORY));
+		ft_dprintf(2, ERR_IS_A_DIRECTORY, process->command->args[0]);
 	else if (bin != NULL && access(bin, X_OK) == -1)
-		(DIRTY_HACK(ERR_PERMISSION_DENIED));
+		ft_dprintf(2, ERR_PERMISSION_DENIED, process->command->args[0]);
 	else if (bin == NULL)
-		(DIRTY_HACK(ERR_COMMAND_NOT_FOUND));
+		ft_dprintf(2, ERR_COMMAND_NOT_FOUND, process->command->args[0]);
 	else if (!g_interrupt)
 		status = forknrun(job, (t_pipe_segment *) process, bin, is_async);
 	ft_memdel((void **)&bin);
 	return (status);
 }
 
-int						_jc_execute_pipeline_queue(t_job_alt *job, bool is_async)
+int						execute_segments(t_job *job, bool is_async)
 {
-	extern bool				g_is_subshell_env;
 	const t_pipe_segment	*list = job->pipeline;
 	int						s;
 
@@ -142,10 +146,7 @@ int						_jc_execute_pipeline_queue(t_job_alt *job, bool is_async)
 		if ((s = run_builtin((t_pipe_segment *)list, is_async)) != -512 && !list->next)
 			return (s);
 		else if (s == -512)
-		{
-			if ((s = run_regular(job, list, is_async)) != -256)
-				return (s);
-		}
+			run_regular(job, list, is_async);
 		close_redundant_fds(list->context);
 		list = list->next;
 	}
@@ -153,43 +154,93 @@ int						_jc_execute_pipeline_queue(t_job_alt *job, bool is_async)
 	return (-1024);
 }
 
-int					launch_job(t_job_alt *job, bool is_async)
+/*
+ *
+ *
+ */
+
+int					wait_for_job(t_job *job)
 {
-	const t_job_alt	*list = jc_get()->active_jobs;
+	t_pipe_segment		*procs;
+	int					status;
+	enum e_job_state	state;
+	int					w;
+
+	state = JOB_RUNNING;
+	status = 0;
+	procs = job->pipeline;
+	ft_printf("Now waiting for job\n");
+	while (procs)
+	{
+		if ((w = waitpid(procs->pid, &status, WUNTRACED)) == procs->pid)
+		{
+			procs->status = status;
+			if (WIFSTOPPED(status) || WIFSIGNALED(status))
+			{
+				state = WIFSTOPPED(status) ? JOB_STOPPED : JOB_SIGTTXX;
+				status = -1;
+				break ;
+			}
+			state = WEXITSTATUS(status);
+		}
+		procs = procs->next;
+	}
+	if (state != JOB_STOPPED)
+		state = JOB_TERMINATED;
+	job->state = state;
+	ft_printf("Finished waiting\n");
+	return (status);
+}
+
+int					launch_job(t_job *job, bool is_async)
+{
+	t_job			*list;
 	int				status;
 	int				i;
 
-	i = 1;
-	if (is_async && !list)
+	g_term->input_state = STATE_JOB_IN_FG;
+	job->command = ft_strarr_join(" ", job->pipeline->command->args);
+	execute_segments(job, is_async);
+	status = 0;
+	signal(SIGTTOU, SIG_IGN);
+	if (g_is_subshell_env || !is_async)
+		status = wait_for_job(job);
+//	tcdrain(0);
+//	tcdrain(1);
+//	tcdrain(2);
+	if (tcsetattr(0, TCSAFLUSH, g_term->context_current->term_config) == -1)
+		ft_dprintf(2, SH ": tcsetattr error: %s\n", strerror(errno));
+	if (tcsetpgrp(0, g_term->shell_pgid) == -1)
+		ft_dprintf(2, SH ": tcsetpgrp error: %s\n", strerror(errno));
+	signal(SIGTTOU, SIG_DFL);
+	if (!g_is_subshell_env && (is_async || status == -1))
 	{
-		ft_printf("Adding first job, its segment is %s\n", job->pipeline->command->args[0]);
-		jc_get()->active_jobs = job;
+		i = 1;
+		if (!(list = jc_get()->active_jobs))
+			jc_get()->active_jobs = job;
+		else
+		{
+			while (list->next && ++i)
+				list = list->next;
+			((t_job *)list)->next = job;
+		}
+		job->id = i;
+		//jc_format_job(job);
 	}
-	else if (is_async)
-	{
-		ft_printf("Adding job, first segment is %s\n", job->pipeline->command->args[0]);
-		while (list->next && ++i)
-			list = list->next;
-		((t_job_alt *)list)->next = job;
-	}
-	job->id = i;
-	status = _jc_execute_pipeline_queue(job, is_async);
-	if (is_async)
-		ft_dprintf(2, "+[n] %d\n", job->pgid);
-	if (!is_async)
+	else
 		jc_job_dealloc(&(job));
 	return (status);
 }
 
 int					jc_tmp_finalize(bool is_async)
 {
-	t_job_alt		*job;
-	int				status;
+	t_job		*job;
+	int			status;
 
 	job = jc_get()->tmp_job;
 	jc_get()->tmp_job = NULL;
-	ft_printf("Passing %p to launcher\n", job);
 	status = launch_job(job, is_async);
-	tcsetpgrp(0, g_term->shell_pgid);
+	if (!is_async)
+		;
 	return (status);
 }

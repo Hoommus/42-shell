@@ -38,9 +38,9 @@ struct s_job_control		*jc_get(void)
 	return (&g_jc);
 }
 
-void						jc_register_job(t_job_alt *job)
+void						jc_register_job(t_job *job)
 {
-	t_job_alt	*list;
+	t_job	*list;
 	int			i;
 
 	i = 1;
@@ -64,8 +64,8 @@ void						jc_register_job(t_job_alt *job)
 
 void						jc_unregister_job(pid_t id)
 {
-	t_job_alt		*ultimate;
-	t_job_alt		*penultimate;
+	t_job		*ultimate;
+	t_job		*penultimate;
 
 	penultimate = jc_get()->active_jobs;
 	ultimate = penultimate ? jc_get()->active_jobs->next : NULL;

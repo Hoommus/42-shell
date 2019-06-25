@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/19 16:39:00 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/18 14:55:55 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/21 21:39:24 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,17 +19,17 @@ int exec_subshell(const t_node *node, t_context *new_context, bool is_async)
 {
 	t_context	*context;
 	int			status;
-	t_job_alt	*job;
+	t_job	*job;
 	int			f;
 
 	if (!new_context)
-		context = context_duplicate(g_term->context_original, true);
+		context = context_duplicate(g_term->context_original, XDUP_TERM);
 	else
 		context = new_context;
 	f = -2;
 	if (is_async || node->left->node_type != NODE_COMMAND)
 	{
-		job = ft_memalloc(sizeof(t_job_alt));
+		job = ft_memalloc(sizeof(t_job));
 		job->state = JOB_BG;
 		f = fork();
 	}

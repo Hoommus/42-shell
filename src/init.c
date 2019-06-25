@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/16 12:28:13 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/03 17:35:24 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/25 14:57:51 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void			init_shell_context(void)
 	if (fcntl(STDERR_FILENO, F_GETFD) != -1)
 		context_add_fd(g_term->context_original, 2, 2, "stderr");
 	environ_from_array(g_term->context_original->environ, environ);
-	g_term->context_current = context_duplicate(g_term->context_original, true);
+	g_term->context_current = context_duplicate(g_term->context_original, XDUP_ENV | XDUP_TERM);
 	environ_deallocate_vector(g_term->context_current->environ);
 	free(g_term->context_current->term_config);
 	g_term->context_current->environ = g_term->context_original->environ;
@@ -54,7 +54,7 @@ struct termios	*init_term(void)
 		g_term->context_original->term_config = oldterm;
 		tcgetattr(g_term->tty_fd, oldterm);
 		ft_memcpy(newterm, oldterm, sizeof(struct termios));
-		newterm->c_lflag &= ~(ECHO | ICANON | IEXTEN) | ECHOE | ECHONL;
+		newterm->c_lflag &= ~(ECHO | ICANON | IEXTEN) | ECHOE | ECHONL | TOSTOP;
 		newterm->c_iflag &= ~(IXOFF);
 		ioctl(STDOUT_FILENO, TIOCGWINSZ, &window);
 		tputs(tgetstr("ei", NULL), 1, &ft_putc);

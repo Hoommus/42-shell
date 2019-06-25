@@ -6,11 +6,12 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/22 21:08:49 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/22 21:09:56 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/25 12:51:17 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "twenty_one_sh.h"
+#include "shell_job_control.h"
 #include "line_editing.h"
 
 t_carpos	*carpos_get(enum e_position type)
@@ -30,7 +31,8 @@ t_carpos	*carpos_save_as(enum e_position type)
 
 t_carpos	*carpos_load(enum e_position type)
 {
-	if (g_term->input_state != STATE_NON_INTERACTIVE)
+	if (g_term->input_state != STATE_NON_INTERACTIVE &&
+		g_term->input_state != STATE_JOB_IN_FG)
 		tputs(tgoto(tgetstr("cm", NULL), g_term->carpos_db[type].col,
 				g_term->carpos_db[type].row), 1, &ft_putc);
 	return (g_term->carpos_db + type);
@@ -44,7 +46,14 @@ t_carpos	*carpos_update(enum e_position type)
 {
 	char		response[17];
 
-	if (g_term->tty_fd != -1 && g_term->input_state != STATE_NON_INTERACTIVE)
+	signal(SIGTTOU, SIG_IGN);
+	signal(SIGTTIN, SIG_IGN);
+	tcsetpgrp(0, g_term->shell_pgid);
+	tcsetattr(0, TCSANOW, jc_get()->shell_context->term_config);
+	signal(SIGTTIN, SIG_DFL);
+	signal(SIGTTOU, SIG_DFL);
+	if (g_term->tty_fd != -1 && g_term->input_state != STATE_NON_INTERACTIVE
+		&& g_term->input_state != STATE_JOB_IN_FG)
 	{
 		write(2, "\x1b[6n", 4);
 		response[16] = 0;

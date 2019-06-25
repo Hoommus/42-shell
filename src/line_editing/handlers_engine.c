@@ -6,10 +6,11 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/18 11:54:55 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/14 13:58:10 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/21 20:38:37 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <shell_job_control.h>
 #include "line_editing.h"
 #include "twenty_one_sh.h"
 
@@ -67,9 +68,9 @@ void							handle_eot(union u_char key)
 	if (key.lng == CEOT && g_term->buffer->size == 0
 						&& g_term->input_state != STATE_HEREDOC)
 	{
-		if (g_term->running_process != 0)
+		if (jc_get()->active_jobs)
 		{
-			ft_dprintf(2, ERR_RUNNING_JOBS);
+			ft_dprintf(2, "\n" ERR_RUNNING_JOBS);
 			display_normal_prompt();
 		}
 		else

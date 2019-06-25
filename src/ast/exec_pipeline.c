@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/05 17:50:23 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/20 13:02:17 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/21 18:33:13 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,8 @@ static int			exec_pipeline_terminator(const t_node *node,
 	int			status;
 
 	if (context_right == NULL)
-		context_right = context_duplicate(g_term->context_original, true);
-	context_left = context_duplicate(g_term->context_original, true);
+		context_right = context_duplicate(g_term->context_original, XDUP_TERM);
+	context_left = context_duplicate(g_term->context_original, XDUP_TERM);
 	pipe(pp);
 	context_remove_ofd(context_right, 0);
 	context_remove_ofd(context_left, 1);
@@ -56,9 +56,9 @@ static int			exec_pipeline_inner(const t_node *node,
 		(node->right->node_type == NODE_COMMAND || node->right->node_type == NODE_SUBSHELL))
 		return (exec_pipeline_terminator(node, context_right, is_async));
 	if (context_right == NULL)
-		context_right = context_duplicate(g_term->context_original, true);
+		context_right = context_duplicate(g_term->context_original, XDUP_TERM);
 	pipe(pp);
-	context_left = context_duplicate(g_term->context_original, true);
+	context_left = context_duplicate(g_term->context_original, XDUP_TERM);
 	context_remove_ofd(context_right, 0);
 	context_remove_ofd(context_left, 1);
 	context_add_fd(context_right, 0, pp[0], "pipe");
@@ -66,11 +66,11 @@ static int			exec_pipeline_inner(const t_node *node,
 	exec_pipeline_inner(node->left, context_left, is_async);
 	if (node->right->node_type == NODE_SUBSHELL)
 	{
-		status = exec_subshell(node->right, context_right, NULL);
+		status = exec_subshell(node->right, context_right, is_async);
 		context_deep_free(&context_right);
 	}
 	else
-		status = exec_command(node->right, context_right, NULL);
+		status = exec_command(node->right, context_right, is_async);
 	return (status);
 }
 

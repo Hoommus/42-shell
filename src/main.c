@@ -6,10 +6,11 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:32 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/20 18:15:59 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/25 15:38:02 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <errno.h>
 #include "line_editing.h"
 #include "shell_job_control.h"
 #include "twenty_one_sh.h"
@@ -18,60 +19,51 @@
 
 struct s_term		*g_term;
 
-enum e_job_state	poll_pipeline(t_pipe_segment *proc)
+enum e_job_state	poll_pipeline(t_job *job)
 {
-	const t_pipe_segment	*list = proc;
-	int						list_size;
-	int						dead;
-	int						stopped;
+	t_pipe_segment			*list;
+	enum e_job_state		state;
 
-	stopped = 0;
-	dead = 0;
-	list_size = 0;
-	while (list && ++list_size)
-		list = list->next;
-	while (proc)
+	state = job->state;
+	list = job->pipeline;
+	while (list)
 	{
-		if (waitpid(proc->pid, &proc->status, WNOHANG | WUNTRACED) == proc->pid)
+		if (waitpid(list->pid, &list->status, WNOHANG | WUNTRACED) == list->pid)
 		{
-			if (WIFSIGNALED(proc->status) && !WIFSTOPPED(proc->status) && WTERMSIG(proc->status))
+			job->notified = false;
+			if (!WIFEXITED(list->status))
 			{
-				proc->is_completed = true;
-				dead++;
+				if (WIFSTOPPED(list->status))
+					state = JOB_STOPPED;
+				else if (WIFSIGNALED(list->status))
+					state = JOB_SIGTTXX;
+				break;
 			}
-			else if (dead += WIFEXITED(proc->status))
-			{
-				waitpid(proc->pid, &proc->status, 0);
-				proc->is_completed = true;
-			}
-			else if (stopped += WIFSTOPPED(proc->status))
-				proc->is_stopped = true;
+			else
+				state = JOB_TERMINATED;
 		}
-		proc = proc->next;
+		list = list->next;
 	}
-	return (stopped != 0 ? -1 : list_size == dead);
+	job->state = state;
+	if (!job->notified)
+	{
+		jc_format_job(job);
+		job->notified = true;
+	}
+	return (state);
 }
 
 static void			check_jobs_notify(void)
 {
-	t_job_alt		*jobs;
-	t_job_alt		*swap;
-	int				poll;
+	t_job				*jobs;
+	t_job				*swap;
 
 	jobs = jc_get()->active_jobs;
 	while (jobs)
 	{
 		swap = jobs->next;
-		if ((poll = poll_pipeline(jobs->pipeline)) != 0 && !jobs->notified)
-		{
-			if (poll == -1)
-				jobs->state = JOB_STOPPED;
-			ft_printf("[%d]   %d %s  %s\n", jobs->id, jobs->pgid,
-				poll == -1 ? "terminated" : "stopped", jobs->command);
-			jobs->notified = true;
-			if (poll == 1)
-				jc_unregister_job(jobs->pgid);
-		}
+		if (poll_pipeline(jobs) == JOB_TERMINATED)
+			jc_unregister_job(jobs->pgid);
 		jobs = swap;
 	}
 }
@@ -80,18 +72,22 @@ static int			shell_loop(void)
 {
 	char		*commands;
 
-	setpgid(getpid(), getpid());
 	g_term->shell_pgid = getpgrp();
-	while (ponies_teleported())
+	while (true)
 	{
-		tcsetpgrp(0, g_term->shell_pgid);
 		g_interrupt = 0;
 		if (g_term->input_state != STATE_NON_INTERACTIVE)
 		{
+			tcflush(0, TCIOFLUSH);
+			tcflush(1, TCOFLUSH);
+			tcflush(2, TCOFLUSH);
+			if (tcsetattr(0, TCSAFLUSH, g_term->context_current->term_config) == -1)
+				ft_dprintf(2, SH ": tcsetattr (loop) error: %s\n", strerror(errno));
+			if (tcsetpgrp(0, g_term->shell_pgid) == -1)
+				ft_dprintf(2, SH ": tcsetpgrp (loop) error: %s\n", strerror(errno));
 			check_jobs_notify();
-			TERM_APPLY_CONFIG(g_term->context_current->term_config);
-			display_prompt(g_term->input_state = g_term->fallback_input_state);
 			buff_clear(g_term->last_status = 0);
+			display_prompt(g_term->input_state = g_term->fallback_input_state);
 			commands = read_arbitrary();
 			history_write(commands, get_history_fd());
 		}

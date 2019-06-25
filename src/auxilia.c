@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:36 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/14 16:49:29 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/25 12:12:01 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,29 +51,28 @@ void		display_prompt(enum e_input_state state)
 {
 	if (carpos_update(POS_CURRENT)->col > 1)
 		ft_printf("\n");
-	if (state == STATE_NORMAL)
+	if (state & STATE_NORMAL)
 		display_normal_prompt();
-	else if (state == STATE_DQUOTE)
+	else if (state & STATE_DQUOTE)
 		ft_printf("dquote> ");
-	else if (state == STATE_QUOTE)
+	else if (state & STATE_QUOTE)
 		ft_printf("quote> ");
-	else if (state == STATE_ESCAPED)
+	else if (state & STATE_ESCAPED)
 		ft_printf("> ");
-	else if (state == STATE_HEREDOC)
+	else if (state & STATE_HEREDOC)
 		ft_printf("hdoc %s> ", g_term->heredoc_word);
-	else if (state == STATE_HEREDOCD)
+	else if (state & STATE_HEREDOCD)
 		ft_printf("hdocd %s> ", g_term->heredoc_word);
-	else if (state == STATE_EMPTY_OPERATOR)
+	else if (state & STATE_EMPTY_OPERATOR)
 		ft_printf("pipe> ");
 	else
 		ft_printf("err> ");
-	carpos_update(POS_PROMPT);
 }
 
 bool		is_string_numeric(const char *str, const int base)
 {
-	static char		*numbers = "0123456789ABCDEF";
-	char			numbers_base[17];
+	const static char	*numbers = "0123456789ABCDEF";
+	char				numbers_base[17];
 
 	ft_bzero(numbers_base, sizeof(numbers_base));
 	ft_memcpy(numbers_base, numbers, base * sizeof(char));

@@ -12,7 +12,7 @@
 
 #include "shell_job_control.h"
 
-t_pipe_segment		*pipe_segment_new(t_command *command, t_context *context, __unused bool is_subshell)
+t_pipe_segment		*pipe_segment_new(t_command *command, t_context *context)
 {
 	t_pipe_segment	*segment;
 
@@ -63,23 +63,3 @@ void				pipeline_destroy(t_pipe_segment **pipeline)
 	}
 	*pipeline = NULL;
 }
-
-int					pipeline_execute(t_pipe_segment *pipeline)
-{
-	int		status;
-
-	status = 1;
-	while (pipeline)
-	{
-		status = pipeline_execute_segment(pipeline);
-		pipeline = pipeline->next;
-	}
-	return (status);
-}
-
-
-int					pipeline_execute_segment(t_pipe_segment *segment)
-{
-	return (segment == NULL);
-}
-

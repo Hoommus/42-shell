@@ -21,13 +21,13 @@ int		exec_and_if(const t_node *parent, bool is_async)
 {
 	int			status_left;
 	int			status_right;
-	t_job_alt	*job;
+	t_job	*job;
 	int			f;
 
 	f = -2;
 	if (is_async)
 	{
-		job = ft_memalloc(sizeof(t_job_alt));
+		job = ft_memalloc(sizeof(t_job));
 		job->state = JOB_BG;
 		f = fork();
 	}
@@ -57,13 +57,13 @@ int		exec_or_if(const t_node *parent, bool is_async)
 {
 	int			status_left;
 	int			status_right;
-	t_job_alt	*job;
+	t_job	*job;
 	int			f;
 
 	f = -2;
 	if (is_async)
 	{
-		job = ft_memalloc(sizeof(t_job_alt));
+		job = ft_memalloc(sizeof(t_job));
 		job->state = JOB_BG;
 		f = fork();
 	}
