@@ -158,6 +158,7 @@ typedef struct				s_command
 	char		**args;
 	char		**assignments;
 	t_io_rdr	*io_redirects;
+	char		*cmd_str;
 }							t_command;
 
 union						u_executor

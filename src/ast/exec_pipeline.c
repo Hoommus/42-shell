@@ -33,8 +33,8 @@ static int			exec_pipeline_terminator(const t_node *node,
 	status =
 		node->left->node_type == NODE_SUBSHELL
 		? exec_subshell(node->left, context_left, is_async)
-		: exec_command(node->left, context_left, is_async)
-		||
+		: exec_command(node->left, context_left, is_async);
+	status =
 		node->right->node_type == NODE_SUBSHELL
 		? exec_subshell(node->right, context_right, is_async)
 		: exec_command(node->right, context_right, is_async);
@@ -86,7 +86,7 @@ int exec_pipeline(const t_node *node, bool is_async)
 		exec_pipeline_terminator(node, NULL, is_async);
 	ft_printf("Calling %s finalization from pipeline node\n", is_async ? "async" : "regular");
 	pipeline_status = jc_tmp_finalize(is_async);
-	if (is_async)
+	if (!is_async)
 		environ_push_entry(jc_get()->shell_context->environ, "?",
 			(swap = ft_itoa(pipeline_status)), SCOPE_SHELL_LOCAL);
 	free(swap);

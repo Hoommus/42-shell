@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:32 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/25 15:38:02 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/27 18:55:01 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,55 +19,6 @@
 
 struct s_term		*g_term;
 
-enum e_job_state	poll_pipeline(t_job *job)
-{
-	t_pipe_segment			*list;
-	enum e_job_state		state;
-
-	state = job->state;
-	list = job->pipeline;
-	while (list)
-	{
-		if (waitpid(list->pid, &list->status, WNOHANG | WUNTRACED) == list->pid)
-		{
-			job->notified = false;
-			if (!WIFEXITED(list->status))
-			{
-				if (WIFSTOPPED(list->status))
-					state = JOB_STOPPED;
-				else if (WIFSIGNALED(list->status))
-					state = JOB_SIGTTXX;
-				break;
-			}
-			else
-				state = JOB_TERMINATED;
-		}
-		list = list->next;
-	}
-	job->state = state;
-	if (!job->notified)
-	{
-		jc_format_job(job);
-		job->notified = true;
-	}
-	return (state);
-}
-
-static void			check_jobs_notify(void)
-{
-	t_job				*jobs;
-	t_job				*swap;
-
-	jobs = jc_get()->active_jobs;
-	while (jobs)
-	{
-		swap = jobs->next;
-		if (poll_pipeline(jobs) == JOB_TERMINATED)
-			jc_unregister_job(jobs->pgid);
-		jobs = swap;
-	}
-}
-
 static int			shell_loop(void)
 {
 	char		*commands;
@@ -75,24 +26,19 @@ static int			shell_loop(void)
 	g_term->shell_pgid = getpgrp();
 	while (true)
 	{
+		tcsetattr(0, TCSANOW, g_term->context_current->term_config);
+		tcsetpgrp(0, g_term->shell_pgid);
 		g_interrupt = 0;
-		if (g_term->input_state != STATE_NON_INTERACTIVE)
+		if (g_term->input_state == STATE_NON_INTERACTIVE)
+			read_fd(0, &commands);
+		else
 		{
-			tcflush(0, TCIOFLUSH);
-			tcflush(1, TCOFLUSH);
-			tcflush(2, TCOFLUSH);
-			if (tcsetattr(0, TCSAFLUSH, g_term->context_current->term_config) == -1)
-				ft_dprintf(2, SH ": tcsetattr (loop) error: %s\n", strerror(errno));
-			if (tcsetpgrp(0, g_term->shell_pgid) == -1)
-				ft_dprintf(2, SH ": tcsetpgrp (loop) error: %s\n", strerror(errno));
-			check_jobs_notify();
+			check_n_notify(false);
 			buff_clear(g_term->last_status = 0);
 			display_prompt(g_term->input_state = g_term->fallback_input_state);
 			commands = read_arbitrary();
 			history_write(commands, get_history_fd());
 		}
-		else
-			read_fd(0, &commands);
 		run_script(tokenize(commands, TOKEN_DELIMITERS), false);
 		ft_strdel(&commands);
 		environ_push_entry(g_term->context_original->environ, "?",
@@ -101,7 +47,6 @@ static int			shell_loop(void)
 		if (g_term->input_state == STATE_NON_INTERACTIVE)
 			return (g_term->last_status);
 	}
-	return (0);
 }
 
 void				init_variables(void)
@@ -179,10 +124,7 @@ int					main(int argc, char **argv)
 	print_messages();
 	setup_signal_handlers();
 	if (argc == 1)
-	{
-		tcsetpgrp(0, jc_get()->shell_pid);
 		shell_loop();
-	}
 	else
 		run_file(argv[1]);
 	return (g_term->last_status);

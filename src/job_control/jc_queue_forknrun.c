@@ -59,8 +59,8 @@ void					handle_signaled(t_job *job, int status)
 			g_sigs[WTERMSIG(status) - 1], 45, job->command);
 }
 
-static void				close_foreign_fds(t_pipe_segment *processes,
-											t_pipe_segment *current)
+static void				close_foreign_fds(t_proc *processes,
+											t_proc *current)
 {
 	struct s_fd_lst	*list;
 
@@ -103,31 +103,7 @@ static void				write_heredocs(const t_io_rdr *io_rdrs)
 	}
 }
 
-int				waitnclaim(t_job *job)
-{
-	t_pipe_segment	*last;
-
-	int			status;
-
-	last = job->pipeline;
-	while (last->next)
-	{
-		waitpid(last->pid, &status, WNOHANG);
-		last = last->next;
-	}
-	signal(SIGTTOU, SIG_IGN);
-	if (waitpid(last->pid, &status, WUNTRACED) == -1)
-		ft_dprintf(2, "waitpid status is -1: %s\n", strerror(errno));
-	tcsetpgrp(0, g_term->shell_pgid);
-	TERM_APPLY_CONFIG(g_term->context_current->term_config);
-	signal(SIGTTOU, SIG_DFL);
-	if (WIFSIGNALED(status))
-		handle_signaled(job, status);
-	last->status = status;
-	return (WEXITSTATUS(last->status));
-}
-
-static void	prepare_exec(t_job *job, t_pipe_segment *process, bool is_async)
+static void	prepare_exec(t_job *job, t_proc *process, bool is_async)
 {
 	pid_t	pgid;
 
@@ -143,10 +119,10 @@ static void	prepare_exec(t_job *job, t_pipe_segment *process, bool is_async)
 		tcsetpgrp(0, pgid);
 	signal(SIGTTOU, SIG_DFL);
 	close_redundant_fds(process->context);
-	close_foreign_fds(job->pipeline, process);
+	close_foreign_fds(job->procs, process);
 }
 
-int forknrun(t_job *job, t_pipe_segment *process, char *path, bool is_async)
+int forknrun(t_job *job, t_proc *process, char *path, bool is_async)
 {
 	process->pid = fork();
 	if (process->pid == 0)
@@ -166,9 +142,9 @@ int forknrun(t_job *job, t_pipe_segment *process, char *path, bool is_async)
 	{
 		if (job->pgid == 0)
 			job->pgid = process->pid;
+		setpgid(process->pid, is_async ? job->pgid : g_term->shell_pgid);
 		if (!is_async)
 			tcsetpgrp(0, job->pgid);
-		setpgid(process->pid, is_async ? job->pgid : g_term->shell_pgid);
 		write_heredocs(process->command->io_redirects);
 		close_redundant_fds(process->context);
 		environ_deallocate_vector(process->context->environ);

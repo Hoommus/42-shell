@@ -12,27 +12,27 @@
 
 #include "shell_job_control.h"
 
-t_pipe_segment		*pipe_segment_new(t_command *command, t_context *context)
+t_proc		*process_create(t_command *command, t_context *context)
 {
-	t_pipe_segment	*segment;
+	t_proc	*segment;
 
-	segment = ft_memalloc(sizeof(t_pipe_segment));
+	segment = ft_memalloc(sizeof(t_proc));
 	segment->command = command;
 	segment->context = context;
 	return (segment);
 }
 
-t_pipe_segment		*pipeline_add_segment(t_pipe_segment **head, t_pipe_segment *segment)
+t_proc		*process_list_add(t_proc **pipeline, t_proc *segment)
 {
-	t_pipe_segment	*list;
+	t_proc	*list;
 
-	if (!head)
+	if (!pipeline)
 		return (NULL);
-	if (*head == NULL)
-		*head = segment;
+	if (*pipeline == NULL)
+		*pipeline = segment;
 	else
 	{
-		list = *head;
+		list = *pipeline;
 		while (list)
 		{
 			if (list->next == NULL)
@@ -43,13 +43,13 @@ t_pipe_segment		*pipeline_add_segment(t_pipe_segment **head, t_pipe_segment *seg
 			list = list->next;
 		}
 	}
-	return (*head);
+	return (*pipeline);
 }
 
-void				pipeline_destroy(t_pipe_segment **pipeline)
+void				process_list_destroy(t_proc **pipeline)
 {
-	t_pipe_segment	*list;
-	t_pipe_segment	*next;
+	t_proc	*list;
+	t_proc	*next;
 
 	if (!pipeline || !*pipeline)
 		return ;

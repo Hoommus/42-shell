@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/08 12:40:49 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/21 20:30:26 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/27 18:43:28 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,13 +30,44 @@ enum					e_job_state
 	JOB_RUNNING = 0,
 	JOB_BG,
 	JOB_STOPPED,
-	JOB_SIGTTXX,
-	JOB_SIGTTOU,
+	JOB_LAUNCHED,
 	JOB_EXITED,
-	JOB_TERMINATED
+	JOB_TERMINATED = 6,
+	JOB_CONTINUED,
+
+	JOB_SIGHUP = 31,
+	JOB_SIGINT,
+	JOB_SIGQUIT,
+	JOB_SIGILL,
+	JOB_SIGTRAP,
+	JOB_SIGABRT,
+	JOB_SIGEMT,
+	JOB_SIGFPE,
+	JOB_SIGKILL,
+	JOB_SIGBUS,
+	JOB_SIGSEGV,
+	JOB_SIGSYS,
+	JOB_SIGPIPE,
+	JOB_SIGALRM,
+	JOB_SIGTERM,
+	JOB_SIGURG,
+	JOB_SIGSTOP,
+	JOB_SIGTSTP,
+	JOB_SIGCONT,
+	JOB_SIGCHLD,
+	JOB_SIGTTIN,
+	JOB_SIGTTOU,
+	JOB_SIGIO,
+	JOB_SIGXCPU,
+	JOB_SIGXFSZ,
+	JOB_SIGVTALRM,
+	JOB_SIGPROF,
+	JOB_SIGWINCH,
+	JOB_SIGINFO,
+	JOB_SIGUSR1,
+	JOB_SIGUSR2
 };
 
-extern const char		*g_state_names[];
 
 /*
 ** needs_wait field indicates if you have to wait for this segment to finish.
@@ -52,12 +83,12 @@ typedef struct			s_segment
 	t_context			*context;
 	struct s_command	*command;
 	struct s_segment	*next;
-}						t_pipe_segment;
+}						t_proc;
 
 typedef struct			s_job_alt
 {
 	char				*command;
-	t_pipe_segment		*pipeline;
+	t_proc				*procs;
 	pid_t				pgid;
 	bool				notified;
 	int					id;
@@ -73,30 +104,31 @@ struct					s_job_control
 	t_job			*tmp_job;
 };
 
-extern volatile sig_atomic_t	g_leave_job;
-
 void					jc_init(t_context *context);
 struct s_job_control	*jc_get(void);
 void					jc_register_job(t_job *job);
-void					jc_unregister_job(pid_t id);
+void					jc_unregister_job(pid_t pgid);
+int						jc_wait(t_job *job);
+t_proc					*process_create(t_command *command, t_context *context);
+t_proc					*process_list_add(t_proc **pipeline, t_proc *segment);
+void					process_list_destroy(t_proc **pipeline);
 
-t_pipe_segment			*pipe_segment_new(t_command *command, t_context *context);
-t_pipe_segment			*pipeline_add_segment(t_pipe_segment **pipeline, t_pipe_segment *segment);
-void					pipeline_destroy(t_pipe_segment **pipeline);
+int						jc_launch(t_job *job, bool is_async);
 
-int						launch_job(t_job *job, bool is_async);
-
-t_job					*jc_tmp_add(t_pipe_segment *segment);
+t_job					*jc_tmp_add(t_proc *segment);
 int						jc_tmp_finalize(bool is_async);
 void					jc_job_dealloc(t_job **job);
+
+enum e_job_state		poll_pipeline(t_job *job, bool wnohang);
+
 
 /*
 ** Auxiliary
 */
 void					handle_signaled(t_job *job, int status);
 char					*jc_state_str(enum e_job_state state);
-void jc_format_job(t_job *job);
-int						forknrun(t_job *job, t_pipe_segment *process, char *path, bool is_async);
+void jc_format_job(const t_job *job);
+int						forknrun(t_job *job, t_proc *process, char *path, bool is_async);
 void					close_redundant_fds(t_context *context);
 
 #endif

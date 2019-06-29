@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/05 17:50:36 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/22 14:35:39 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/27 13:43:07 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,6 +115,7 @@ static void	expand_everything(const struct s_command *command)
 
 int exec_command(const t_node *command_node, t_context *new_context, bool is_async)
 {
+	extern bool				g_is_subshell_env;
 	const struct s_command	*command = command_node->command;
 	t_context				*context;
 	int						status;
@@ -131,8 +132,9 @@ int exec_command(const t_node *command_node, t_context *new_context, bool is_asy
 	status = 0;
 	if (!g_interrupt && command->args != NULL && command->args[0] != NULL)
 	{
-		jc_tmp_add(pipe_segment_new((t_command *) command, context));
-		if (new_context == NULL)
+		jc_tmp_add(process_create((t_command *) command, context));
+		is_async = g_is_subshell_env ? false : is_async;
+		if (new_context == NULL || g_is_subshell_env)
 			status = jc_tmp_finalize(is_async);
 	}
 	return (status);
