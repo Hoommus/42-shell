@@ -13,6 +13,7 @@
 #include "twenty_one_sh.h"
 #include "shell_job_control.h"
 #include "line_editing.h"
+#include <errno.h>
 
 t_carpos	*carpos_get(enum e_position type)
 {
@@ -45,19 +46,17 @@ t_carpos	*carpos_load(enum e_position type)
 t_carpos	*carpos_update(enum e_position type)
 {
 	char		response[17];
+	int			log;
 
-	signal(SIGTTOU, SIG_IGN);
-	signal(SIGTTIN, SIG_IGN);
-	tcsetpgrp(0, g_term->shell_pgid);
-	tcsetattr(0, TCSANOW, jc_get()->shell_context->term_config);
-	signal(SIGTTIN, SIG_DFL);
-	signal(SIGTTOU, SIG_DFL);
 	if (g_term->tty_fd != -1 && g_term->input_state != STATE_NON_INTERACTIVE
 		&& g_term->input_state != STATE_JOB_IN_FG)
 	{
-		write(2, "\x1b[6n", 4);
+		log = open(LOG_FILE, O_WRONLY | O_APPEND);
+		if (write(2, "\x1b[6n", 4) == -1)
+			ft_dprintf(log, "Got -1 from write: %s\n", strerror(errno));
 		response[16] = 0;
-		read(STDIN_FILENO, response, 16);
+		if (read(STDIN_FILENO, response, 10) == -1)
+			ft_dprintf(log, "Got -1 from read: %s\n", strerror(errno));
 		if (ft_strchr(response, '[') && ft_strchr(response, ';'))
 		{
 			g_term->carpos_db[type].row =
@@ -65,6 +64,7 @@ t_carpos	*carpos_update(enum e_position type)
 			g_term->carpos_db[type].col =
 				(short)(ft_atoi(ft_strchr(response, ';') + 1) - 1);
 		}
+		close(log);
 	}
 	return (g_term->carpos_db + type);
 }

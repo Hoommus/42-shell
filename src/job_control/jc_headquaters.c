@@ -33,6 +33,7 @@ void						jc_register_job(t_job *job)
 
 	i = 1;
 	list = jc_get()->active_jobs;
+	job->id = i;
 	if (list == NULL)
 		jc_get()->active_jobs = job;
 	else
@@ -42,6 +43,7 @@ void						jc_register_job(t_job *job)
 			list = list->next;
 			i++;
 		}
+		job->id = i + 1;
 		list->next = job;
 	}
 	jc_format_job(job);

@@ -54,12 +54,17 @@ struct termios	*init_term(void)
 		g_term->context_original->term_config = oldterm;
 		tcgetattr(g_term->tty_fd, oldterm);
 		ft_memcpy(newterm, oldterm, sizeof(struct termios));
-		newterm->c_lflag &= ~(ECHO | ICANON | IEXTEN) | ECHOE | ECHONL | TOSTOP;
-		newterm->c_iflag &= ~(IXOFF);
+		newterm->c_lflag &= ~(ECHO | ECHOK | ECHONL | ECHOCTL | ICANON) | ISIG | IEXTEN;
+		newterm->c_iflag &= ~(IXOFF) | BRKINT;
+		newterm->c_cc[VMIN] = 1;
+		newterm->c_cc[VTIME] = 0;
 		ioctl(STDOUT_FILENO, TIOCGWINSZ, &window);
 		tputs(tgetstr("ei", NULL), 1, &ft_putc);
 		g_term->ws_col = window.ws_col;
 		g_term->ws_row = window.ws_row;
+		dup2(g_term->tty_fd, 0);
+		dup2(g_term->tty_fd, 1);
+		dup2(g_term->tty_fd, 2);
 		close_wrapper(g_term->tty_fd);
 	}
 	g_term->fallback_input_state = g_term->input_state;

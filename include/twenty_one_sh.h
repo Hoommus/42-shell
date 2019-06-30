@@ -252,7 +252,7 @@ void					reset_signal_handlers(void);
 /*
 ** Auxilia (auxilia.c)
 */
-void					check_n_notify(bool notify_all);
+void					jc_check_n_notify(bool notify_all);
 u_int64_t				hash_sdbm(const char *str);
 ssize_t					ponies_teleported(void);
 int						read_fd(const int fd, char **result);

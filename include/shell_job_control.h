@@ -120,7 +120,7 @@ int						jc_tmp_finalize(bool is_async);
 void					jc_job_dealloc(t_job **job);
 
 enum e_job_state		poll_pipeline(t_job *job, bool wnohang);
-
+int						alterate_proc(t_job *job, t_proc *proc);
 
 /*
 ** Auxiliary

@@ -38,6 +38,7 @@ void		jc_to_fg(t_job *job)
 			TERM_APPLY_CONFIG(segments->context->term_config);
 			kill(segments->pid, SIGCONT);
 			segments->is_stopped = false;
+			job->notified = false;
 		}
 		segments = segments->next;
 	}

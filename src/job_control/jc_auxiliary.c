@@ -22,8 +22,8 @@ void		jc_format_job(const t_job *job)
 		option = '-';
 	else
 		option = ' ';
-	ft_dprintf(2, "[%d]  %c %d %-14s %s\n",
-		job->id, option, job->pgid, jc_state_str(job->state), job->command);
+	ft_dprintf(2, "[%d%-2c %c %d %-14s %s\n",
+		job->id, ']', option, job->pgid, jc_state_str(job->state), job->command);
 }
 
 char		*jc_state_str(enum e_job_state state)

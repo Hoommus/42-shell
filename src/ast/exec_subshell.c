@@ -72,8 +72,10 @@ int		exec_subshell(const t_node *node, t_context *new_context, bool is_async)
 		setpgid((job->pgid = f), f);
 		job->procs = process_create(NULL, context);
 		job->procs->pid = f;
-		job->command = ft_strdup("");
+		job->command = ft_strdup("(subshell)");
 		jc_register_job(job);
+		if (!is_async)
+			jc_wait(job);
 		status = 0;
 	}
 	return (status);

@@ -19,12 +19,6 @@ static void				tstp(int sig)
 	sig = 0;
 }
 
-//void					tstp_alt(int sig, siginfo_t *info, void *ignore)
-//{
-//	ignore = (void *)(sig & 0);
-//	info->si_pid
-//}
-
 static void				handle_sigint(int sig)
 {
 	g_interrupt = sig;
@@ -37,7 +31,6 @@ static void				resize(int sig)
 
 	if (sig == SIGWINCH && jc_get()->active_jobs == NULL)
 	{
-		ft_printf("Fuck, resize!\n");
 		ioctl(STDOUT_FILENO, TIOCGWINSZ, &size);
 		g_term->ws_row = size.ws_row;
 		g_term->ws_col = size.ws_col;
@@ -45,14 +38,36 @@ static void				resize(int sig)
 	}
 }
 
-void					sigchild(int sig, siginfo_t *info, void *ignore)
+void					sigquit(int sig)
 {
 	sig = 0;
+}
+
+void					sigchild(int sig, siginfo_t *info, void *ignore)
+{
+	pid_t	pgid;
+	t_job	*jobs = jc_get()->active_jobs;
+	t_proc	*procs;
+
+	sig = 0;
 	ignore = 0;
-	ft_printf("\nFuck, sigchild came from %d with %d signal!\n"
-		   "si_value ptr = %p", info->si_pid, info->si_code, info->si_value.sival_ptr);
-//	display_prompt(g_term->input_state);
-//	buffer_redraw();
+	pgid = getpgid(info->si_pid);
+	while (jobs)
+	{
+		procs = jobs->procs;
+		while (procs && jobs->pgid == pgid)
+		{
+			if (procs->pid == info->si_pid)
+			{
+				waitpid(procs->pid, &procs->status, WUNTRACED);
+				alterate_proc(jobs, procs);
+				break ;
+			}
+			procs = procs->next;
+		}
+		jobs = jobs->next;
+	}
+	tcsetattr(0, TCSADRAIN, g_term->shell_term);
 }
 
 void					setup_signal_handlers(void)
@@ -60,14 +75,15 @@ void					setup_signal_handlers(void)
 	struct sigaction	action;
 
 	ft_bzero(&action, sizeof(struct sigaction));
-	action.__sigaction_u.__sa_handler = &handle_sigint;
+	action.sa_handler = &handle_sigint;
 	sigaction(SIGINT, &action, NULL);
 	action.sa_flags = SA_RESTART;
-	action.__sigaction_u.__sa_handler = &tstp;
+	action.sa_handler = &tstp;
 	sigaction(SIGTSTP, &action, NULL);
-	action.sa_flags = SA_SIGINFO | SA_RESTART;
-	action.__sigaction_u.__sa_sigaction = &sigchild;
-//	sigaction(SIGCHLD, &action, NULL);
+	action.sa_flags = SA_SIGINFO;
+	action.sa_sigaction = &sigchild;
+	sigaction(SIGCHLD, &action, NULL);
+	//signal(SIGCHLD, SIG_DFL);
 	signal(SIGWINCH, &resize);
 	signal(SIGPIPE, &tstp);
 }

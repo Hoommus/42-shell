@@ -80,6 +80,9 @@ static void			deal_with_newline(const char *arr)
 
 static void			deal_with_pasted(char *str)
 {
+	int		log;
+
+	log = open(LOG_FILE, O_WRONLY | O_APPEND);
 	buff_insert_string_at(g_term->buffer->iterator, str);
 	write(1, str, ft_strlen(str));
 	if (carpos_update(POS_CURRENT)->col >= g_term->ws_col - 1)
@@ -88,6 +91,7 @@ static void			deal_with_pasted(char *str)
 		caret_move(1, D_RIGHT);
 	}
 	recheck_state(0);
+	close(log);
 }
 
 char				*read_arbitrary(void)
@@ -95,13 +99,15 @@ char				*read_arbitrary(void)
 	union u_char	input;
 	char			swap[1025];
 
+//	tcsetattr(0, TCSADRAIN, g_term->shell_term);
 	if (g_term->input_state == STATE_HEREDOC)
 	{
 		display_prompt(g_term->input_state);
 		buff_clear(0);
 	}
-	while (g_term->input_state != STATE_COMMIT && carpos_update(POS_CURRENT))
+	while (g_term->input_state != STATE_COMMIT)
 	{
+		carpos_update(POS_CURRENT);
 		if (read(0, ft_memset(swap, 0, 1025), 1024) == -1)
 			return ((char *)(write(1, "\n", 1) & 0));
 		else if (is_key_hooked(*(union u_char *)ft_memcpy(input.arr, swap, 8))

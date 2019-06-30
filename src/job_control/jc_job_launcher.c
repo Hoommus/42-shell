@@ -139,44 +139,47 @@ int					jc_wait(t_job *job)
 {
 	t_proc				*procs;
 	int					status;
+	sigset_t			mask;
 
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGCHLD);
+	sigprocmask(SIG_SETMASK, &mask, 0);
 	poll_pipeline(job, false);
 	procs = job->procs;
 	while (procs->next)
 		procs = procs->next;
 	status = WEXITSTATUS(procs->status);
+	sigemptyset(&mask);
+	sigprocmask(SIG_SETMASK, &mask, 0);
 	return (status);
 }
 
 int					jc_launch(t_job *job, bool is_async)
 {
-	t_job			*list;
 	int				status;
-	int				i;
 
 	g_term->input_state = STATE_JOB_IN_FG;
-	job->command = ft_strarr_join(" ", job->procs->command->args);
+	if (job->procs && job->procs->command)
+		job->command = ft_strarr_join(" ", job->procs->command->args);
 	execute_segments(job, is_async);
 	status = 0;
 	if (g_is_subshell_env || !is_async)
 		status = jc_wait(job);
-	signal(SIGTTOU, SIG_IGN);
-	tcsetpgrp(0, g_term->shell_pgid);
-	tcsetattr(0, TCSANOW, g_term->context_current->term_config);
+	if (!is_async)
+	{
+		signal(SIGTTOU, SIG_IGN);
+		tcsetpgrp(0, g_term->shell_pgid);
+		signal(SIGTTOU, SIG_DFL);
+	}
+	tcsetattr(0, TCSADRAIN, g_term->shell_term);
 	if (!g_is_subshell_env && (is_async || status == -1))
 	{
-		i = 1;
-		list = jc_get()->active_jobs;
-		while (list && ++i)
-			list = list->next;
-		job->id = i;
 		job->state = JOB_LAUNCHED;
 		jc_register_job(job);
 		job->state = JOB_RUNNING;
 	}
 	else
 		jc_job_dealloc(&(job));
-	signal(SIGTTOU, SIG_DFL);
 	g_term->input_state = g_term->fallback_input_state;
 	return (status);
 }

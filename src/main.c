@@ -24,18 +24,24 @@ static int			shell_loop(void)
 	char		*commands;
 
 	g_term->shell_pgid = getpgrp();
+	g_term->shell_term = ft_memalloc(sizeof(struct termios));
+	*g_term->shell_term = *g_term->context_current->term_config;
 	while (true)
 	{
-		tcsetattr(0, TCSANOW, g_term->context_current->term_config);
-		tcsetpgrp(0, g_term->shell_pgid);
+		if (tcgetpgrp(0) != g_term->shell_pgid)
+			tcsetpgrp(0, g_term->shell_pgid);
+		tcsetattr(0, TCSADRAIN, g_term->shell_term);
+		tcflush(0, TCIOFLUSH);
+		tcflush(1, TCIOFLUSH);
+		tcflush(2, TCIOFLUSH);
 		g_interrupt = 0;
 		if (g_term->input_state == STATE_NON_INTERACTIVE)
 			read_fd(0, &commands);
 		else
 		{
-			check_n_notify(false);
-			buff_clear(g_term->last_status = 0);
+			jc_check_n_notify(false);
 			display_prompt(g_term->input_state = g_term->fallback_input_state);
+			buff_clear(g_term->last_status = 0);
 			commands = read_arbitrary();
 			history_write(commands, get_history_fd());
 		}

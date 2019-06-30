@@ -13,6 +13,31 @@
 #include "shell_job_control.h"
 #include "twenty_one_sh.h"
 
+int					alterate_proc(t_job *job, t_proc *proc)
+{
+	job->notified = false;
+	if (WIFEXITED(proc->status))
+	{
+		job->state = JOB_TERMINATED;
+		proc->is_completed = true;
+		return (1);
+	}
+	else if (WIFSTOPPED(proc->status))
+	{
+		job->state = WSTOPSIG(proc->status) > 0
+					 ? WSTOPSIG(proc->status) + 30 : JOB_STOPPED;
+		proc->is_stopped = true;
+		return (2);
+	}
+	else if (WIFSIGNALED(proc->status))
+	{
+		job->state = WTERMSIG(proc->status) + 30;
+		proc->is_completed = true;
+		return (3);
+	}
+	return (0);
+}
+
 enum e_job_state	poll_pipeline(t_job *job, bool wnohang)
 {
 	t_proc			*procs;
@@ -23,27 +48,8 @@ enum e_job_state	poll_pipeline(t_job *job, bool wnohang)
 	{
 		if (waitpid(procs->pid, &procs->status, wflags) == procs->pid)
 		{
-			job->notified = false;
-			if (WIFEXITED(procs->status))
-			{
-				job->state = JOB_TERMINATED;
-				procs->is_completed = true;
-			}
-			else if (WIFSTOPPED(procs->status))
-			{
-				job->state = WSTOPSIG(procs->status) > 0
-							? WSTOPSIG(procs->status) + 30 : JOB_STOPPED;
-				procs->is_stopped = true;
-				if (!wnohang)
-					break ;
-			}
-			else if (WIFSIGNALED(procs->status))
-			{
-				job->state = WTERMSIG(procs->status) + 30;
-				procs->is_completed = true;
-				if (!wnohang)
-					break ;
-			}
+			if (alterate_proc(job, procs) >= 2)
+				break ;
 		}
 		procs = procs->next;
 	}
@@ -69,7 +75,7 @@ bool				is_completed(t_job *job)
 	return (is_completed);
 }
 
-void				check_n_notify(bool notify_all)
+void				jc_check_n_notify(bool notify_all)
 {
 	t_job				*job;
 	t_job				*swap;
@@ -82,17 +88,42 @@ void				check_n_notify(bool notify_all)
 	{
 		swap = job->next;
 		state = poll_pipeline(job, true);
-		if (notify_all || (job->state != JOB_RUNNING && !job->notified++))
+		if (notify_all || (job->state != JOB_RUNNING && !job->notified))
+		{
 			jc_format_job(job);
+			job->notified = true;
+		}
 		if (is_completed(job))
 			jc_unregister_job(job->pgid);
 		job = swap;
 	}
 }
 
-int			hs_jobs(const char **args)
+void				hs_jobs_killall(void)
 {
-	check_n_notify(true);
+	t_job	*jobs;
+	t_proc	*procs;
+
+	jobs = jc_get()->active_jobs;
+	while (jobs)
+	{
+		procs = jobs->procs;
+		while (procs)
+		{
+			kill(procs->pid, SIGKILL);
+			procs = procs->next;
+		}
+		jobs = jobs->next;
+	}
+}
+
+int					hs_jobs(const char **args)
+{
+	if (args && args[0] && ft_strcmp(args[0], "killall") == 0)
+	{
+		hs_jobs_killall();
+	}
+	jc_check_n_notify(true);
 	args = NULL;
 	return (0);
 }
