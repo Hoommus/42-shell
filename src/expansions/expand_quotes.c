@@ -18,7 +18,7 @@ char	*expand_dquote_internals(char *str, u_int32_t from, u_int32_t to)
 	char	*partial;
 	char	*swap;
 
-	partial = ft_strsub(str, from + 1, to - 1);
+	partial = ft_strsub(str, from + 1, to - from - 1);
 	swap = expand_escaped(partial);
 	free(partial);
 	partial = strinsert(str, swap, from, (to) - from + 1);

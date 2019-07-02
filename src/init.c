@@ -62,6 +62,9 @@ struct termios	*init_term(void)
 		tputs(tgetstr("ei", NULL), 1, &ft_putc);
 		g_term->ws_col = window.ws_col;
 		g_term->ws_row = window.ws_row;
+		close_wrapper(0);
+		close_wrapper(1);
+		close_wrapper(2);
 		dup2(g_term->tty_fd, 0);
 		dup2(g_term->tty_fd, 1);
 		dup2(g_term->tty_fd, 2);

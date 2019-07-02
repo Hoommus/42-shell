@@ -22,7 +22,7 @@ struct s_builtin	g_builtins[] = {
 	{"export", &hs_export},
 	{"exit", &hs_exit},
 	{"fg", &hs_fg},
-	{"bg", &hs_fg},
+	{"bg", &hs_bg},
 	{"history", &hs_history},
 	{"help", &hs_help},
 	{"jobs", &hs_jobs},
@@ -64,25 +64,24 @@ int					hs_help(const char **args)
 
 int					hs_exit(const char **args)
 {
-	TERM_APPLY_CONFIG(g_term->context_original->term_config);
 	if (args && *args)
 	{
 		if (!is_string_numeric(*args, 10))
 		{
 			ft_dprintf(2, SH ": exit: %s: numeric argument required\n", *args);
-			if (g_is_subshell_env)
+			if (jc_is_subshell())
 				return (2);
 			else
 				exit(2);
 		}
-		else if (g_is_subshell_env)
+		else if (jc_is_subshell())
 			return (ft_atoi(*args));
 		else if (jc_get()->active_jobs != NULL)
 			return ((ft_dprintf(2, "You have running jobs.\n") & 0) | 1);
 		else
 			exit(ft_atoi(*args));
 	}
-	if (g_is_subshell_env)
+	if (jc_is_subshell())
 		return (0);
 	else if (jc_get()->active_jobs != NULL)
 		return ((ft_dprintf(2, "You have running jobs.\n") & 0) | 1);

@@ -110,12 +110,6 @@ static void	prepare_exec(t_job *job, t_proc *process, bool is_async)
 	pgid = job->pgid == 0 ? getpid() : job->pgid;
 	if (is_async)
 		setpgid(getpid(), pgid);
-	//reset_signal_handlers();
-	signal(SIGINT, SIG_DFL);
-	signal(SIGTSTP, SIG_DFL);
-	signal(SIGTTIN, SIG_DFL);
-	signal(SIGWINCH, SIG_DFL);
-	signal(SIGCHLD, SIG_DFL);
 	signal(SIGTTOU, SIG_IGN);
 	context_switch(process->context);
 	if (!is_async && tcgetpgrp(0) != pgid)

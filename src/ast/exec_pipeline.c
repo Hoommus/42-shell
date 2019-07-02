@@ -30,14 +30,8 @@ static int			exec_pipeline_terminator(const t_node *node,
 	context_remove_ofd(context_left, 1);
 	context_add_fd(context_right, 0, pp[0], "pipe");
 	context_add_fd(context_left, 1, pp[1], "pipe");
-	status =
-		node->left->node_type == NODE_SUBSHELL
-		? exec_subshell(node->left, context_left, is_async)
-		: exec_command(node->left, context_left, is_async);
-	status =
-		node->right->node_type == NODE_SUBSHELL
-		? exec_subshell(node->right, context_right, is_async)
-		: exec_command(node->right, context_right, is_async);
+	status = exec_node(node->left, context_left, is_async);
+	status = exec_node(node->right, context_right, is_async);
 	if (node->left->node_type == NODE_SUBSHELL)
 		context_deep_free(&context_left);
 	if (node->right->node_type == NODE_SUBSHELL)
@@ -64,13 +58,7 @@ static int			exec_pipeline_inner(const t_node *node,
 	context_add_fd(context_right, 0, pp[0], "pipe");
 	context_add_fd(context_left, 1, pp[1], "pipe");
 	exec_pipeline_inner(node->left, context_left, is_async);
-	if (node->right->node_type == NODE_SUBSHELL)
-	{
-		status = exec_subshell(node->right, context_right, is_async);
-		context_deep_free(&context_right);
-	}
-	else
-		status = exec_command(node->right, context_right, is_async);
+	status = exec_node(node->right, context_right, is_async);
 	return (status);
 }
 
@@ -84,7 +72,6 @@ int exec_pipeline(const t_node *node, bool is_async)
 		exec_pipeline_inner(node, NULL, is_async);
 	else
 		exec_pipeline_terminator(node, NULL, is_async);
-	ft_printf("Calling %s finalization from pipeline node\n", is_async ? "async" : "regular");
 	pipeline_status = jc_tmp_finalize(is_async);
 	if (!is_async)
 		environ_push_entry(jc_get()->shell_context->environ, "?",

@@ -119,6 +119,8 @@ t_bresult						*simple_command_build(const t_state *state,
 												struct s_result *last_build);
 t_bresult						*subshell_build(const t_state *state,
 												struct s_result *last_build);
+t_bresult						*brace_group_build(const t_state *state,
+												struct s_result *last_build);
 
 t_bresult						*pipe_sequence_build(const t_state *state,
 												struct s_result *last_build);
@@ -178,24 +180,24 @@ extern const t_rule				g_while_clause;
 ** extern const t_rule	g_for_clause;
 ** extern const t_rule	g_until_clause;
 **
-**
 ** extern const t_rule	g_fname;
 ** extern const t_rule	g_case_clause;
 ** extern const t_rule	g_case_list;
 ** extern const t_rule	g_case_item_ns;
 ** extern const t_rule	g_case_item;
 ** extern const t_rule	g_for_token;
-** extern const t_rule	g_if_token;
-** extern const t_rule	g_then_token;
-** extern const t_rule	g_fi_token;
-** extern const t_rule	g_elif_token;
-** extern const t_rule	g_else_token;
+**
 ** extern const t_rule	g_while_token;
 ** extern const t_rule	g_until_token;
 ** extern const t_rule	g_do_token;
 ** extern const t_rule	g_done_token;
-**
 */
+
+extern const t_rule				g_if_token;
+extern const t_rule				g_then_token;
+extern const t_rule				g_fi_token;
+extern const t_rule				g_elif_token;
+extern const t_rule				g_else_token;
 
 extern const t_rule				g_bang_token;
 

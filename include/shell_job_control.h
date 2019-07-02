@@ -68,12 +68,6 @@ enum					e_job_state
 	JOB_SIGUSR2
 };
 
-
-/*
-** needs_wait field indicates if you have to wait for this segment to finish.
-** It exists to make pipelines inside subshells and subshells inside pipelines possible.
-*/
-
 typedef struct			s_segment
 {
 	int					status;
@@ -125,10 +119,33 @@ int						alterate_proc(t_job *job, t_proc *proc);
 /*
 ** Auxiliary
 */
+t_job					*choose_job(const char *criteria);
 void					handle_signaled(t_job *job, int status);
 char					*jc_state_str(enum e_job_state state);
-void jc_format_job(const t_job *job);
-int						forknrun(t_job *job, t_proc *process, char *path, bool is_async);
+void					jc_format_job(const t_job *job);
+int						forknrun(t_job *job, t_proc *process, char *path,
+	bool is_async);
 void					close_redundant_fds(t_context *context);
+
+/*
+** Subshells
+*/
+
+int						jc_lock_subshell_state(pid_t pgid);
+int						jc_unlock_subshell_state(pid_t pgid);
+int						jc_enable_subshell(void);
+int						jc_disable_subshell(void);
+int						jc_is_subshell(void);
+
+/*
+** Signals
+*/
+
+void					sigchild_unset_handler(void);
+void					sigchild_set_handler(void);
+void					unset_signal_handlers(void);
+const sigset_t			*sigchild_block(void);
+const sigset_t			*sigchild_unblock(void);
+bool					sigchild_is_blocked(void);
 
 #endif

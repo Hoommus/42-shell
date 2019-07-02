@@ -14,6 +14,7 @@
 
 static int		g_rdr_error;
 
+// TODO: fix that fifo
 static int		open_at_fd(int what_fd, const char *path, int oflag,
 	t_context *context)
 {

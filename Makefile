@@ -46,16 +46,17 @@ AST_SRC = ast_exec_main.c ast_exec_preprocess.c \
           nodes_memory.c nodes_manipulations.c \
           execution.c \
           exec_command.c exec_command_alterators.c exec_command_heredocs.c \
-          exec_subshell.c \
-          exec_pipeline.c exec_andor_if.c\
+          exec_subshell.c exec_brace_group.c \
+          exec_pipeline.c exec_andor_if.c \
           tree_auxillary.c \
           tree_simple_command.c tree_simple_command_rdrs.c tree_subshell.c \
-          tree_pipe_sequence.c tree_and_or.c tree_list.c
+          tree_pipe_sequence.c tree_and_or.c tree_list.c \
+          tree_brace_group.c
 
 BUILTIN_DIR = builtins/
 BUILTIN_SRC = cd.c where.c builtins.c hs_history.c tokenizer_test.c \
               syntax_test.c hs_set.c hs_setenv.c hs_unsetenv.c \
-              hs_export.c hs_jobs.c hs_fg.c
+              hs_export.c hs_jobs.c hs_fg.c hs_bg.c
 
 INTERFACE_DIR = line_editing/
 INTERFACE_SRC = buffer_drawing.c buffer_input.c  \
@@ -70,9 +71,10 @@ INTERFACE_SRC = buffer_drawing.c buffer_input.c  \
                 auxiliary_buffer.c auxiliary_le.c
 
 JOB_CONTROL_DIR = job_control/
-JOB_CONTROL_SRC = signals_basic.c \
+JOB_CONTROL_SRC = signals_basic.c signals_children.c signals_child_blocker.c \
                   context_manipulations.c context_switch.c \
-                  jc_headquaters.c  \
+                  jc_subshell_env.c \
+                  jc_headquaters.c jc_state_updates.c \
                   jc_queue_execution.c jc_queue_forknrun.c jc_queue_interface.c \
                   pipeline.c jc_job_launcher.c jc_auxiliary.c
 

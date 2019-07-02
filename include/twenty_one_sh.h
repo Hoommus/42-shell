@@ -135,7 +135,7 @@ struct					s_fd_lst
 ** TODO: Add info about shell config
 */
 
-typedef struct
+typedef struct			s_context
 {
 	t_env_vector		*environ;
 	struct termios		*term_config;

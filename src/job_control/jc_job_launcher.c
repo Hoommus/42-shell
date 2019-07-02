@@ -3,8 +3,6 @@
 #include "shell_job_control.h"
 #include "shell_builtins.h"
 
-extern bool				g_is_subshell_env;
-
 void					jc_job_dealloc(t_job **job)
 {
 	process_list_destroy(&(*job)->procs);
@@ -115,11 +113,12 @@ static int				run_regular(t_job *job, const t_proc *process, bool is_async)
 int						execute_segments(t_job *job, bool is_async)
 {
 	const t_proc	*list = job->procs;
-	struct termios			termios;
-	int						s;
+	struct termios	termios;
+	int				s;
 
+	s = -1024;
 	if ((list && list->next) || is_async)
-		g_is_subshell_env = true;
+		jc_enable_subshell();
 	while (list)
 	{
 		if ((s = run_builtin((t_proc *)list, is_async)) != -512 && !list->next)
@@ -131,56 +130,82 @@ int						execute_segments(t_job *job, bool is_async)
 		close_redundant_fds(list->context);
 		list = list->next;
 	}
-	g_is_subshell_env = false;
+	jc_disable_subshell();
+	if (jc_is_subshell() || !is_async)
+		return (jc_wait(job));
 	return (-1024);
 }
 
 int					jc_wait(t_job *job)
 {
-	t_proc				*procs;
-	int					status;
-	sigset_t			mask;
+	t_proc		*procs;
+	int			status;
+	bool		was_blocked;
 
-	sigemptyset(&mask);
-	sigaddset(&mask, SIGCHLD);
-	sigprocmask(SIG_SETMASK, &mask, 0);
+	if (!(was_blocked = sigchild_is_blocked()))
+		sigchild_block();
 	poll_pipeline(job, false);
 	procs = job->procs;
 	while (procs->next)
 		procs = procs->next;
-	status = WEXITSTATUS(procs->status);
-	sigemptyset(&mask);
-	sigprocmask(SIG_SETMASK, &mask, 0);
+	alterate_proc(job, procs);
+	status = procs->status;
+	if (!was_blocked)
+		sigchild_unblock();
 	return (status);
+}
+
+int					jc_resolve_status(t_job *job)
+{
+	t_proc		*proc;
+
+	proc = job->procs;
+	while (proc->next)
+		proc = proc->next;
+	if (proc->pid != 0 && proc->status != 0 && WIFSIGNALED(proc->status))
+	{
+		job->state = WTERMSIG(proc->status) + 30;
+		ft_dprintf(2, "%s %s\n", jc_state_str(job->state), job->command);
+		return (WTERMSIG(proc->status));
+	}
+	else if (proc->pid != 0 && proc->status != 0 && WIFSTOPPED(proc->status))
+	{
+		job->state = WSTOPSIG(proc->status) > 0
+					 ? WSTOPSIG(proc->status) + 30 : JOB_STOPPED;
+		return (WSTOPSIG(proc->status));
+	}
+	else if (proc->pid != 0 && proc->status != 0 && WIFEXITED(proc->status))
+	{
+		job->state = JOB_TERMINATED;
+		return (WEXITSTATUS(proc->status));
+	}
+	return (0);
 }
 
 int					jc_launch(t_job *job, bool is_async)
 {
 	int				status;
 
-	g_term->input_state = STATE_JOB_IN_FG;
 	if (job->procs && job->procs->command)
 		job->command = ft_strarr_join(" ", job->procs->command->args);
-	execute_segments(job, is_async);
-	status = 0;
-	if (g_is_subshell_env || !is_async)
-		status = jc_wait(job);
+	status = execute_segments(job, is_async);
 	if (!is_async)
 	{
-		signal(SIGTTOU, SIG_IGN);
 		tcsetpgrp(0, g_term->shell_pgid);
-		signal(SIGTTOU, SIG_DFL);
+		jc_resolve_status(job);
 	}
 	tcsetattr(0, TCSADRAIN, g_term->shell_term);
-	if (!g_is_subshell_env && (is_async || status == -1))
+	if (!jc_is_subshell() && (is_async || status == -1024))
 	{
 		job->state = JOB_LAUNCHED;
 		jc_register_job(job);
 		job->state = JOB_RUNNING;
 	}
+	else if (job->state == JOB_SIGTSTP || job->state == JOB_SIGSTOP ||
+			job->state == JOB_SIGTTIN || job->state == JOB_SIGTTOU)
+		jc_register_job(job);
 	else
 		jc_job_dealloc(&(job));
-	g_term->input_state = g_term->fallback_input_state;
 	return (status);
 }
 
@@ -191,6 +216,11 @@ int					jc_tmp_finalize(bool is_async)
 
 	job = jc_get()->tmp_job;
 	jc_get()->tmp_job = NULL;
+	if (job == NULL)
+	{
+		ft_dprintf(2, SH "%d: Tried to launch a job, but it turned out to be NULL\n", getpid());
+		abort();
+	}
 	status = jc_launch(job, is_async);
 	if (!is_async)
 		status = WEXITSTATUS(status);

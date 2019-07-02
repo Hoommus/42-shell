@@ -24,62 +24,70 @@ t_job		*search_string(const char *str, bool anywhere)
 	return (NULL);
 }
 
-void		jc_to_fg(t_job *job)
+int			jc_to_fg(t_job *job)
 {
 	t_proc	*segments;
+	int		status;
 
 	job->state = JOB_CONTINUED;
 	jc_format_job(job);
+	job->state = JOB_RUNNING;
 	segments = job->procs;
+	TERM_APPLY_CONFIG(segments->context->term_config);
+	tcsetpgrp(0, job->pgid);
 	while (segments)
 	{
 		if (segments->is_stopped && !segments->is_completed)
 		{
-			TERM_APPLY_CONFIG(segments->context->term_config);
 			kill(segments->pid, SIGCONT);
 			segments->is_stopped = false;
 			job->notified = false;
 		}
 		segments = segments->next;
 	}
-	job->state = JOB_RUNNING;
-	tcsetpgrp(0, job->pgid);
-	jc_wait(job);
-	signal(SIGTTOU, SIG_IGN);
+	status = jc_wait(job);
 	tcsetpgrp(0, g_term->shell_pgid);
 	TERM_APPLY_CONFIG(g_term->context_current->term_config);
-	signal(SIGTTOU, SIG_DFL);
+	return (status);
+}
+
+t_job		*choose_job(const char *criteria)
+{
+	t_job		*list;
+
+	list = jc_get()->active_jobs;
+	if (criteria[1] == 0 && (criteria[0] == '%' || criteria[0] == '+'))
+	{
+		while (list && list->next)
+			list = list->next;
+		return (list);
+	}
+	else if (criteria[1] == 0 && (criteria[0] == '-'))
+	{
+		while (list && list->next && list->next->next)
+			list = list->next;
+		return (list);
+	}
+	else if (is_string_numeric(criteria, 10))
+		return (search_job_id(ft_atoi(criteria)));
+	return (search_string(criteria + (criteria[0] == '?'), criteria[0] == '?'));
 }
 
 int			hs_fg(const char **args)
 {
-	t_job		*list;
 	t_job		*job;
 	const char	*arg;
 
-	list = jc_get()->active_jobs;
+	if (jc_is_subshell())
+		return (1);
 	if (!args || !args[0] || args[0][0] != '%' || (args[0] && args[1]))
 		return ((ft_dprintf(2, "fg: invalid argument(s): "
 			"you must specify a job via single parameter starting with `%%'\n") & 0) | 1);
+	if (jc_get()->active_jobs == NULL)
+		return ((ft_dprintf(2, "fg: no active jobs\n") & 0) | 1);
 	arg = args[0] + 1;
-	if (arg[1] == 0 && (arg[0] == '%' || arg[0] == '+'))
-	{
-		while (list && list->next)
-			list = list->next;
-		job = list;
-	}
-	else if (arg[1] == 0 && (arg[0] == '-'))
-	{
-		while (list && list->next && list->next->next)
-			list = list->next;
-		job = list;
-	}
-	else if (is_string_numeric(arg, 10))
-		job = search_job_id(ft_atoi(arg));
-	else
-		job = search_string(arg + (arg[0] == '?'), arg[0] == '?');
+	job = choose_job(arg);
 	if (job == NULL)
-		return ((ft_dprintf(2, "fg: no jobs matching criteria: `%s'\n", arg - 1) & 0) | 1);
-	jc_to_fg(job);
-	return (0);
+		return ((ft_dprintf(2, "fg: no jobs matching criteria: `%%%s'\n", arg) & 0) | 1);
+	return (jc_to_fg(job));
 }

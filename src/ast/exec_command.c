@@ -110,16 +110,16 @@ static void	expand_everything(const struct s_command *command)
 ** when the last process in the pipeline is passed for execution.
 **
 ** TODO: optimise (how?..) execution if no variables and fds changes are made
-** TODO: Make copy-on-write-style environ arrays in contexts
 */
 
 int exec_command(const t_node *command_node, t_context *new_context, bool is_async)
 {
-	extern bool				g_is_subshell_env;
 	const struct s_command	*command = command_node->command;
 	t_context				*context;
 	int						status;
 
+	if (command_node->node_type != NODE_COMMAND || command == NULL)
+		exit(ft_dprintf(2, SH ": fatal: cmd node is not actually a command\n"));
 	context = new_context ? new_context
 		: context_duplicate(g_term->context_original, XDUP_TERM);
 	expand_everything(command);
@@ -133,8 +133,8 @@ int exec_command(const t_node *command_node, t_context *new_context, bool is_asy
 	if (!g_interrupt && command->args != NULL && command->args[0] != NULL)
 	{
 		jc_tmp_add(process_create((t_command *) command, context));
-		is_async = g_is_subshell_env ? false : is_async;
-		if (new_context == NULL || g_is_subshell_env)
+		is_async = jc_is_subshell() ? false : is_async;
+		if (new_context == NULL)
 			status = jc_tmp_finalize(is_async);
 	}
 	return (status);

@@ -31,14 +31,14 @@ static char		*extract_special(const char *str, u_int32_t *off)
 
 static char		*extract_var(const char *str, u_int32_t *off)
 {
+	const char	spec = *(str + *off + 1);
 	char		tmp[1024];
 	t_var		*var;
 	char		*swap;
 	int			i;
 
 	ft_bzero(tmp, sizeof(char) * 1024);
-	if (*(str + *off + 1) == '$' || *(str + *off + 1) == '?' ||
-		*(str + *off + 1) == '!' || *(str + *off + 1) == '0')
+	if (spec == '$' || spec == '?' || spec == '!' || spec == '0' || spec == '{')
 		return (extract_special(str, off));
 	i = *off + 1;
 	while (str[i] && (ft_isalnum(str[i]) || str[i] == '_'))
