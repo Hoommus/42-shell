@@ -6,55 +6,90 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/19 16:39:00 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/18 14:55:55 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/27 16:54:53 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "twenty_one_sh.h"
 #include "shell_job_control.h"
 
-bool				g_is_subshell_env;
+#define NINT noreturn int
 
-int exec_subshell(const t_node *node, t_context *new_context, bool is_async)
+static NINT	exec_subshell_async(const t_node *body, t_context *new_context)
 {
-	t_context	*context;
-	int			status;
-	t_job_alt	*job;
-	int			f;
+	int		status;
+	pid_t	pgid;
 
-	if (!new_context)
-		context = context_duplicate(g_term->context_original, true);
-	else
-		context = new_context;
+	setpgid((pgid = getpid()), getpid());
+	g_term->shell_pgid = pgid;
+	sigprocmask(SIG_SETMASK, &((sigset_t){0}), NULL);
+	unset_signal_handlers();
+	close(g_term->history_file);
+	tcsetpgrp(0, getpgid(getpid()));
+	context_switch(new_context);
+	close_redundant_fds(new_context);
+	status = exec_node(body, NULL, false);
+	exit(status);
+}
+
+static int	exec_subshell_regular(const t_node *body, t_context *new_context)
+{
+	int		status;
+	bool	did_lock;
+
+	jc_enable_subshell();
+	did_lock = jc_lock_subshell_state(getpgid(getpid()));
+	context_switch(new_context);
+	status = exec_node(body, NULL, false);
+	context_switch(jc_get()->shell_context);
+	if (did_lock)
+		jc_unlock_subshell_state(getpgid(getpid()));
+	jc_disable_subshell();
+	return (status);
+}
+
+int			exec_subshell(const t_node *node, t_context *new_context, bool is_async)
+{
+	t_context		*context;
+	int				status;
+	t_job			*job;
+	int				f;
+	const t_node	*body = node->left;
+
+	status = 0;
+	context = new_context ? new_context
+			: context_duplicate(g_term->context_original, XDUP_TERM);
 	f = -2;
-	if (is_async || node->left->node_type != NODE_COMMAND)
-	{
-		job = ft_memalloc(sizeof(t_job_alt));
-		job->state = JOB_BG;
+	job = ft_memalloc(sizeof(t_job));
+	jc_enable_subshell();
+	jc_lock_subshell_state(g_term->shell_pgid);
+	if (is_async || !(body->node_type == NODE_SEPARATOR && body->right &&
+				body->right->node_type == NODE_COMMAND && body->left == NULL))
 		f = fork();
-	}
-	g_is_subshell_env = true;
-	if (f == -2 || f == 0)
-	{
-		if (f == 0)
-			setpgid(getpid(), getpid());
-		context_switch(context);
-		status = exec_node((t_node *) node->left, NULL, false);
-		if (!new_context)
-			context_deep_free(&context);
-		context_switch(jc_get()->shell_context);
-		if (f == 0)
-			exit(status);
-		g_is_subshell_env = false;
-		return (0);
-	}
+	if (f == 0)
+		exec_subshell_async(body, context);
 	else if (f == -1)
+		status = (ft_dprintf(2, SH ": fork error in async subshell\n") & 0) | 1;
+	else if (f == -2)
 	{
+		status = exec_subshell_regular(body, context);
 		jc_job_dealloc(&job);
-		return ((ft_dprintf(2, SH ": fork error in async subshell\n") & 0) | 1);
 	}
-	g_is_subshell_env = false;
-	setpgid((job->pgid = f), f);
-	jc_register_job(job);
-	return (0);
+	else if (f > 0)
+	{
+		setpgid((job->pgid = f), f);
+		sigchild_block();
+		job->procs = process_create(NULL, context);
+		job->procs->pid = f;
+		job->command = ft_strdup("(subshell)");
+		if (is_async)
+			jc_register_job(job);
+		tcsetpgrp(0, job->pgid);
+		status = is_async ? 0 : jc_wait(job);
+		tcsetpgrp(0, g_term->shell_pgid);
+		sigchild_unblock();
+	}
+	jc_unlock_subshell_state(g_term->shell_pgid);
+	jc_disable_subshell();
+	return (status);
 }

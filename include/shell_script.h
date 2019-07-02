@@ -97,6 +97,7 @@ enum						e_node_type
 {
 	NODE_PIPE,
 	NODE_SUBSHELL,
+	NODE_BRACE_GROUP,
 	NODE_SEPARATOR,
 	NODE_AMPERSAND,
 	NODE_OR_IF,
@@ -158,12 +159,14 @@ typedef struct				s_command
 	char		**args;
 	char		**assignments;
 	t_io_rdr	*io_redirects;
+	char		*cmd_str;
 }							t_command;
 
 union						u_executor
 {
 	int		(*exec)(const t_node *node, bool is_async);
-	int		(*exec_with_context)(const t_node *node, t_context *context, bool is_async);
+	int		(*exec_with_context)(const t_node *node, t_context *context,
+		bool is_async);
 };
 
 struct						s_executor
@@ -207,15 +210,29 @@ void						run_heredocs(t_node *node);
 */
 
 void						run_script(t_token *list_head, bool log_recursion);
-int exec_command(const t_node *command_node, t_context *new_context, bool is_async);
-int exec_subshell(const t_node *node, t_context *new_context, bool is_async);
-int							exec_semicolon_iterative(t_node *parent);
-int exec_semicolon_recursive(const t_node *parent, bool is_async);
-int exec_and_if(const t_node *parent, bool is_async);
-int exec_or_if(const t_node *parent, bool is_async);
-int exec_node(const t_node *node, t_context *context, bool is_async);
 int							exec_abort(int dummy);
-int exec_pipeline(const t_node *node, bool is_async);
+
+int							exec_or_if(const t_node *node, bool is_async);
+
+int							exec_and_if(const t_node *node, bool is_async);
+
+int							exec_pipeline(const t_node *node, bool is_async);
+
+int							exec_node(const t_node *node,
+	t_context *context, bool is_async);
+
+int							exec_command(const t_node *command_node,
+	t_context *new_context, bool is_async);
+
+int							exec_subshell(const t_node *node,
+	t_context *new_context, bool is_async);
+
+int							exec_brace_group(const t_node *node,
+	t_context *new_context, bool is_async);
+
+int							exec_semicolon_iterative(t_node *parent);
+int							exec_semicolon_recursive(const t_node *parent,
+	bool is_async);
 
 /*
 ** File reading and executing

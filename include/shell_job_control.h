@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/08 12:40:49 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/20 16:19:58 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/27 18:43:28 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,22 +27,46 @@
 
 enum					e_job_state
 {
-	JOB_FG = 0,
+	JOB_RUNNING = 0,
 	JOB_BG,
-	JOB_PIPE,
 	JOB_STOPPED,
-	JOB_SIGTTXX,
-	JOB_SIGTTOU,
+	JOB_LAUNCHED,
 	JOB_EXITED,
-	JOB_TERMINATED
+	JOB_TERMINATED = 6,
+	JOB_CONTINUED,
+
+	JOB_SIGHUP = 31,
+	JOB_SIGINT,
+	JOB_SIGQUIT,
+	JOB_SIGILL,
+	JOB_SIGTRAP,
+	JOB_SIGABRT,
+	JOB_SIGEMT,
+	JOB_SIGFPE,
+	JOB_SIGKILL,
+	JOB_SIGBUS,
+	JOB_SIGSEGV,
+	JOB_SIGSYS,
+	JOB_SIGPIPE,
+	JOB_SIGALRM,
+	JOB_SIGTERM,
+	JOB_SIGURG,
+	JOB_SIGSTOP,
+	JOB_SIGTSTP,
+	JOB_SIGCONT,
+	JOB_SIGCHLD,
+	JOB_SIGTTIN,
+	JOB_SIGTTOU,
+	JOB_SIGIO,
+	JOB_SIGXCPU,
+	JOB_SIGXFSZ,
+	JOB_SIGVTALRM,
+	JOB_SIGPROF,
+	JOB_SIGWINCH,
+	JOB_SIGINFO,
+	JOB_SIGUSR1,
+	JOB_SIGUSR2
 };
-
-extern const char		*g_state_names[];
-
-/*
-** needs_wait field indicates if you have to wait for this segment to finish.
-** It exists to make pipelines inside subshells and subshells inside pipelines possible.
-*/
 
 typedef struct			s_segment
 {
@@ -53,56 +77,75 @@ typedef struct			s_segment
 	t_context			*context;
 	struct s_command	*command;
 	struct s_segment	*next;
-}						t_pipe_segment;
+}						t_proc;
 
 typedef struct			s_job_alt
 {
 	char				*command;
-	t_pipe_segment		*pipeline;
+	t_proc				*procs;
 	pid_t				pgid;
 	bool				notified;
 	int					id;
 	enum e_job_state	state;
 	struct s_job_alt	*next;
-}						t_job_alt;
-
-typedef struct			s_process
-{
-	pid_t				pid;
-	int					wexitstatus;
-	struct s_command	*command;
-	struct s_process	*next;
-}						t_process;
+}						t_job;
 
 struct					s_job_control
 {
 	t_context		*shell_context;
 	pid_t			shell_pid;
-	t_job_alt		*active_jobs;
-	t_job_alt		*tmp_job;
+	t_job			*active_jobs;
+	t_job			*tmp_job;
 };
 
 void					jc_init(t_context *context);
 struct s_job_control	*jc_get(void);
-void					jc_register_job(t_job_alt *job);
-void					jc_unregister_job(pid_t id);
+void					jc_register_job(t_job *job);
+void					jc_unregister_job(pid_t pgid);
+int						jc_wait(t_job *job);
+t_proc					*process_create(t_command *command, t_context *context);
+t_proc					*process_list_add(t_proc **pipeline, t_proc *segment);
+void					process_list_destroy(t_proc **pipeline);
 
-t_pipe_segment			*pipe_segment_new(t_command *command, t_context *context, bool is_subshell);
-t_pipe_segment			*pipeline_add_segment(t_pipe_segment **pipeline, t_pipe_segment *segment);
-void					pipeline_destroy(t_pipe_segment **pipeline);
-int						pipeline_execute(t_pipe_segment *pipeline);
-int						pipeline_execute_segment(t_pipe_segment *segment);
+int						jc_launch(t_job *job, bool is_async);
 
-int						launch_job(t_job_alt *job, bool is_async);
-
-t_job_alt				*jc_tmp_add(t_pipe_segment *segment);
+t_job					*jc_tmp_add(t_proc *segment);
 int						jc_tmp_finalize(bool is_async);
-void					jc_job_dealloc(t_job_alt **job);
+void					jc_job_dealloc(t_job **job);
+
+enum e_job_state		poll_pipeline(t_job *job, bool wnohang);
+int						alterate_proc(t_job *job, t_proc *proc);
+
 /*
 ** Auxiliary
 */
-
-int						forknrun(t_job_alt *job, t_pipe_segment *process, char *path, bool is_async);
+t_job					*choose_job(const char *criteria);
+void					handle_signaled(t_job *job, int status);
+char					*jc_state_str(enum e_job_state state);
+void					jc_format_job(const t_job *job);
+int						forknrun(t_job *job, t_proc *process, char *path,
+	bool is_async);
 void					close_redundant_fds(t_context *context);
+
+/*
+** Subshells
+*/
+
+int						jc_lock_subshell_state(pid_t pgid);
+int						jc_unlock_subshell_state(pid_t pgid);
+int						jc_enable_subshell(void);
+int						jc_disable_subshell(void);
+int						jc_is_subshell(void);
+
+/*
+** Signals
+*/
+
+void					sigchild_unset_handler(void);
+void					sigchild_set_handler(void);
+void					unset_signal_handlers(void);
+const sigset_t			*sigchild_block(void);
+const sigset_t			*sigchild_unblock(void);
+bool					sigchild_is_blocked(void);
 
 #endif

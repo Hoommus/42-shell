@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/10 12:09:35 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/18 16:53:39 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/21 21:36:42 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,21 +103,24 @@ static void		duplicate_fds(t_context *new, const t_context *context,
 	list = context->fd_list;
 	while (list)
 	{
-		tmp = ft_memalloc(sizeof(struct s_fd_lst));
-		if (list->label)
-			tmp->label = ft_strdup("cloned");
-		tmp->original = list->original;
-		tmp->current = with_dup ? dup(list->current) : list->current;
-		//fcntl(tmp->current, F_SETFL, O_CLOEXEC);
-		if (!new->fd_list && !new_list)
+		if (list->current >= 0)
 		{
-			new->fd_list = tmp;
-			new_list = tmp;
-		}
-		else
-		{
-			new_list->next = tmp;
-			new_list = new_list->next;
+			tmp = ft_memalloc(sizeof(struct s_fd_lst));
+			if (list->label)
+				tmp->label = ft_strdup("cloned");
+			tmp->original = list->original;
+			tmp->current = with_dup ? dup(list->current) : list->current;
+			fcntl(tmp->current, F_SETFL, O_CLOEXEC);
+			if (!new->fd_list)
+			{
+				new->fd_list = tmp;
+				new_list = tmp;
+			}
+			else
+			{
+				new_list->next = tmp;
+				new_list = new_list->next;
+			}
 		}
 		list = list->next;
 	}
@@ -131,7 +134,7 @@ static void		duplicate_fds(t_context *new, const t_context *context,
 ** and the same pointer to environ (to modify shell environment without hassle).
 */
 
-t_context		*context_duplicate(const t_context *context, bool with_dup)
+t_context		*context_duplicate(const t_context *context, int dup_what)
 {
 	t_context			*new;
 
@@ -140,10 +143,11 @@ t_context		*context_duplicate(const t_context *context, bool with_dup)
 	if (context->term_config != NULL)
 		ft_memcpy(new->term_config, context->term_config,
 			sizeof(struct termios));
-	if (with_dup)
+	if (dup_what | XDUP_ENV)
 		duplicate_environ(new, context);
 	else
-		new->environ = context->environ;
-	duplicate_fds(new, context, with_dup);
+		new->environ = environ_create_vector(4);
+	if (dup_what | XDUP_FDS)
+		duplicate_fds(new, context, dup_what);
 	return (new);
 }

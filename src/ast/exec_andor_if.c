@@ -17,17 +17,17 @@
 ** TODO: Fix global return status to match zsh's
 */
 
-int		exec_and_if(const t_node *parent, bool is_async)
+int		exec_and_if(const t_node *node, bool is_async)
 {
 	int			status_left;
 	int			status_right;
-	t_job_alt	*job;
+	t_job	*job;
 	int			f;
 
 	f = -2;
 	if (is_async)
 	{
-		job = ft_memalloc(sizeof(t_job_alt));
+		job = ft_memalloc(sizeof(t_job));
 		job->state = JOB_BG;
 		f = fork();
 	}
@@ -36,9 +36,9 @@ int		exec_and_if(const t_node *parent, bool is_async)
 		if (f == 0)
 			setpgid(getpid(), getpid());
 		status_right = 1;
-		status_left = exec_node(parent->left, NULL, false);
+		status_left = exec_node(node->left, NULL, false);
 		if (status_left == 0)
-			status_right = exec_node(parent->right, NULL, false);
+			status_right = exec_node(node->right, NULL, false);
 		if (f == 0)
 			exit(status_right);
 		return ((status_right));
@@ -53,17 +53,17 @@ int		exec_and_if(const t_node *parent, bool is_async)
 	return (0);
 }
 
-int		exec_or_if(const t_node *parent, bool is_async)
+int		exec_or_if(const t_node *node, bool is_async)
 {
 	int			status_left;
 	int			status_right;
-	t_job_alt	*job;
+	t_job	*job;
 	int			f;
 
 	f = -2;
 	if (is_async)
 	{
-		job = ft_memalloc(sizeof(t_job_alt));
+		job = ft_memalloc(sizeof(t_job));
 		job->state = JOB_BG;
 		f = fork();
 	}
@@ -72,9 +72,9 @@ int		exec_or_if(const t_node *parent, bool is_async)
 		if (f == 0)
 			setpgid(getpid(), getpid());
 		status_right = 0;
-		status_left = exec_node(parent->left, NULL, false);
+		status_left = exec_node(node->left, NULL, false);
 		if (status_left != 0)
-			status_right = exec_node(parent->right, NULL, false);
+			status_right = exec_node(node->right, NULL, false);
 		if (f == 0)
 			exit(status_right);
 		return ((status_right));

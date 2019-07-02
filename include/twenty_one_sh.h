@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/18 15:30:09 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/25 12:06:36 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,9 @@
 # include <termcap.h>
 # include <limits.h>
 # include <sys/termios.h>
+
+# include <stdbool.h>
+# include <stdnoreturn.h>
 
 # include "libft.h"
 # include "ft_printf.h"
@@ -116,11 +119,11 @@ struct					s_fd_lst
 	struct s_fd_lst		*next;
 };
 
-# define CNTXT_DUP_NOTHING 0b0000
-# define CNTXT_DUP_FDS     0b0001
-# define CNTXT_DUP_ENV     0b0010
-# define CNTXT_DUP_TERM    0b0100
-# define CNTXT_DUP_ALL     0b0111
+# define XDUP_NOTHING 0b0000
+# define XDUP_FDS     0b0001
+# define XDUP_ENV     0b0010
+# define XDUP_TERM    0b0100
+# define XDUP_ALL     0b0111
 
 /*
 ** So context is an entity that controls used environment variables,
@@ -132,7 +135,7 @@ struct					s_fd_lst
 ** TODO: Add info about shell config
 */
 
-typedef struct
+typedef struct			s_context
 {
 	t_env_vector		*environ;
 	struct termios		*term_config;
@@ -186,10 +189,10 @@ struct					s_term
 
 	short				flags;
 
+	struct termios		*shell_term;
 	pid_t				shell_pgid;
 
 	int					last_status;
-	pid_t				running_process;
 
 	t_context			*context_original;
 	t_context			*context_current;
@@ -226,7 +229,7 @@ int						unset_env_v(t_env_vector *vector, const char *key);
 void					context_switch(t_context *to_which);
 void					context_deep_free(t_context **context);
 t_context				*context_duplicate(const t_context *context,
-	bool with_dup);
+											int dup_what);
 void					context_add_fd(t_context *context, const int original,
 	const int actual, const char *label);
 void					context_remove_fd(t_context *context, const int fd);
@@ -240,13 +243,16 @@ bool					context_is_fd_present(const t_context *context,
 */
 
 char					*read_arbitrary(void);
-void					setup_signal_handlers(void);
 void					display_prompt(enum e_input_state state);
 int						display_normal_prompt(void);
+
+void					setup_signal_handlers(void);
+void					reset_signal_handlers(void);
 
 /*
 ** Auxilia (auxilia.c)
 */
+void					jc_check_n_notify(bool notify_all);
 u_int64_t				hash_sdbm(const char *str);
 ssize_t					ponies_teleported(void);
 int						read_fd(const int fd, char **result);

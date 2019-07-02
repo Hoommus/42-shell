@@ -1,44 +1,27 @@
 
+#include <errno.h>
 #include "shell_job_control.h"
 #include "shell_builtins.h"
 
-void				jc_job_dealloc(t_job_alt **job)
+void					jc_job_dealloc(t_job **job)
 {
-	pipeline_destroy(&(*job)->pipeline);
+	process_list_destroy(&(*job)->procs);
+	free((*job)->command);
 	free(*job);
 	*job = NULL;
 }
 
-t_job_alt			*jc_tmp_add(t_pipe_segment *segment)
+t_job					*jc_tmp_add(t_proc *segment)
 {
 	struct s_job_control	*jc = jc_get();
 
 	if (jc->tmp_job == NULL)
-		jc->tmp_job = ft_memalloc(sizeof(t_job_alt));
-	pipeline_add_segment(&jc->tmp_job->pipeline, segment);
+		jc->tmp_job = ft_memalloc(sizeof(t_job));
+	process_list_add(&jc->tmp_job->procs, segment);
 	return (jc->tmp_job);
 }
 
-
-void					close_redundant_fds(t_context *context)
-{
-	struct s_fd_lst		*list;
-
-	if (context == NULL)
-		return ;
-	list = context->fd_list;
-	while (list)
-	{
-		if (ft_strcmp(list->label, "rdr_duped_1337"))
-		{
-			if (list->current > 2)
-				close(list->current);
-		}
-		list = list->next;
-	}
-}
-
-static char				*path_to_target(t_pipe_segment *segment)
+static char				*path_to_target(t_proc *segment)
 {
 	const char	**args = (const char **)segment->command->args;
 	t_var		*var;
@@ -66,7 +49,7 @@ static char				*path_to_target(t_pipe_segment *segment)
 	return (swap);
 }
 
-static int				forknrun_builtin(t_pipe_segment *segment, int (*bltin)(const char **))
+static int				forknrun_builtin(t_proc *segment, int (*bltin)(const char **))
 {
 	int						status;
 
@@ -82,7 +65,7 @@ static int				forknrun_builtin(t_pipe_segment *segment, int (*bltin)(const char 
 	return (0);
 }
 
-static int				run_builtin(t_pipe_segment *segment, bool is_async)
+static int				run_builtin(t_proc *segment, bool is_async)
 {
 	extern struct s_builtin	g_builtins[];
 	const char				*bltin = segment->command->args ? segment->command->args[0] : NULL;
@@ -97,7 +80,7 @@ static int				run_builtin(t_pipe_segment *segment, bool is_async)
 				context_switch(segment->context);
 				segment->status = g_builtins[i].
 					function((const char **)segment->command->args + 1);
-				context_switch(NULL);
+				context_switch(jc_get()->shell_context);
 				return (segment->status);
 			}
 			else
@@ -106,90 +89,140 @@ static int				run_builtin(t_pipe_segment *segment, bool is_async)
 	return (-512);
 }
 
-#define DIRTY_HACK(err) (ft_dprintf(2, err, process->command->args[0]), -1024)
-
-static int				run_regular(t_job_alt *job, const t_pipe_segment *process, bool is_async)
+static int				run_regular(t_job *job, const t_proc *process, bool is_async)
 {
 	int				status;
 	char			*bin;
 
 	status = -256;
-	if ((bin = path_to_target((t_pipe_segment *)process)) != NULL
+	if ((bin = path_to_target((t_proc *)process)) != NULL
 		&& access(bin, F_OK) == -1 && ft_strchr(bin, '/') != NULL)
-		(DIRTY_HACK(ERR_NO_SUCH_FILE));
+		ft_dprintf(2, ERR_NO_SUCH_FILE, process->command->args[0]);
 	else if (bin != NULL && is_dir(bin))
-		(DIRTY_HACK(ERR_IS_A_DIRECTORY));
+		ft_dprintf(2, ERR_IS_A_DIRECTORY, process->command->args[0]);
 	else if (bin != NULL && access(bin, X_OK) == -1)
-		(DIRTY_HACK(ERR_PERMISSION_DENIED));
+		ft_dprintf(2, ERR_PERMISSION_DENIED, process->command->args[0]);
 	else if (bin == NULL)
-		(DIRTY_HACK(ERR_COMMAND_NOT_FOUND));
+		ft_dprintf(2, ERR_COMMAND_NOT_FOUND, process->command->args[0]);
 	else if (!g_interrupt)
-		status = forknrun(job, (t_pipe_segment *) process, bin, is_async);
+		status = forknrun(job, (t_proc *) process, bin, is_async);
 	ft_memdel((void **)&bin);
 	return (status);
 }
 
-int						_jc_execute_pipeline_queue(t_job_alt *job, bool is_async)
+int						execute_segments(t_job *job, bool is_async)
 {
-	extern bool				g_is_subshell_env;
-	const t_pipe_segment	*list = job->pipeline;
-	int						s;
+	const t_proc	*list = job->procs;
+	struct termios	termios;
+	int				s;
 
+	s = -1024;
 	if ((list && list->next) || is_async)
-		g_is_subshell_env = true;
+		jc_enable_subshell();
 	while (list)
 	{
-		if ((s = run_builtin((t_pipe_segment *)list, is_async)) != -512 && !list->next)
+		if ((s = run_builtin((t_proc *)list, is_async)) != -512 && !list->next)
 			return (s);
 		else if (s == -512)
-		{
-			if ((s = run_regular(job, list, is_async)) != -256)
-				return (s);
-		}
+			run_regular(job, list, is_async);
+		tcgetattr(0, &termios);
+		*list->context->term_config = termios;
 		close_redundant_fds(list->context);
 		list = list->next;
 	}
-	g_is_subshell_env = false;
+	jc_disable_subshell();
+	if (jc_is_subshell() || !is_async)
+		return (jc_wait(job));
 	return (-1024);
 }
 
-int					launch_job(t_job_alt *job, bool is_async)
+int					jc_wait(t_job *job)
 {
-	const t_job_alt	*list = jc_get()->active_jobs;
-	int				status;
-	int				i;
+	t_proc		*procs;
+	int			status;
+	bool		was_blocked;
 
-	i = 1;
-	if (is_async && !list)
+	if (!(was_blocked = sigchild_is_blocked()))
+		sigchild_block();
+	poll_pipeline(job, false);
+	procs = job->procs;
+	while (procs->next)
+		procs = procs->next;
+	alterate_proc(job, procs);
+	status = procs->status;
+	if (!was_blocked)
+		sigchild_unblock();
+	return (status);
+}
+
+int					jc_resolve_status(t_job *job)
+{
+	t_proc		*proc;
+
+	proc = job->procs;
+	while (proc->next)
+		proc = proc->next;
+	if (proc->pid != 0 && proc->status != 0 && WIFSIGNALED(proc->status))
 	{
-		ft_printf("Adding first job, its segment is %s\n", job->pipeline->command->args[0]);
-		jc_get()->active_jobs = job;
+		job->state = WTERMSIG(proc->status) + 30;
+		ft_dprintf(2, "%s %s\n", jc_state_str(job->state), job->command);
+		return (WTERMSIG(proc->status));
 	}
-	else if (is_async)
+	else if (proc->pid != 0 && proc->status != 0 && WIFSTOPPED(proc->status))
 	{
-		ft_printf("Adding job, first segment is %s\n", job->pipeline->command->args[0]);
-		while (list->next && ++i)
-			list = list->next;
-		((t_job_alt *)list)->next = job;
+		job->state = WSTOPSIG(proc->status) > 0
+					 ? WSTOPSIG(proc->status) + 30 : JOB_STOPPED;
+		return (WSTOPSIG(proc->status));
 	}
-	job->id = i;
-	status = _jc_execute_pipeline_queue(job, is_async);
-	if (is_async)
-		ft_dprintf(2, "+[n] %d\n", job->pgid);
+	else if (proc->pid != 0 && proc->status != 0 && WIFEXITED(proc->status))
+	{
+		job->state = JOB_TERMINATED;
+		return (WEXITSTATUS(proc->status));
+	}
+	return (0);
+}
+
+int					jc_launch(t_job *job, bool is_async)
+{
+	int				status;
+
+	if (job->procs && job->procs->command)
+		job->command = ft_strarr_join(" ", job->procs->command->args);
+	status = execute_segments(job, is_async);
 	if (!is_async)
+	{
+		tcsetpgrp(0, g_term->shell_pgid);
+		jc_resolve_status(job);
+	}
+	tcsetattr(0, TCSADRAIN, g_term->shell_term);
+	if (!jc_is_subshell() && (is_async || status == -1024))
+	{
+		job->state = JOB_LAUNCHED;
+		jc_register_job(job);
+		job->state = JOB_RUNNING;
+	}
+	else if (job->state == JOB_SIGTSTP || job->state == JOB_SIGSTOP ||
+			job->state == JOB_SIGTTIN || job->state == JOB_SIGTTOU)
+		jc_register_job(job);
+	else
 		jc_job_dealloc(&(job));
 	return (status);
 }
 
 int					jc_tmp_finalize(bool is_async)
 {
-	t_job_alt		*job;
-	int				status;
+	t_job		*job;
+	int			status;
 
 	job = jc_get()->tmp_job;
 	jc_get()->tmp_job = NULL;
-	ft_printf("Passing %p to launcher\n", job);
-	status = launch_job(job, is_async);
-	tcsetpgrp(0, g_term->shell_pgid);
+	if (job == NULL)
+	{
+		ft_dprintf(2, SH "%d: Tried to launch a job, but it turned out to be NULL\n", getpid());
+		abort();
+	}
+	status = jc_launch(job, is_async);
+	if (!is_async)
+		status = WEXITSTATUS(status);
 	return (status);
 }

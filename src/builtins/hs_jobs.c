@@ -6,16 +6,41 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/08 19:57:36 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/19 17:50:45 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/27 18:55:01 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell_job_control.h"
 #include "twenty_one_sh.h"
 
-int			hs_jobs(const char **args)
+void				hs_jobs_killall(void)
 {
-	ft_printf(SH ": no job control in this shell.\n");
+	t_job	*jobs;
+	t_proc	*procs;
+
+	jobs = jc_get()->active_jobs;
+	while (jobs)
+	{
+		procs = jobs->procs;
+		while (procs)
+		{
+			kill(procs->pid, SIGKILL);
+			procs = procs->next;
+		}
+		jobs = jobs->next;
+	}
+}
+
+int					hs_jobs(const char **args)
+{
+	if (jc_is_subshell())
+		return (1);
+	if (args && args[0] && ft_strcmp(args[0], "killall") == 0)
+	{
+		hs_jobs_killall();
+		return (0);
+	}
+	jc_check_n_notify(true);
 	args = NULL;
 	return (0);
 }

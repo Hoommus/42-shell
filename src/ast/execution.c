@@ -22,6 +22,7 @@ const struct s_executor		g_executors_table[] = {
 	{ NODE_OR_IF, {&exec_or_if} },
 	{ NODE_AND_IF, {&exec_and_if} },
 	{ NODE_SUBSHELL, {.exec_with_context = &exec_subshell} },
+	{ NODE_BRACE_GROUP, {.exec_with_context = &exec_brace_group} },
 	{ 0, {NULL}}
 };
 
@@ -33,10 +34,10 @@ int							exec_abort(int dummy)
 
 int exec_node(const t_node *node, t_context *context, bool is_async)
 {
-	int		i;
+	int			i;
 
-	if (node->lasync)
-		ft_printf("Executing async node\n");
+	if (jc_is_subshell())
+		is_async = false;
 	i = -1;
 	while (g_executors_table[++i].executor.exec && !g_interrupt)
 		if (node->node_type == g_executors_table[i].node_type)
@@ -52,16 +53,9 @@ int exec_semicolon_recursive(const t_node *parent, bool is_async)
 
 	status = is_async & 0;
 	if (parent->left)
-	{
-		ft_printf("Executing node of type %d %s\n", parent->left->node_type,
-			parent->lasync ? "asynchronously" : "");
 		status = exec_node(parent->left, NULL, parent->lasync);
-		ft_printf("Calling finalization from semicolon node\n");
-		//jc_tmp_finalize(parent->lasync);
-	}
 	if (parent->right)
 		status = exec_node(parent->right, NULL, parent->rasync);
-	g_term->last_status = status;
 	return (status);
 }
 

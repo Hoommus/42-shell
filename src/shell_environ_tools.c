@@ -47,14 +47,14 @@ char		**environ_to_array(t_env_vector *vector, u_int32_t scopes)
 	return (array);
 }
 
-static char	**append_rogue_env(t_env_vector *valt, char **env, size_t offset)
+static char	**append_rogue_env(t_env_vector *valt, char **env, u_int32_t scopes, size_t offset)
 {
 	const t_var		*vars = valt->array;
 	size_t			i;
 
 	i = -1;
 	while (++i < valt->size)
-		if (vars[i].key != NULL)
+		if (vars[i].key != NULL && (scopes & ((t_var *)valt->array + i)->scope))
 			env[offset++] = ft_strings_join(2, "=", vars[i].key, vars[i].value);
 	return (env);
 }
@@ -89,7 +89,7 @@ char		**environ_to_array_diff(t_env_vector *valt, const t_env_vector *vshell, u_
 				((t_var *)vshell->array + i)->key,
 				((t_var *)vshell->array + i)->value);
 	}
-	return (append_rogue_env(valt, env, j));
+	return (append_rogue_env(valt, env, scopes, j));
 }
 
 void		environ_from_array(t_env_vector *vector, const char **environ)

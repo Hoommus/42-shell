@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/05 17:50:36 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/20 13:02:54 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/06/27 13:43:07 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,19 +110,18 @@ static void	expand_everything(const struct s_command *command)
 ** when the last process in the pipeline is passed for execution.
 **
 ** TODO: optimise (how?..) execution if no variables and fds changes are made
-** TODO: Make copy-on-write-style environ arrays in contexts
 */
 
 int exec_command(const t_node *command_node, t_context *new_context, bool is_async)
 {
 	const struct s_command	*command = command_node->command;
 	t_context				*context;
-	enum e_job_state		job_class;
 	int						status;
 
-	job_class = new_context ? JOB_FG : JOB_PIPE;
+	if (command_node->node_type != NODE_COMMAND || command == NULL)
+		exit(ft_dprintf(2, SH ": fatal: cmd node is not actually a command\n"));
 	context = new_context ? new_context
-							: context_duplicate(g_term->context_current, true);
+		: context_duplicate(g_term->context_original, XDUP_TERM);
 	expand_everything(command);
 	if (alterate_filedes(command, context))
 	{
@@ -133,12 +132,10 @@ int exec_command(const t_node *command_node, t_context *new_context, bool is_asy
 	status = 0;
 	if (!g_interrupt && command->args != NULL && command->args[0] != NULL)
 	{
-		jc_tmp_add(pipe_segment_new((t_command *)command, context, is_async));
+		jc_tmp_add(process_create((t_command *) command, context));
+		is_async = jc_is_subshell() ? false : is_async;
 		if (new_context == NULL)
-		{
-			ft_printf("Calling finalization from command node\n");
 			status = jc_tmp_finalize(is_async);
-		}
 	}
 	return (status);
 }

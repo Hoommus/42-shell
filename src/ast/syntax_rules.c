@@ -251,52 +251,54 @@ const t_rule g_term_rule_dash = {
 **  	.tree_builder = NULL
 **  };
 **
-** const t_rule g_if_clause = {
-** 	.token = TOKEN_NOT_APPLICABLE,
-** 	.expands_to = {
-** 		{
-** 			&g_if_token,
-** 			&g_compound_list,
-** 			&g_then_token,
-** 			&g_compound_list,
-** 			&g_else_part,
-** 			&g_fi_token
-** 		},
-** 		{
-** 			&g_if_token,
-** 			&g_compound_list,
-** 			&g_then_token,
-** 			&g_compound_list,
-** 			&g_fi_token
-** 		}
-** 	},
-** 	.human_readable = "if_clause",
-** 	.tree_builder = NULL
-** };
-** const t_rule g_else_part = {
-** 	.token = TOKEN_NOT_APPLICABLE,
-** 	.expands_to = {
-** 		{
-** 			&g_elif_token,
-** 			&g_compound_list,
-** 			&g_then_token,
-** 			&g_compound_list
-** 		},
-** 		{
-** 			&g_elif_token,
-** 			&g_compound_list,
-** 			&g_then_token,
-** 			&g_compound_list,
-** 			&g_else_part
-** 		},
-** 		{
-** 			&g_else_token,
-** 			&g_compound_list
-** 		}
-** 	},
-** 	.human_readable = "else_part",
-** 	.tree_builder = NULL
-** };
+*/
+const t_rule g_if_clause = {
+	.token = TOKEN_NOT_APPLICABLE,
+	.expands_to = {
+		{
+			&g_if_token,
+			&g_compound_list,
+			&g_then_token,
+			&g_compound_list,
+			&g_else_part,
+			&g_fi_token
+		},
+		{
+			&g_if_token,
+			&g_compound_list,
+			&g_then_token,
+			&g_compound_list,
+			&g_fi_token
+		}
+	},
+	.human_readable = "if_clause",
+	.tree_builder = NULL
+};
+const t_rule g_else_part = {
+	.token = TOKEN_NOT_APPLICABLE,
+	.expands_to = {
+		{
+			&g_elif_token,
+			&g_compound_list,
+			&g_then_token,
+			&g_compound_list
+		},
+		{
+			&g_elif_token,
+			&g_compound_list,
+			&g_then_token,
+			&g_compound_list,
+			&g_else_part
+		},
+		{
+			&g_else_token,
+			&g_compound_list
+		}
+	},
+	.human_readable = "else_part",
+	.tree_builder = NULL
+};
+/*
 **
 ** const t_rule g_while_clause = {
 ** 	.token = TOKEN_NOT_APPLICABLE,
@@ -332,7 +334,9 @@ const t_rule g_function_definition = {
 			&g_linebreak,
 			&g_function_body
 		}
-	}
+	},
+	.human_readable = "function_def",
+	.tree_builder = NULL
 };
 
 const t_rule g_function_body = {
@@ -359,7 +363,7 @@ const t_rule g_brace_group = {
 		{&g_lbrace_token, &g_list, &g_rbrace_token}
 	},
 	.human_readable = "brace_group",
-	.tree_builder = NULL
+	.tree_builder = brace_group_build
 };
 
 const t_rule g_simple_command = {
@@ -694,37 +698,38 @@ const t_rule g_word_token = {
 	"word_t",
 	.tree_builder = NULL
 };
+
+const t_rule g_if_token = {
+	TOKEN_IF,
+	{{0}},
+	"if_t",
+	.tree_builder = NULL
+};
+const t_rule g_then_token = {
+	TOKEN_THEN,
+	{{0}},
+	"then_t",
+	.tree_builder = NULL
+};
+const t_rule g_fi_token = {
+	TOKEN_FI,
+	{{0}},
+	"fi_t",
+	.tree_builder = NULL
+};
+const t_rule g_elif_token = {
+	TOKEN_ELIF,
+	{{0}},
+	"elif_t",
+	.tree_builder = NULL
+};
+const t_rule g_else_token = {
+	TOKEN_ELSE,
+	{{0}},
+	"else_t",
+	.tree_builder = NULL
+};
 /*
-** const t_rule g_if_token = {
-** 	TOKEN_IF,
-** 	{{0}},
-** 	"if_t",
-** 	.tree_builder = NULL
-** };
-** const t_rule g_then_token = {
-** 	TOKEN_THEN,
-** 	{{0}},
-** 	"then_t",
-** 	.tree_builder = NULL
-** };
-** const t_rule g_fi_token = {
-** 	TOKEN_FI,
-** 	{{0}},
-** 	"fi_t",
-** 	.tree_builder = NULL
-** };
-** const t_rule g_elif_token = {
-** 	TOKEN_ELIF,
-** 	{{0}},
-** 	"elif_t",
-** 	.tree_builder = NULL
-** };
-** const t_rule g_else_token = {
-** 	TOKEN_ELSE,
-** 	{{0}},
-** 	"else_t",
-** 	.tree_builder = NULL
-** };
 ** const t_rule g_for_token = {
 ** 	TOKEN_FOR,
 ** 	{{0}},

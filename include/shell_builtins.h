@@ -35,7 +35,6 @@ int						hs_cd(const char **args);
 int						hs_echo(const char **args);
 int						hs_export(const char **args);
 int						hs_env(const char **args);
-int						hs_setenv(const char **args);
 int						hs_unsetenv(const char **args);
 int						hs_help(const char **args);
 int						hs_exit(const char **args);
