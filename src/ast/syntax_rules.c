@@ -155,7 +155,8 @@ const t_rule g_compound_command = {
 const t_rule g_subshell = {
 	.token = TOKEN_NOT_APPLICABLE,
 	.expands_to = {
-		{&g_lbracket_token, &g_list, &g_rbracket_token}
+		{&g_lbracket_token, &g_list, &g_rbracket_token},
+		{&g_lbracket_token, &g_list, &g_separator, &g_rbracket_token}
 	},
 	.human_readable = "subshell",
 	.tree_builder = &subshell_build

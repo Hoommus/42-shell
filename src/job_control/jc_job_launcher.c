@@ -89,13 +89,13 @@ static int				run_builtin(t_proc *segment, bool is_async)
 	return (-512);
 }
 
-static int				run_regular(t_job *job, const t_proc *process, bool is_async)
+static int				run_regular(t_job *job, t_proc *process, bool is_async)
 {
 	int				status;
 	char			*bin;
 
 	status = -256;
-	if ((bin = path_to_target((t_proc *)process)) != NULL
+	if ((bin = path_to_target(process)) != NULL
 		&& access(bin, F_OK) == -1 && ft_strchr(bin, '/') != NULL)
 		ft_dprintf(2, ERR_NO_SUCH_FILE, process->command->args[0]);
 	else if (bin != NULL && is_dir(bin))
@@ -105,7 +105,7 @@ static int				run_regular(t_job *job, const t_proc *process, bool is_async)
 	else if (bin == NULL)
 		ft_dprintf(2, ERR_COMMAND_NOT_FOUND, process->command->args[0]);
 	else if (!g_interrupt)
-		status = forknrun(job, (t_proc *) process, bin, is_async);
+		status = forknrun(job, process, bin, is_async);
 	ft_memdel((void **)&bin);
 	return (status);
 }
@@ -124,7 +124,7 @@ int						execute_segments(t_job *job, bool is_async)
 		if ((s = run_builtin((t_proc *)list, is_async)) != -512 && !list->next)
 			return (s);
 		else if (s == -512)
-			run_regular(job, list, is_async);
+			run_regular(job, (t_proc *)list, is_async);
 		tcgetattr(0, &termios);
 		*list->context->term_config = termios;
 		close_redundant_fds(list->context);
@@ -215,12 +215,9 @@ int					jc_tmp_finalize(bool is_async)
 	int			status;
 
 	job = jc_get()->tmp_job;
-	jc_get()->tmp_job = NULL;
 	if (job == NULL)
-	{
-		ft_dprintf(2, SH "%d: Tried to launch a job, but it turned out to be NULL\n", getpid());
-		abort();
-	}
+		return (0);
+	jc_get()->tmp_job = NULL;
 	status = jc_launch(job, is_async);
 	if (!is_async)
 		status = WEXITSTATUS(status);

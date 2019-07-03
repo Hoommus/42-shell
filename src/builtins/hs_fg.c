@@ -48,7 +48,7 @@ int			jc_to_fg(t_job *job)
 	status = jc_wait(job);
 	tcsetpgrp(0, g_term->shell_pgid);
 	TERM_APPLY_CONFIG(g_term->context_current->term_config);
-	return (status);
+	return (WEXITSTATUS(status));
 }
 
 t_job		*choose_job(const char *criteria)

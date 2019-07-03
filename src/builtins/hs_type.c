@@ -38,35 +38,35 @@ void	hs_where_auxilia(const char **paths, const char *arg)
 
 	where = NULL;
 	i = -1;
-	while (paths[++i])
+	while (paths && paths[++i])
 	{
 		swap = ft_strings_join(2, "/", paths[i], arg, NULL);
 		if (access(swap, X_OK) == 0)
 			where = ft_strdup(swap);
 		free(swap);
 	}
-	if (is_builtin(arg))
-		ft_printf("%s: shell built-in command\n", arg);
-	if (where)
-	{
-		ft_printf("%s\n", where);
-		free(where);
-	}
-	else if (!is_builtin(arg))
-		ft_dprintf(2, "where: %s: not found\n", arg);
+	if ((swap = get_alias(arg)))
+		ft_printf("%s is an alias for %s\n", arg, swap);
+	else if (is_builtin(arg))
+		ft_printf("%s is a shell builtin\n", arg);
+	else if (where)
+		ft_printf("%s is %s\n", arg, where);
+	else
+		ft_dprintf(2, SH ": type: %s: not found\n", arg);
+	free(where);
 }
 
 /*
 ** seems like some code is shared with try_binary
 */
 
-int		hs_where(const char **args)
+int		hs_type(const char **args)
 {
 	t_var	*path;
 	char	**paths;
 
 	path = get_env_v(NULL, "PATH");
-	paths = ft_strsplit(path->value, ':');
+	paths = path ? ft_strsplit(path->value, ':') : NULL;
 	while (*args)
 		hs_where_auxilia((const char **)paths, *args++);
 	free_array((void **)paths);

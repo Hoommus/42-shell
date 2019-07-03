@@ -120,8 +120,7 @@ int						alterate_proc(t_job *job, t_proc *proc);
 ** Auxiliary
 */
 t_job					*choose_job(const char *criteria);
-void					handle_signaled(t_job *job, int status);
-char					*jc_state_str(enum e_job_state state);
+const char				*jc_state_str(enum e_job_state state);
 void					jc_format_job(const t_job *job);
 int						forknrun(t_job *job, t_proc *process, char *path,
 	bool is_async);

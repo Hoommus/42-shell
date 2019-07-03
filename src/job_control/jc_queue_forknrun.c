@@ -14,51 +14,6 @@
 #include "shell_job_control.h"
 #include "shell_builtins.h"
 
-char					*g_sigs[] =
-{
-	"hangup",
-	"interrupted",
-	"quit",
-	"illegal instruction",
-	"trace trap",
-	"abort",
-	"EMT instruction",
-	"floating point exception",
-	"killed",
-	"bus error",
-	"segmentation fault",
-	"invalid system call",
-	"broken pipe",
-	"suspended (tty input)",
-	"terminated",
-	"suspended (tty input)",
-	"suspended (signal)",
-	"suspended",
-	"suspended (tty input)",
-	"suspended (tty input)",
-	"suspended (tty input)",
-	"suspended (tty output)",
-	"suspended (tty input)",
-	"cpu limit exceeded",
-	"file size limit exceeded",
-	"virtual time alarm",
-	"profile signal",
-	"suspended (tty input)",
-	"suspended (tty input)",
-	"user-defined signal 1",
-	"user-defined signal 2"
-};
-
-void					handle_signaled(t_job *job, int status)
-{
-	if (ft_strlen(job->command) < 45)
-		ft_printf("\n        %d %s   %s\n", job->pgid,
-			g_sigs[WTERMSIG(status) - 1], job->command);
-	else
-		ft_printf("\n        %d %s   %.*s...\n", job->pgid,
-			g_sigs[WTERMSIG(status) - 1], 45, job->command);
-}
-
 static void				close_foreign_fds(t_proc *processes,
 											t_proc *current)
 {

@@ -10,7 +10,7 @@
 #                                                                              #
 # **************************************************************************** #
 
-NAME = 21sh
+NAME = 42sh
 
 CC = clang
 
@@ -54,9 +54,10 @@ AST_SRC = ast_exec_main.c ast_exec_preprocess.c \
           tree_brace_group.c
 
 BUILTIN_DIR = builtins/
-BUILTIN_SRC = cd.c where.c builtins.c hs_history.c tokenizer_test.c \
-              syntax_test.c hs_set.c hs_setenv.c hs_unsetenv.c \
-              hs_export.c hs_jobs.c hs_fg.c hs_bg.c
+BUILTIN_SRC = cd.c builtins.c hs_history.c tokenizer_test.c \
+              syntax_test.c hs_set.c hs_unset.c \
+              hs_export.c hs_jobs.c hs_fg.c hs_bg.c hs_true.c hs_type.c \
+              hs_false.c hs_alias.c
 
 INTERFACE_DIR = line_editing/
 INTERFACE_SRC = buffer_drawing.c buffer_input.c  \
