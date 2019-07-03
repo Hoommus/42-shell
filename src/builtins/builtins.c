@@ -14,23 +14,24 @@
 #include "twenty_one_sh.h"
 #include "shell_builtins.h"
 
-extern bool			g_is_subshell_env;
-
 struct s_builtin	g_builtins[] = {
+	{"alias", &hs_alias},
+	{"bg", &hs_bg},
 	{"cd", &hs_cd},
 	{"echo", &hs_echo},
 	{"export", &hs_export},
 	{"exit", &hs_exit},
 	{"fg", &hs_fg},
-	{"bg", &hs_bg},
+	{"false", &hs_false},
 	{"history", &hs_history},
 	{"help", &hs_help},
 	{"jobs", &hs_jobs},
 	{"quit", &hs_exit},
 	{"set", &hs_set},
 	{"tokenizer", &hs_tokenizer},
+	{"true", &hs_true},
+	{"type", &hs_type},
 	{"unset", &hs_unsetenv},
-	{"where", &hs_where},
 	{NULL, NULL}
 };
 

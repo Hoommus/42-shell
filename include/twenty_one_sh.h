@@ -258,6 +258,7 @@ ssize_t					ponies_teleported(void);
 int						read_fd(const int fd, char **result);
 bool					is_dir(const char *path);
 bool					is_string_numeric(const char *str, const int base);
+char					*get_alias(const char *name);
 
 /*
 ** Final input parsing (variables_replacement.c)

@@ -34,18 +34,18 @@ int						hs_alias(const char **args);
 int						hs_cd(const char **args);
 int						hs_echo(const char **args);
 int						hs_export(const char **args);
-int						hs_env(const char **args);
 int						hs_unsetenv(const char **args);
 int						hs_help(const char **args);
 int						hs_exit(const char **args);
-int						hs_where(const char **args);
+int						hs_type(const char **args);
 int						hs_history(const char **args);
 int						hs_tokenizer(const char **args);
 int						hs_syntax(const char **args);
-int						hs_test(const char **args);
 int						hs_jobs(const char **args);
 int						hs_fg(const char **args);
 int						hs_bg(const char **args);
+int						hs_true(const char **args);
+int						hs_false(const char **args);
 
 int						hs_set(const char **args);
 

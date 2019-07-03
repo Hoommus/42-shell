@@ -21,16 +21,12 @@
 t_env_vector		*environ_create_vector(const u_int32_t capacity)
 {
 	t_env_vector	*vector;
-	char			*swap;
 
 	vector = ft_memalloc(sizeof(t_env_vector));
 	vector->capacity = capacity;
 	vector->size = 0;
 	vector->array = (t_var *)ft_memalloc(capacity * sizeof(t_var));
 	ft_bzero(vector->array, sizeof(t_var) * vector->capacity);
-	environ_push_entry(vector, "env_vector_capacity", swap = ft_itoa(capacity),
-			SCOPE_SHELL_LOCAL);
-	free(swap);
 	return (vector);
 }
 
@@ -57,7 +53,6 @@ t_env_vector		*environ_reallocate_vector(t_env_vector *vector)
 {
 	t_var			*array;
 	size_t			array_size;
-	char			*swap;
 
 	vector->capacity = vector->capacity + (vector->capacity >> 1);
 	array = (t_var *)ft_memalloc(vector->capacity * sizeof(t_var));
@@ -65,9 +60,5 @@ t_env_vector		*environ_reallocate_vector(t_env_vector *vector)
 	ft_memcpy(array, vector->array, array_size);
 	free(vector->array);
 	vector->array = array;
-	environ_update_entry(vector, "env_vector_capacity",
-						swap = ft_itoa(vector->capacity),
-						SCOPE_SHELL_LOCAL);
-	free(swap);
 	return (vector);
 }

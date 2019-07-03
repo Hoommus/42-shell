@@ -12,7 +12,42 @@
 
 #include "shell_job_control.h"
 
-void		jc_format_job(const t_job *job)
+static const char	*g_sigs[] =
+{
+	"hangup",
+	"interrupted",
+	"quit",
+	"illegal instruction",
+	"trace trap",
+	"abort",
+	"EMT instruction",
+	"floating point exception",
+	"killed",
+	"bus error",
+	"segmentation fault",
+	"invalid system call",
+	"broken pipe",
+	"suspended (tty input)",
+	"terminated",
+	"suspended (tty input)",
+	"suspended (signal)",
+	"suspended",
+	"suspended (tty input)",
+	"suspended (tty input)",
+	"suspended (tty input)",
+	"suspended (tty output)",
+	"suspended (tty input)",
+	"cpu limit exceeded",
+	"file size limit exceeded",
+	"virtual time alarm",
+	"profile signal",
+	"suspended (tty input)",
+	"suspended (tty input)",
+	"user-defined signal 1",
+	"user-defined signal 2"
+};
+
+void				jc_format_job(const t_job *job)
 {
 	char	option;
 
@@ -27,10 +62,8 @@ void		jc_format_job(const t_job *job)
 		jc_state_str(job->state), job->command);
 }
 
-char		*jc_state_str(enum e_job_state state)
+const char			*jc_state_str(enum e_job_state state)
 {
-	extern char		*g_sigs[];
-
 	if (state == JOB_EXITED || state == JOB_TERMINATED)
 		return ("terminated");
 	else if (state == JOB_STOPPED)
@@ -47,7 +80,7 @@ char		*jc_state_str(enum e_job_state state)
 		return ("unknown");
 }
 
-void					close_redundant_fds(t_context *context)
+void				close_redundant_fds(t_context *context)
 {
 	struct s_fd_lst		*list;
 
