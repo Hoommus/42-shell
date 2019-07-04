@@ -31,9 +31,6 @@ static int			shell_loop(void)
 		if (tcgetpgrp(0) != g_term->shell_pgid)
 			tcsetpgrp(0, g_term->shell_pgid);
 		tcsetattr(0, TCSADRAIN, g_term->shell_term);
-		tcflush(0, TCIOFLUSH);
-		tcflush(1, TCIOFLUSH);
-		tcflush(2, TCIOFLUSH);
 		g_interrupt = 0;
 		if (g_term->input_state == STATE_NON_INTERACTIVE)
 			read_fd(0, &commands);

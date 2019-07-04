@@ -16,7 +16,7 @@
 ** new_token expects command to be already malloced
 */
 
-t_token			*new_token(char *value, enum e_token_type type)
+t_token			*new_token(const char *value, enum e_token_type type)
 {
 	t_token	*new;
 

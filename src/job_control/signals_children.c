@@ -31,11 +31,17 @@ static void		sigchild_handler(int sig, siginfo_t *info, void *ignore)
 
 void			sigchild_set_handler(void)
 {
-	sigaction(SIGCHLD, &((struct sigaction){
+	static sigset_t			set;
+	static struct sigaction	act = {
 		.sa_mask = 0,
-		.sa_flags = SA_SIGINFO,
+		.sa_flags = SA_SIGINFO | SA_RESTART,
 		.sa_sigaction = &sigchild_handler
-	}), NULL);
+	};
+
+	if (!sigismember(&set, SIGCHLD))
+		sigaddset(&set, SIGCHLD);
+	act.sa_mask = set;
+	sigaction(SIGCHLD, &act, NULL);
 }
 
 void			unset_signal_handlers(void)

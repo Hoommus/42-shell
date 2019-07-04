@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:46:06 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/25 12:41:42 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/03 19:12:35 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,14 +38,16 @@ static void				resize(int sig)
 	}
 }
 
-void					sigquit(int sig)
+void					sigttou(int sig)
 {
+	tcsetpgrp(0, g_term->shell_pgid);
 	sig = 0;
 }
 
 void					setup_signal_handlers(void)
 {
 	struct sigaction	action;
+	sigset_t			set;
 
 	ft_bzero(&action, sizeof(struct sigaction));
 	action.sa_handler = &handle_sigint;
@@ -58,9 +60,12 @@ void					setup_signal_handlers(void)
 		.sa_flags = SA_RESTART,
 		.sa_handler = &tstp}), NULL);
 	sigchild_set_handler();
-	//signal(SIGCHLD, SIG_DFL);
 	signal(SIGWINCH, &resize);
 	signal(SIGPIPE, &tstp);
-	signal(SIGTTOU, &sigquit);
-	signal(SIGTTIN, &sigquit);
+	signal(SIGTTOU, &sigttou);
+	signal(SIGTTIN, &sigttou);
+	sigemptyset(&set);
+	sigaddset(&set, SIGTTOU);
+	sigaddset(&set, SIGTTIN);
+	sigprocmask(SIG_BLOCK, &set, 0);
 }

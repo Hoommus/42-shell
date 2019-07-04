@@ -1,4 +1,5 @@
 
+#include <errno.h>
 #include "shell_job_control.h"
 
 static bool			is_completed(t_job *job)
@@ -50,14 +51,21 @@ enum e_job_state	poll_pipeline(t_job *job, bool wnohang)
 {
 	t_proc			*procs;
 	const int		wflags = WUNTRACED | (wnohang ? WNOHANG : 0);
+	int				w;
 
 	procs = job->procs;
 	while (procs)
 	{
-		if (waitpid(procs->pid, &procs->status, wflags) == procs->pid)
+		if ((w = waitpid(procs->pid, &procs->status, wflags)) == procs->pid)
 		{
 			if (alterate_proc(job, procs) >= 2)
 				break ;
+		}
+		else if (w == 0 && !procs->is_completed)
+		{
+			job->state = JOB_RUNNING;
+			procs->is_stopped = false;
+			job->notified = false;
 		}
 		procs = procs->next;
 	}

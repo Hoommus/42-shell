@@ -45,7 +45,7 @@ void	hs_where_auxilia(const char **paths, const char *arg)
 			where = ft_strdup(swap);
 		free(swap);
 	}
-	if ((swap = get_alias(arg)))
+	if ((swap = alias_get(arg)))
 		ft_printf("%s is an alias for %s\n", arg, swap);
 	else if (is_builtin(arg))
 		ft_printf("%s is a shell builtin\n", arg);

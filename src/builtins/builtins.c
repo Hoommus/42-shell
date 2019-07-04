@@ -31,7 +31,8 @@ struct s_builtin	g_builtins[] = {
 	{"tokenizer", &hs_tokenizer},
 	{"true", &hs_true},
 	{"type", &hs_type},
-	{"unset", &hs_unsetenv},
+	{"unalias", &hs_unalias},
+	{"unset", &hs_unset},
 	{NULL, NULL}
 };
 

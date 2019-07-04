@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/07 18:12:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/25 12:06:36 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/03 22:00:51 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -258,7 +258,9 @@ ssize_t					ponies_teleported(void);
 int						read_fd(const int fd, char **result);
 bool					is_dir(const char *path);
 bool					is_string_numeric(const char *str, const int base);
-char					*get_alias(const char *name);
+char					*alias_get(const char *name);
+int						alias_remove(const char *name);
+int						alias_remove_all(void);
 
 /*
 ** Final input parsing (variables_replacement.c)

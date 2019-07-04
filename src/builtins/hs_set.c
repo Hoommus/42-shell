@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/14 17:11:49 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/26 16:15:50 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/03 22:17:44 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,19 @@ void	print_var(const t_var *var)
 	else
 		output = "\"%s\"='%s'\n";
 	ft_printf(output, var->key, var->value);
+}
+
+void	print_var_vector(const t_env_vector *vector, u_int32_t scopes)
+{
+	u_int32_t			i;
+
+	i = 0;
+	while (i < vector->size)
+	{
+		if (((t_var *)vector->array)[i].scope & scopes)
+			print_var((t_var *)vector->array + i);
+		i++;
+	}
 }
 
 int		hs_set(const char **args)

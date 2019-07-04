@@ -157,10 +157,6 @@ static struct s_token		*create_token(const char *str, t_token *last,
 	return (token);
 }
 
-/*
-** Splits string into token list and updates corresponding global state.
-*/
-
 struct s_token				*tokenize(char *string, const char *delimiters)
 {
 	register u_int64_t	i;
