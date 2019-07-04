@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/29 14:44:44 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/16 14:59:54 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/04 17:56:30 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -183,7 +183,7 @@ extern const struct s_executor		g_executors_table[];
 */
 
 struct s_token				*tokenize(char *str, const char *delimiters);
-struct s_token				*new_token(char *value, enum e_token_type type);
+struct s_token				*new_token(const char *value, enum e_token_type type);
 void						add_token(t_token **head, t_token **tail,
 														t_token *to_add);
 t_token						*pop_token(t_token **head, t_token **tail);
@@ -204,7 +204,7 @@ char						*strip_escaped_nl_and_comments(char *string);
 */
 
 void						run_heredocs(t_node *node);
-
+t_token						*apply_aliases(t_token *list_head);
 /*
 ** AST Main
 */

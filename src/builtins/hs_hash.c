@@ -1,30 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   builtins2.c                                        :+:      :+:    :+:   */
+/*   hs_hash.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/07/31 14:46:04 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/03/25 15:35:45 by vtarasiu         ###   ########.fr       */
+/*   Created: 2019/07/04 13:10:22 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/07/04 13:16:26 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "twenty_one_sh.h"
+#include "shell_builtins.h"
 
-int				hs_unset(const char **args)
+int					hs_hash(const char **args)
 {
-	int		len;
-	int		i;
 
-	i = 0;
-	len = 0;
-	while (args[len])
-		len++;
-	if (len == 0)
-		ft_printf("usage:\nunset KEY [KEY ...]\n");
-	else
-		while (i < len)
-			unset_env_v(g_term->context_original->environ, args[i++]);
-	return (0);
 }

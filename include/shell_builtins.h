@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:56:22 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/04 15:56:33 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/04 12:58:48 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,16 +25,17 @@ struct					s_builtin
 };
 
 void					print_var(const t_var *var);
-
+void					print_var_vector(const t_env_vector *vector, u_int32_t scopes);
 /*
 ** Builtins (builtins/ *.c)
 */
 
 int						hs_alias(const char **args);
+int						hs_unalias(const char **args);
 int						hs_cd(const char **args);
 int						hs_echo(const char **args);
 int						hs_export(const char **args);
-int						hs_unsetenv(const char **args);
+int						hs_unset(const char **args);
 int						hs_help(const char **args);
 int						hs_exit(const char **args);
 int						hs_type(const char **args);

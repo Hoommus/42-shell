@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   hs_alias.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/07/03 21:57:44 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/07/04 17:44:56 by vtarasiu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "shell_builtins.h"
 #include "twenty_one_sh.h"
@@ -25,7 +36,7 @@ static void			push_name_value(const char *arg)
 	}
 }
 
-char			*get_alias(const char *name)
+char			*alias_get(const char *name)
 {
 	t_var		*entry;
 
@@ -37,6 +48,29 @@ char			*get_alias(const char *name)
 	return (NULL);
 }
 
+int				alias_remove(const char *name)
+{
+	if (!g_alias_vector || !environ_get_entry(g_alias_vector, name))
+		return (1);
+	environ_remove_entry(g_alias_vector, name);
+	return (0);
+}
+
+int				alias_remove_all(void)
+{
+	const t_var	*array = (t_var *)g_alias_vector->array;
+	u_int32_t	i;
+
+	i = 0;
+	while (i < g_alias_vector->size)
+	{
+		environ_remove_entry(g_alias_vector, array[0].key);
+		i++;
+	}
+	return (0);
+}
+
+// TODO: make alias name validation
 int				hs_alias(const char **args)
 {
 	u_int32_t	i;
@@ -47,11 +81,14 @@ int				hs_alias(const char **args)
 	if (g_alias_vector == NULL)
 		g_alias_vector = environ_create_vector(8);
 	if (args == NULL || args[0] == NULL)
+	{
+		print_var_vector(g_alias_vector, SCOPE_GLOBAL);
 		return (1);
+	}
 	i = 0;
 	while (args[i])
 	{
-		if (ft_strchr(args[i], '=') == NULL)
+		if (ft_strchr(args[i], '='))
 			push_name_value(args[i]);
 		else if ((entry = environ_get_entry(g_alias_vector, args[i])))
 			print_var(entry);

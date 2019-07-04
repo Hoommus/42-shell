@@ -22,6 +22,7 @@ static NINT	exec_subshell_async(const t_node *body, t_context *new_context)
 
 	setpgid((pgid = getpid()), getpid());
 	g_term->shell_pgid = pgid;
+	g_term->input_state = STATE_NON_INTERACTIVE;
 	sigprocmask(SIG_SETMASK, &((sigset_t){0}), NULL);
 	unset_signal_handlers();
 	close(g_term->history_file);
@@ -70,12 +71,12 @@ int			exec_subshell(const t_node *node, t_context *new_context, bool is_async)
 		exec_subshell_async(body, context);
 	else if (f == -1)
 		status = (ft_dprintf(2, SH ": fork error in async subshell\n") & 0) | 1;
-	else if (f == -2)
+	else if (f <= -2)
 	{
 		status = exec_subshell_regular(body, context);
 		jc_job_dealloc(&job);
 	}
-	else if (f > 0)
+	else
 	{
 		setpgid((job->pgid = f), f);
 		sigchild_block();

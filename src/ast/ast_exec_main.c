@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:56:01 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/09 11:52:43 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/04 19:04:39 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,7 @@ void				run_script(t_token *list_head, bool log_recursion)
 
 	if (list_head == NULL)
 		return ;
-	init_state(&state, list_head, log_recursion);
-	// TODO: apply aliases before this shiet
+	init_state(&state, apply_aliases(list_head), log_recursion);
 	result = is_syntax_valid(state);
 	state.list_offset = offset_list(state.list_offset, result.consumed +
 		result.valid);

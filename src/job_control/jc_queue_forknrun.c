@@ -70,6 +70,9 @@ static void	prepare_exec(t_job *job, t_proc *process, bool is_async)
 	if (!is_async && tcgetpgrp(0) != pgid)
 		tcsetpgrp(0, pgid);
 	signal(SIGTTOU, SIG_DFL);
+	signal(SIGTTIN, SIG_DFL);
+	signal(SIGTSTP, SIG_DFL);
+	signal(SIGSTOP, SIG_DFL);
 	close_redundant_fds(process->context);
 	close_foreign_fds(job->procs, process);
 }

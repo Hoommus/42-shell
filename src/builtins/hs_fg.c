@@ -33,7 +33,7 @@ int			jc_to_fg(t_job *job)
 	jc_format_job(job);
 	job->state = JOB_RUNNING;
 	segments = job->procs;
-	TERM_APPLY_CONFIG(segments->context->term_config);
+	TERM_APPLY_CONFIG(g_term->context_original->term_config);
 	tcsetpgrp(0, job->pgid);
 	while (segments)
 	{
@@ -81,13 +81,13 @@ int			hs_fg(const char **args)
 	if (jc_is_subshell())
 		return (1);
 	if (!args || !args[0] || args[0][0] != '%' || (args[0] && args[1]))
-		return ((ft_dprintf(2, "fg: invalid argument(s): "
-			"you must specify a job via single parameter starting with `%%'\n") & 0) | 1);
+		return ((ft_dprintf(2, "fg: invalid argument\n "
+							"usage:\n fg [job_id]\n") & 0) | 1);
 	if (jc_get()->active_jobs == NULL)
 		return ((ft_dprintf(2, "fg: no active jobs\n") & 0) | 1);
 	arg = args[0] + 1;
 	job = choose_job(arg);
 	if (job == NULL)
 		return ((ft_dprintf(2, "fg: no jobs matching criteria: `%%%s'\n", arg) & 0) | 1);
-	return (jc_to_fg(job));
+	return ((g_term->last_status = jc_to_fg(job)));
 }

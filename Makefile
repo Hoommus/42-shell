@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/06/27 18:24:39 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/07/04 12:59:39 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -57,7 +57,7 @@ BUILTIN_DIR = builtins/
 BUILTIN_SRC = cd.c builtins.c hs_history.c tokenizer_test.c \
               syntax_test.c hs_set.c hs_unset.c \
               hs_export.c hs_jobs.c hs_fg.c hs_bg.c hs_true.c hs_type.c \
-              hs_false.c hs_alias.c
+              hs_false.c hs_alias.c hs_unalias.c
 
 INTERFACE_DIR = line_editing/
 INTERFACE_SRC = buffer_drawing.c buffer_input.c  \
