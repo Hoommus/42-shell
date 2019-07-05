@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/04 11:56:24 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/04 11:56:24 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/05 16:19:03 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ const sigset_t	*sigchild_block(void)
 
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGCHLD);
-	sigprocmask(SIG_SETMASK, &mask, &g_old);
+	sigprocmask(SIG_BLOCK, &mask, &g_old);
 	return (&g_old);
 }
 
@@ -29,6 +29,7 @@ const sigset_t	*sigchild_unblock(void)
 	sigset_t	mask;
 
 	sigemptyset(&mask);
+//	sigaddset(&mask, SIGCHLD);
 	sigprocmask(SIG_SETMASK, &mask, &g_old);
 	return (&g_old);
 }

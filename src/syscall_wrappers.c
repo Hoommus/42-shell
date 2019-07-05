@@ -19,7 +19,7 @@ int		openm_wrapper(const char *path, int oflag, mode_t mode)
 	fd = open(path, oflag, mode);
 	if (fd != -1)
 		context_add_fd(g_term->context_current, fd, fd, path);
-	fcntl(fd, F_SETFL, O_CLOEXEC);
+	//fcntl(fd, F_SETFL, O_CLOEXEC);
 	return (fd);
 }
 

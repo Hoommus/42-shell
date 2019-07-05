@@ -179,6 +179,12 @@ struct					s_term
 {
 	enum e_input_state	input_state;
 	enum e_input_state	fallback_input_state;
+	enum e_acompl_state
+	{
+		AC_COMMAND,
+		AC_FILE,
+		AC_DIR
+	}					acompl_state;
 	char				*heredoc_word;
 	short				ws_col;
 	short				ws_row;

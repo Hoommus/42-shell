@@ -63,30 +63,3 @@ int					hs_help(const char **args)
 	*args = args[0];
 	return (0);
 }
-
-int					hs_exit(const char **args)
-{
-	if (args && *args)
-	{
-		if (!is_string_numeric(*args, 10))
-		{
-			ft_dprintf(2, SH ": exit: %s: numeric argument required\n", *args);
-			if (jc_is_subshell())
-				return (2);
-			else
-				exit(2);
-		}
-		else if (jc_is_subshell())
-			return (ft_atoi(*args));
-		else if (jc_get()->active_jobs != NULL)
-			return ((ft_dprintf(2, "You have running jobs.\n") & 0) | 1);
-		else
-			exit(ft_atoi(*args));
-	}
-	if (jc_is_subshell())
-		return (0);
-	else if (jc_get()->active_jobs != NULL)
-		return ((ft_dprintf(2, "You have running jobs.\n") & 0) | 1);
-	else
-		exit(0);
-}

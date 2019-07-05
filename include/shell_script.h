@@ -247,7 +247,7 @@ int							alterate_filedes(const struct s_command *command,
 /*
 ** Expansions
 */
-
 char						*expand(char *string);
+void						expand_globs(struct s_command *command);
 
 #endif

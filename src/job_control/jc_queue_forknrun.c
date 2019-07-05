@@ -73,6 +73,7 @@ static void	prepare_exec(t_job *job, t_proc *process, bool is_async)
 	signal(SIGTTIN, SIG_DFL);
 	signal(SIGTSTP, SIG_DFL);
 	signal(SIGSTOP, SIG_DFL);
+	sigprocmask(SIG_SETMASK, &((sigset_t){0}), NULL);
 	close_redundant_fds(process->context);
 	close_foreign_fds(job->procs, process);
 }

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/18 11:54:55 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/21 20:38:37 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/05 16:43:57 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ static const struct s_listener	g_key_hooks[] =
 	{{CSUSP}, &handle_tab, STATE_UNIVERSAL},
 	{{CTIME}, &handle_tab, STATE_UNIVERSAL},
 	{{CSTART}, &handle_tab, STATE_UNIVERSAL},
-	{{'\t'}, &handle_tab, STATE_UNIVERSAL},
+	{{'\t'}, &handle_tab, STATE_NORMAL | STATE_NON_INTERACTIVE},
 	{{0}, 0, 0}
 };
 
@@ -56,11 +56,6 @@ bool							is_key_hooked(union u_char key)
 		if (g_key_hooks[i++].key.lng == key.lng)
 			return (true);
 	return (false);
-}
-
-void							handle_tab(union u_char key)
-{
-	key.lng = 1337;
 }
 
 void							handle_eot(union u_char key)
@@ -94,6 +89,7 @@ void							handle_key(union u_char key)
 		{
 			if ((g_key_hooks[i].states & g_term->input_state) != 0)
 				g_key_hooks[i].handler(key);
-			break ;
+			return ;
 		}
+
 }

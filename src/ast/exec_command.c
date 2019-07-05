@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/05 17:50:36 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/27 13:43:07 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/05 17:34:04 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,6 +101,7 @@ static void	expand_everything(const struct s_command *command)
 		ft_memdel((void **)&swap);
 	}
 	expand_in_rdrs(command);
+	expand_globs((struct s_command *)command);
 }
 
 /*
@@ -123,12 +124,12 @@ int exec_command(const t_node *command_node, t_context *new_context, bool is_asy
 	context = new_context ? new_context
 		: context_duplicate(g_term->context_original, XDUP_TERM);
 	expand_everything(command);
+	alterate_vars(command, context);
 	if (alterate_filedes(command, context))
 	{
 		context_deep_free(&context);
 		return (1);
 	}
-	alterate_vars(command, context);
 	status = 0;
 	if (!g_interrupt && command->args != NULL && command->args[0] != NULL)
 	{
@@ -137,5 +138,7 @@ int exec_command(const t_node *command_node, t_context *new_context, bool is_asy
 		if (new_context == NULL)
 			status = jc_tmp_finalize(is_async);
 	}
+	else
+		context_deep_free(&context);
 	return (status);
 }
