@@ -91,5 +91,4 @@ void							handle_key(union u_char key)
 				g_key_hooks[i].handler(key);
 			return ;
 		}
-
 }

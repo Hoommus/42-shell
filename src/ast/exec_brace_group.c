@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_brace_group.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/07/06 15:51:01 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/07/06 15:51:01 by vtarasiu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "twenty_one_sh.h"
 #include "shell_job_control.h"
@@ -44,12 +55,12 @@ int			exec_brace_group(const t_node *node,
 	f = -2;
 	job = ft_memalloc(sizeof(t_job));
 	if (is_async || !(node->left->node_type == NODE_SEPARATOR
-					  && node->left->right && node->left->left == NULL))
+						&& node->left->right && node->left->left == NULL))
 		f = fork();
 	if (f == 0)
 		exec_brace_group_async(node, context, is_async);
 	else if (f == -1)
-		status = (ft_dprintf(2, SH ": fork error in async brace group\n") & 0) | 1;
+		status = (ft_dprintf(2, SH ": fork error in async braces\n") & 0) | 1;
 	else if (f == -2)
 	{
 		status = exec_brace_group_regular(node, context, is_async);

@@ -69,7 +69,7 @@ INTERFACE_SRC = buffer_drawing.c buffer_input.c  \
                 handlers_arrows_mods.c handlers_arrows_vertical.c \
                 handlers_clipboard.c \
                 pasteboard_interface.c \
-                auxiliary_buffer.c auxiliary_le.c handlers_tab.c
+                auxiliary_buffer.c auxiliary_le.c handlers_tab.c acompl_states.c
 
 JOB_CONTROL_DIR = job_control/
 JOB_CONTROL_SRC = signals_basic.c signals_children.c signals_child_blocker.c \

@@ -181,9 +181,9 @@ struct					s_term
 	enum e_input_state	fallback_input_state;
 	enum e_acompl_state
 	{
-		AC_COMMAND,
-		AC_FILE,
-		AC_DIR
+		AC_NONE = 0,
+		AC_COMMAND = 1,
+		AC_FILE = 2
 	}					acompl_state;
 	char				*heredoc_word;
 	short				ws_col;
