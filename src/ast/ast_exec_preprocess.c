@@ -75,9 +75,11 @@ static t_token		*insert_list_instead(t_token *insertion, t_token *instead)
 {
 	t_token		*lcopy;
 	t_token		*nl;
-	t_token		*prev = instead->prev;
-	t_token		*next = instead->next;
+	t_token		*prev;
+	t_token		*next;
 
+	prev = instead->prev;
+	next = instead->next;
 	lcopy = insertion;
 	while (lcopy->next)
 		lcopy = lcopy->next;

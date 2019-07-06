@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/16 12:28:13 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/25 14:57:51 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/06 16:03:06 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 void			init_shell_context(void)
 {
 	extern const char	**environ;
+	extern t_env_vector	*g_alias_vector;
 
 	g_term = (struct s_term *)ft_memalloc(sizeof(struct s_term));
 	g_term->context_original = ft_memalloc(sizeof(t_context));
@@ -34,7 +35,8 @@ void			init_shell_context(void)
 	free(g_term->context_current->term_config);
 	g_term->context_current->environ = g_term->context_original->environ;
 	g_term->context_current->term_config = init_term();
-	context_switch(g_term->context_current);
+	//context_switch(g_term->context_current);
+	g_alias_vector = environ_create_vector(8);
 }
 
 struct termios	*init_term(void)

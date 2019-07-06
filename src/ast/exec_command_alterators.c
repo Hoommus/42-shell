@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/09 15:45:40 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/07 18:48:55 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/05 14:02:01 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,9 +93,11 @@ int				alterate_filedes(const struct s_command *command,
 	g_rdr_error = 0;
 	while (++rdr && rdr->type != TOKEN_NOT_APPLICABLE)
 	{
-		if (rdr->type == TOKEN_GREAT || rdr->type == TOKEN_DGREAT)
-			open_at_fd(rdr->left.fd, rdr->right.path, O_CREAT | O_WRONLY |
-				(rdr->type == TOKEN_DGREAT ? O_APPEND : O_TRUNC), cntxt);
+		if (rdr->type == TOKEN_GREAT)
+			open_at_fd(rdr->left.fd, rdr->right.path, O_CREAT | O_WRONLY, cntxt);
+		else if (rdr->type == TOKEN_DGREAT)
+			fcntl(open_at_fd(rdr->left.fd, rdr->right.path,
+				O_CREAT | O_WRONLY | O_APPEND, cntxt), F_SETFL, O_APPEND);
 		else if (rdr->type == TOKEN_CLOBBER)
 			open_at_fd(rdr->left.fd, rdr->right.path, O_CREAT | O_WRONLY |
 				O_EXCL, cntxt);

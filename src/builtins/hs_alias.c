@@ -6,14 +6,14 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/03 21:57:44 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/04 17:44:56 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/06 15:57:21 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell_builtins.h"
 #include "twenty_one_sh.h"
 
-static t_env_vector	*g_alias_vector;
+t_env_vector		*g_alias_vector;
 
 static void			push_name_value(const char *arg)
 {
@@ -78,8 +78,6 @@ int				hs_alias(const char **args)
 	int			status;
 
 	status = 0;
-	if (g_alias_vector == NULL)
-		g_alias_vector = environ_create_vector(8);
 	if (args == NULL || args[0] == NULL)
 	{
 		print_var_vector(g_alias_vector, SCOPE_GLOBAL);

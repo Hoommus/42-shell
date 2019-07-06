@@ -3,7 +3,7 @@
 #include "shell_job_control.h"
 #include "shell_builtins.h"
 
-void					jc_job_dealloc(t_job **job)
+void			jc_job_dealloc(t_job **job)
 {
 	process_list_destroy(&(*job)->procs);
 	free((*job)->command);
@@ -11,7 +11,7 @@ void					jc_job_dealloc(t_job **job)
 	*job = NULL;
 }
 
-t_job					*jc_tmp_add(t_proc *segment)
+t_job			*jc_tmp_add(t_proc *segment)
 {
 	struct s_job_control	*jc = jc_get();
 
@@ -21,7 +21,7 @@ t_job					*jc_tmp_add(t_proc *segment)
 	return (jc->tmp_job);
 }
 
-static char				*path_to_target(t_proc *segment)
+static char		*path_to_target(t_proc *segment)
 {
 	const char	**args = (const char **)segment->command->args;
 	t_var		*var;
@@ -49,7 +49,8 @@ static char				*path_to_target(t_proc *segment)
 	return (swap);
 }
 
-static int				forknrun_builtin(t_proc *segment, int (*bltin)(const char **))
+static int		forknrun_builtin(t_proc *segment,
+	int (*bltin)(const char **))
 {
 	int						status;
 
@@ -59,16 +60,18 @@ static int				forknrun_builtin(t_proc *segment, int (*bltin)(const char **))
 		exit(bltin((const char **)segment->command->args + 1));
 	}
 	else if (status == -1)
-		ft_dprintf(2, SH ": fork for builtin %s failed\n", segment->command->args[0]);
+		ft_dprintf(2, SH ": fork for builtin %s failed\n",
+			segment->command->args[0]);
 	else
 		context_deep_free(&segment->context);
 	return (0);
 }
 
-static int				run_builtin(t_proc *segment, bool is_async)
+static int		run_builtin(t_proc *segment, bool is_async)
 {
 	extern struct s_builtin	g_builtins[];
-	const char				*bltin = segment->command->args ? segment->command->args[0] : NULL;
+	const char				*bltin = segment->command->args ?
+									segment->command->args[0] : NULL;
 	int						i;
 
 	i = -1;
@@ -89,7 +92,7 @@ static int				run_builtin(t_proc *segment, bool is_async)
 	return (-512);
 }
 
-static int				run_regular(t_job *job, t_proc *process, bool is_async)
+static int		run_regular(t_job *job, t_proc *process, bool is_async)
 {
 	int				status;
 	char			*bin;
@@ -110,7 +113,7 @@ static int				run_regular(t_job *job, t_proc *process, bool is_async)
 	return (status);
 }
 
-int						execute_segments(t_job *job, bool is_async)
+int				execute_segments(t_job *job, bool is_async)
 {
 	const t_proc	*list = job->procs;
 	struct termios	termios;
@@ -136,7 +139,7 @@ int						execute_segments(t_job *job, bool is_async)
 	return (-1024);
 }
 
-int					jc_wait(t_job *job)
+int				jc_wait(t_job *job)
 {
 	t_proc		*procs;
 	int			status;
@@ -155,7 +158,7 @@ int					jc_wait(t_job *job)
 	return (status);
 }
 
-int					jc_resolve_status(t_job *job)
+int				jc_resolve_status(t_job *job)
 {
 	t_proc		*proc;
 
@@ -182,7 +185,7 @@ int					jc_resolve_status(t_job *job)
 	return (0);
 }
 
-int					jc_launch(t_job *job, bool is_async)
+int				jc_launch(t_job *job, bool is_async)
 {
 	int				status;
 
@@ -209,7 +212,7 @@ int					jc_launch(t_job *job, bool is_async)
 	return (status);
 }
 
-int					jc_tmp_finalize(bool is_async)
+int				jc_tmp_finalize(bool is_async)
 {
 	t_job		*job;
 	int			status;

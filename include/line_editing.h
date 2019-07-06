@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:56:36 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/05/14 13:48:57 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/06 14:07:54 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,7 @@ void				handle_alt_right(union u_char key);
 
 enum e_input_state	toggle_quotes(enum e_input_state current, u_int64_t i);
 enum e_input_state	recheck_state(u_int64_t from_index);
-
+char *acompl_update_state(u_int64_t from_index, char *buf, size_t bufsize);
 /*
 ** Caret positions manipulation (cursor_positions.c)
 */
