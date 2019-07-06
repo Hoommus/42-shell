@@ -14,41 +14,15 @@
 #include "acompl.h"
 #include "shell_hashtable.h"
 
+int					get_hashv(char *input_str, char *builtv[])
+{
+	input_str = NULL;
+	*builtv = builtv[0];
+	return (0);
+}
 
-//int					get_hashv(char *input_str, char *builtv[])
-//{
-//	size_t	input_len;
-//	size_t	hashi;
-//	size_t	i;
-//
-//	input_len = ft_strlen(input_str);
-//	hashi = 0;
-//	i = 0;
-//	while (0)
-//	{
-//		if (ft_strnstr(NULL, input_str, input_len))
-//			hashv[hashi++] = ft_strdup(NULL);
-//		i++;
-//	}
-//	//hashv[hashi] = NULL;
-//	return (0);
-//}
-//
-//int					get_hashc(char *input_str)
-//{
-//	size_t	input_len;
-//	size_t	hashc;
-//	size_t	i;
-//
-//	input_len = ft_strlen(input_str);
-//	hashc = 0;
-//	i = 0;
-//	while (0)
-//	{
-//		if (ft_strnstr(NULL, input_str, input_len))
-//			hashc++;
-//		i++;
-//	}
-//	return (hashc);
-//}
-//
+int					get_hashc(char *input_str)
+{
+	input_str = NULL;
+	return (0);
+}
