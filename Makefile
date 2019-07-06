@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/07/05 18:33:52 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/07/06 19:00:02 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -90,11 +90,17 @@ GLOB_DIR = features/glob/
 GLOB_SRC = plist.c parse_dirs.c asterisk_match.c range_match.c \
            ft_glob.c create_pathv.c sort_paths.c dir_match.c
 
+HASH_DIR = features/hash/
+HASH_SRC = hash_add.c hash_free.c hash_get.c hash_init.c \
+           hash_trunc.c
+
 AUTOCOMPLETE_DIR = features/autocomplete/
-AUTOCOMPLETE_SRC = acompl.c acompl_cmd.c acompl_file.c filter_paths.c
+AUTOCOMPLETE_SRC = acompl.c acompl_cmd.c acompl_file.c filter_paths.c \
+                   acompl_builtin.c acompl_alias.c acompl_hash.c
 
 OBJ = $(addprefix $(OBJ_DIR), $(SHELL_SRC:.c=.o))                           \
       $(addprefix $(OBJ_DIR)$(AST_DIR), $(AST_SRC:.c=.o))                   \
+      $(addprefix $(OBJ_DIR)$(HASH_DIR), $(HASH_SRC:.c=.o))                 \
       $(addprefix $(OBJ_DIR)$(GLOB_DIR), $(GLOB_SRC:.c=.o))                 \
       $(addprefix $(OBJ_DIR)$(LEXER_DIR), $(LEXER_SRC:.c=.o))               \
       $(addprefix $(OBJ_DIR)$(HISTORY_DIR), $(HISTORY_SRC:.c=.o))           \
@@ -114,6 +120,7 @@ $(NAME): prepare $(OBJ)
 prepare:
 	@mkdir -p $(OBJ_DIR)$(AST_DIR)
 	@mkdir -p $(OBJ_DIR)$(GLOB_DIR)
+	@mkdir -p $(OBJ_DIR)$(HASH_DIR)
 	@mkdir -p $(OBJ_DIR)$(LEXER_DIR)
 	@mkdir -p $(OBJ_DIR)$(HISTORY_DIR)
 	@mkdir -p $(OBJ_DIR)$(BUILTINS_DIR)

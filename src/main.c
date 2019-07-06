@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:32 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/27 18:55:01 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/06 18:37:40 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include "twenty_one_sh.h"
 #include "shell_history.h"
 #include "shell_script.h"
+#include "shell_hashtable.h"
 
 struct s_term		*g_term;
 
@@ -126,6 +127,7 @@ int					main(int argc, char **argv)
 	jc_init(g_term->context_current);
 	print_messages();
 	setup_signal_handlers();
+	hash_init(&g_hash_table, 1280);
 	if (argc == 1)
 		shell_loop();
 	else

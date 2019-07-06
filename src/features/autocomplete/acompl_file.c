@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   acompl_file.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: mvladymy <mvladymy@student.unit.ua>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/03 03:17:00 by mvladymy          #+#    #+#             */
-/*   Updated: 2019/07/04 20:22:44 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/03 16:54:45 by mvladymy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ static char		*create_pattern(char *str)
 	ft_strlcat(pattern, "*", pat_len);
 	return (pattern);
 }
+
 
 static size_t	count_suitable_paths(char *pathv[])
 {
@@ -88,7 +89,7 @@ static int		del_common_files(glob_t *pglob)
 	return (0);
 }
 
-int				acompl_file(char *input_str, char *result_buf,
+int				acompl_file(char *input_str, char* result_buf,
 							size_t res_size, bool is_cmd)
 {
 	glob_t	gl;
@@ -103,6 +104,6 @@ int				acompl_file(char *input_str, char *result_buf,
 	else
 		res = filter_paths(&gl.gl_pathv[gl.gl_offs], result_buf, res_size);
 	free(pattern);
-	ft_globfree(&gl);
-	return (res);
+	ft_globfree(&gl);	
+	return (res);	
 }

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/05 16:39:57 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/06 18:06:57 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/06 18:26:43 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,6 @@ void							handle_tab(union u_char key)
 	if (state != ACOMPL_ERROR && state != ACOMPL_NOTHING && ft_strcmp(buf, buf2))
 	{
 		buff_insert_string_at(g_term->buffer->iterator, buf2 + offset);
-		buffer_redraw_i(g_term->buffer->iterator - 1);
+		buffer_redraw_i(g_term->buffer->iterator - (ft_strlen(buf2) - offset));
 	}
 }

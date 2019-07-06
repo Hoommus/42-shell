@@ -6,7 +6,7 @@
 /*   By: mvladymy <mvladymy@student.unit.ua>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/03 03:17:00 by mvladymy          #+#    #+#             */
-/*   Updated: 2019/07/03 23:50:38 by mvladymy         ###   ########.fr       */
+/*   Updated: 2019/07/06 19:28:33 by mvladymy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,80 +14,32 @@
 #include "libft.h"
 #include "acompl.h"
 
-const char	*g_builtins_sample[] = {
-	"foo",
-	"bar",
-	"fofobar",
-	"fibar",
-	"sobaka",
-	NULL
-};
+#define ALLCMDC(cmd) (cmd[0] + cmd[1] + cmd[2])
 
-const char *g_alias_sample[] = {
-	"lol",
-	"ololo",
-	"kek",
-	"lolkek",
-	NULL
-};
-
-static int	set_pathv(char *input_str, char *pathv[])
-{
-	size_t	input_len;
-	size_t	path_count;
-	size_t	i;
-
-	input_len = ft_strlen(input_str);
-	path_count = 0;
-	i = 0;
-	while (g_builtins_sample[i])
-	{
-		if (ft_strnstr(g_builtins_sample[i], input_str, input_len))
-			pathv[path_count++] = ft_strdup(g_builtins_sample[i]);
-		i++;
-	}
-	pathv[path_count] = NULL;
-	return (0);
-}
-
-static int	get_path_count(char *input_str)
-{
-	size_t	input_len;
-	size_t	path_count;
-	size_t	i;
-
-	input_len = ft_strlen(input_str);
-	path_count = 0;
-	i = 0;
-	while (g_builtins_sample[i])
-	{
-		if (ft_strnstr(g_builtins_sample[i], input_str, input_len))
-			path_count++;
-		i++;
-	}
-	return (path_count);
-}
-
-static void	free_pathv(char *pathv[])
+static void	free_cmdv(char *cmdv[])
 {
 	size_t	i;
 
 	i = 0;
-	while (pathv[i])
-		free(pathv[i++]);
-	free(pathv);
+	while (cmdv[i])
+		free(cmdv[i++]);
+	free(cmdv); 
 }
 
-static int	get_pathv(char *input_str, char **pathv[])
+static int	get_cmdv(char *input_str, char **cmdv[])
 {
-	size_t	pathc;
+	size_t	cmdc[3];
 
-	pathc = get_path_count(input_str);
-	if (!(*pathv = (char **)malloc(sizeof(char **) * (pathc + 1))))
+	cmdc[0] = get_builtc(input_str);
+	cmdc[1] = get_aliasc(input_str);
+	cmdc[2] = get_hashc(input_str);
+	if (!(*cmdv = (char **)malloc(sizeof(char **) * (ALLCMDC(cmdc) + 1))))
 		return (-1);
-	if (set_pathv(input_str, *pathv))
+	if (get_builtv(input_str, *cmdv)
+			|| get_aliasv(input_str, *cmdv)
+			|| get_hashv(input_str, *cmdv))
 	{
-		free_pathv(*pathv);
+		free_cmdv(*cmdv);
 		return (-1);
 	}
 	return (0);
@@ -96,11 +48,11 @@ static int	get_pathv(char *input_str, char **pathv[])
 int			acompl_cmd(char *input_str, char *result_buf, size_t res_size)
 {
 	int		ret;
-	char	**pathv;
+	char	**cmdv;
 
-	if (get_pathv(input_str, &pathv))
+	if (get_cmdv(input_str, &cmdv))
 		return (ACOMPL_ERROR);
-	ret = filter_paths(pathv, result_buf, res_size);
-	free_pathv(pathv);
+	ret = filter_paths(cmdv, result_buf, res_size);
+	free_cmdv(cmdv);	
 	return (ret);
 }
