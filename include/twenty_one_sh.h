@@ -219,6 +219,7 @@ void					init_files(void);
 void					init_variables(void);
 short					init_fd_at_home(char *filename, int flags);
 int						parse_args(int argc, char **argv);
+void					init_hashtable(void);
 
 /*
 ** Environment (environ_utils.c)

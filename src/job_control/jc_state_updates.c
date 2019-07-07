@@ -61,12 +61,12 @@ enum e_job_state	poll_pipeline(t_job *job, bool wnohang)
 			if (alterate_proc(job, procs) >= 2)
 				break ;
 		}
-		else if (w == 0 && !procs->is_completed)
-		{
-			job->state = JOB_RUNNING;
-			procs->is_stopped = false;
-			job->notified = false;
-		}
+//		else if (w == 0 && !procs->is_completed)
+//		{
+//			job->state = JOB_RUNNING;
+//			procs->is_stopped = false;
+//			job->notified = false;
+//		}
 		procs = procs->next;
 	}
 	return (job->state);

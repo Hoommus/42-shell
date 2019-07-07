@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/07/06 19:00:02 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/07/07 13:20:07 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -34,7 +34,7 @@ SHELL_SRC = main.c init.c memory.c auxilia.c       \
             shell_environ.c shell_environ_tools.c shell_environ_vector.c \
             shell_environ_memory.c \
             syscall_wrappers.c \
-            auxiliary_main.c shell_errors.c
+            auxiliary_main.c init_hashtable.c
 
 LEXER_DIR = lexer/
 LEXER_SRC = tokenizer.c tokens_mem.c token_word_types.c \
@@ -57,7 +57,7 @@ BUILTINS_DIR = builtins/
 BUILTINS_SRC = cd.c builtins.c hs_history.c tokenizer_test.c \
                syntax_test.c hs_set.c hs_unset.c \
                hs_export.c hs_jobs.c hs_fg.c hs_bg.c hs_true.c hs_type.c \
-               hs_false.c hs_alias.c hs_unalias.c hs_exit.c
+               hs_false.c hs_alias.c hs_unalias.c hs_exit.c hs_hash.c
 
 INTERFACE_DIR = line_editing/
 INTERFACE_SRC = buffer_drawing.c buffer_input.c  \

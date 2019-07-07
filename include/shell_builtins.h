@@ -30,6 +30,7 @@ void					print_var_vector(const t_env_vector *vector, u_int32_t scopes);
 ** Builtins (builtins/ *.c)
 */
 
+int						hs_hash(const char **args);
 int						hs_alias(const char **args);
 int						hs_unalias(const char **args);
 int						hs_cd(const char **args);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   acompl.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: mvladymy <mvladymy@student.unit.ua>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/03 16:35:43 by mvladymy          #+#    #+#             */
-/*   Updated: 2019/07/06 19:42:22 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/06 18:50:53 by mvladymy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,13 @@
 
 #include <limits.h>
 
-typedef enum	e_acompl {
-    ACOMPL_NOTHING,
-    ACOMPL_CONTINUE,
-    ACOMPL_END,
-    ACOMPL_ERROR,
-    ACOMPL_MAXINT = INT_MAX
-}				t_acompl;
+typedef enum    e_acompl {                                                      
+    ACOMPL_NOTHING,                                                             
+    ACOMPL_CONTINUE,                                                            
+    ACOMPL_END,                                                                 
+    ACOMPL_ERROR,                                                               
+    ACOMPL_MAXINT = INT_MAX                                                     
+}               t_acompl;
 
 # include <glob.h>
 # include <stdbool.h>

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:32 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/06 18:37:40 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/07 13:26:29 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,7 +127,7 @@ int					main(int argc, char **argv)
 	jc_init(g_term->context_current);
 	print_messages();
 	setup_signal_handlers();
-	hash_init(&g_hash_table, 1280);
+	init_hashtable();
 	if (argc == 1)
 		shell_loop();
 	else

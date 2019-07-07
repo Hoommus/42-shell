@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   hash_add.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvladymy <mvladymy@student.unit.ua>        +#+  +:+       +#+        */
+/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/04 23:14:43 by mvladymy          #+#    #+#             */
-/*   Updated: 2019/07/05 10:28:05 by mvladymy         ###   ########.fr       */
+/*   Updated: 2019/07/07 14:48:51 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 
 static int	create_node(const char *key, const char *value, t_hash_node **node)
 {
-	if (!(*node	= (t_hash_node *)malloc(sizeof(t_hash_node))))
+	if (!(*node	= (t_hash_node *)ft_memalloc(sizeof(t_hash_node))))
 		return (-1);
 	if (!((*node)->key = ft_strdup(key)))
 	{
