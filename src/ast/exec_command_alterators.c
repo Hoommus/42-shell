@@ -108,6 +108,5 @@ int				alterate_filedes(const struct s_command *command,
 		else if (rdr->type == TOKEN_LESSAND || rdr->type == TOKEN_GREATAND)
 			rdr_greatand(cntxt, rdr);
 	}
-	rdr_heredocs(cntxt, command->io_redirects);
 	return (g_rdr_error);
 }

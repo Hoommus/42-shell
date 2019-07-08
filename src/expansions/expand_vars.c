@@ -6,30 +6,30 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/06 16:43:04 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/27 15:59:36 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/07 17:50:07 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "expansions_internal.h"
 #include "twenty_one_sh.h"
 
-static char		*extract_special(const char *str, u_int32_t *off)
+static char
+	*extract_special(const char *str, u_int32_t *off)
 {
-	char		*dummy;
+	char		dummy[2];
 	char		*swap;
 	t_var		*var;
 
-	dummy = ft_strnew(2);
 	dummy[0] = *(str + *off + 1);
 	dummy[1] = 0;
 	var = environ_get_entry(g_term->context_current->environ, dummy);
 	swap = strinsert(str, var ? var->value : "", *off, ft_strlen(dummy) + 1);
 	*off += ft_strlen(var ? var->value : " ") - 1;
-	free(dummy);
 	return (swap);
 }
 
-static char		*extract_var(const char *str, u_int32_t *off)
+static char
+	*extract_var(const char *str, u_int32_t *off)
 {
 	const char	spec = *(str + *off + 1);
 	char		tmp[1024];
@@ -61,7 +61,8 @@ static char		*extract_var(const char *str, u_int32_t *off)
 #define DQUOTE 1
 #define QUOTE 2
 
-static int __attribute__((no_sanitize("address")))		check_ignore(const char *str, u_int32_t i, int ignore)
+static int __attribute__((no_sanitize("address")))
+	check_ignore(const char *str, u_int32_t i, int ignore)
 {
 	if (i > 0 && str[i - 1] == '\\')
 		return (ignore);
@@ -72,7 +73,8 @@ static int __attribute__((no_sanitize("address")))		check_ignore(const char *str
 	return (ignore);
 }
 
-char __attribute__((no_sanitize("address")))			*expand_vars(char *str)
+char __attribute__((no_sanitize("address")))
+	*expand_vars(char *str)
 {
 	u_int32_t	i;
 	size_t		len;

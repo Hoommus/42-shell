@@ -182,7 +182,7 @@ int				jc_resolve_status(t_job *job)
 		job->state = JOB_TERMINATED;
 		return (WEXITSTATUS(proc->status));
 	}
-	return (0);
+	return (-2048);
 }
 
 int				jc_launch(t_job *job, bool is_async)
@@ -195,7 +195,8 @@ int				jc_launch(t_job *job, bool is_async)
 	if (!is_async)
 	{
 		tcsetpgrp(0, g_term->shell_pgid);
-		jc_resolve_status(job);
+		status = jc_resolve_status(job);
+		status = status == -2048 ? 127 : status;
 	}
 	tcsetattr(0, TCSADRAIN, g_term->shell_term);
 	if (!jc_is_subshell() && (is_async || status == -1024))
@@ -222,7 +223,5 @@ int				jc_tmp_finalize(bool is_async)
 		return (0);
 	jc_get()->tmp_job = NULL;
 	status = jc_launch(job, is_async);
-	if (!is_async)
-		status = WEXITSTATUS(status);
 	return (status);
 }

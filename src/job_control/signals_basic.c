@@ -57,7 +57,7 @@ void					setup_signal_handlers(void)
 		.sa_handler = &handle_sigint
 	}), NULL);
 	sigaction(SIGTSTP, &((struct sigaction){
-		.sa_flags = SA_RESTART,
+		.sa_flags = 0,
 		.sa_handler = &tstp}), NULL);
 	sigchild_set_handler();
 	signal(SIGWINCH, &resize);

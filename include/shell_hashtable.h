@@ -29,7 +29,7 @@ typedef struct	s_hash_tab
 	size_t		size;
 }				t_hash_tab;
 
-t_hash_tab		*g_hash_table;
+extern t_hash_tab		*g_hash_table;
 
 int				hash_init(t_hash_tab **hash_table, size_t tab_size);
 int				hash_add(t_hash_tab *hash_table,

@@ -6,7 +6,7 @@
 /*   By: mvladymy <mvladymy@student.unit.ua>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/30 15:05:15 by mvladymy          #+#    #+#             */
-/*   Updated: 2019/07/03 00:40:57 by mvladymy         ###   ########.fr       */
+/*   Updated: 2019/07/06 14:23:12 by mvladymy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ static inline t_plist	*last_plist(t_plist *plist)
 	return (plist);
 }
 
-t_plist					*add_path(t_plist **plist_p, char *path)
+t_plist					*add_path(t_plist **plist_p, const char *path)
 {
 	t_plist	*plist;
 	t_plist	*last;
