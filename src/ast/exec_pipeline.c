@@ -32,9 +32,9 @@ static int			exec_pipeline_terminator(const t_node *node,
 	context_add_fd(context_left, 1, pp[1], "pipe");
 	status = exec_node(node->left, context_left, is_async);
 	status = exec_node(node->right, context_right, is_async);
-	if (node->left->node_type == NODE_SUBSHELL)
+	if (node->left->node_type == NODE_SUBSHELL || node->left->node_type == NODE_BRACE_GROUP)
 		context_deep_free(&context_left);
-	if (node->right->node_type == NODE_SUBSHELL)
+	if (node->right->node_type == NODE_SUBSHELL || node->right->node_type == NODE_BRACE_GROUP)
 		context_deep_free(&context_right);
 	return (status);
 }
@@ -58,7 +58,9 @@ static int			exec_pipeline_inner(const t_node *node,
 	context_add_fd(context_right, 0, pp[0], "pipe");
 	context_add_fd(context_left, 1, pp[1], "pipe");
 	exec_pipeline_inner(node->left, context_left, is_async);
+	close_redundant_fds(context_left);
 	status = exec_node(node->right, context_right, is_async);
+	close_redundant_fds(context_right);
 	return (status);
 }
 
