@@ -143,18 +143,16 @@ int				jc_wait(t_job *job)
 {
 	t_proc		*procs;
 	int			status;
-	bool		was_blocked;
 
-	if (!(was_blocked = sigchild_is_blocked()))
-		sigchild_block();
 	poll_pipeline(job, false);
 	procs = job->procs;
 	while (procs->next)
 		procs = procs->next;
 	alterate_proc(job, procs);
 	status = procs->status;
-	if (!was_blocked)
-		sigchild_unblock();
+	if (job->state == JOB_SIGTSTP || job->state == JOB_SIGSTOP ||
+		job->state == JOB_SIGTTIN || job->state == JOB_SIGTTOU)
+		return (-1024);
 	return (status);
 }
 
@@ -165,19 +163,19 @@ int				jc_resolve_status(t_job *job)
 	proc = job->procs;
 	while (proc->next)
 		proc = proc->next;
-	if (proc->pid != 0 && proc->status != 0 && WIFSIGNALED(proc->status))
+	if (proc->pid != 0 && WIFSIGNALED(proc->status))
 	{
 		job->state = WTERMSIG(proc->status) + 30;
 		ft_dprintf(2, "%s %s\n", jc_state_str(job->state), job->command);
 		return (WTERMSIG(proc->status));
 	}
-	else if (proc->pid != 0 && proc->status != 0 && WIFSTOPPED(proc->status))
+	else if (proc->pid != 0 && WIFSTOPPED(proc->status))
 	{
 		job->state = WSTOPSIG(proc->status) > 0
 					 ? WSTOPSIG(proc->status) + 30 : JOB_STOPPED;
 		return (WSTOPSIG(proc->status));
 	}
-	else if (proc->pid != 0 && proc->status != 0 && WIFEXITED(proc->status))
+	else if (proc->pid != 0 && WIFEXITED(proc->status))
 	{
 		job->state = JOB_TERMINATED;
 		return (WEXITSTATUS(proc->status));

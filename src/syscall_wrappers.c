@@ -15,11 +15,16 @@
 int		openm_wrapper(const char *path, int oflag, mode_t mode)
 {
 	int		fd;
+	int		flags;
 
 	fd = open(path, oflag, mode);
 	if (fd != -1)
+	{
 		context_add_fd(g_term->context_current, fd, fd, path);
-	fcntl(fd, F_SETFL, O_CLOEXEC);
+		flags = fcntl(fd, F_GETFL);
+		if (flags != -1)
+			fcntl(fd, F_SETFL, flags | O_CLOEXEC);
+	}
 	return (fd);
 }
 

@@ -56,7 +56,8 @@ enum e_job_state	poll_pipeline(t_job *job, bool wnohang)
 	procs = job->procs;
 	while (procs)
 	{
-		if ((w = waitpid(procs->pid, &procs->status, wflags)) == procs->pid)
+		if (procs->pid != 0 &&
+			(w = waitpid(procs->pid, &procs->status, wflags)) == procs->pid)
 		{
 			if (alterate_proc(job, procs) >= 2 && (wflags & WNOHANG))
 				break ;

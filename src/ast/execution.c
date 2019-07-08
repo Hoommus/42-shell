@@ -6,16 +6,16 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/27 13:23:10 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/20 20:02:35 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/08 19:10:52 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell_job_control.h"
 #include "shell_script.h"
 
-volatile sig_atomic_t		g_interrupt;
+volatile sig_atomic_t	g_interrupt;
 
-const struct s_executor		g_executors_table[] = {
+const struct s_executor	g_executors_table[] = {
 	{ NODE_COMMAND, {.exec_with_context = &exec_command} },
 	{ NODE_SEPARATOR, {&exec_semicolon_recursive} },
 	{ NODE_PIPE, {&exec_pipeline} },
@@ -26,13 +26,14 @@ const struct s_executor		g_executors_table[] = {
 	{ 0, {NULL}}
 };
 
-int							exec_abort(int dummy)
+int						exec_abort(int dummy)
 {
 	dummy = 0;
 	return (g_interrupt = -77);
 }
 
-int exec_node(const t_node *node, t_context *context, bool is_async)
+int						exec_node(const t_node *node, t_context *context,
+	bool is_async)
 {
 	int			i;
 
@@ -41,13 +42,21 @@ int exec_node(const t_node *node, t_context *context, bool is_async)
 	i = -1;
 	while (g_executors_table[++i].executor.exec && !g_interrupt)
 		if (node->node_type == g_executors_table[i].node_type)
-			return (g_executors_table[i].executor.exec_with_context(node, context, is_async));
+		{
+			if (node->node_type == NODE_PIPE || node->node_type == NODE_OR_IF ||
+				node->node_type == NODE_AND_IF)
+				return (g_executors_table[i].executor.exec(node, is_async));
+			else
+				return (g_executors_table[i].executor.
+					exec_with_context(node, context, is_async));
+		}
 	if (!g_interrupt)
 		ft_printf("No executor for node of type %d\n", node->node_type);
 	return (71);
 }
 
-int exec_semicolon_recursive(const t_node *parent, bool is_async)
+int						exec_semicolon_recursive(const t_node *parent,
+	bool is_async)
 {
 	int		status;
 
@@ -69,7 +78,7 @@ int exec_semicolon_recursive(const t_node *parent, bool is_async)
 ** Because tree balancing is for virgins and crutches are for real chads
 */
 
-int							exec_semicolon_iterative(t_node *parent)
+int						exec_semicolon_iterative(t_node *parent)
 {
 	t_node	*sep;
 

@@ -81,8 +81,7 @@ static void	prepare_exec(t_job *job, t_proc *process, bool is_async)
 
 int			forknrun(t_job *job, t_proc *proc, char *path, bool is_async)
 {
-	proc->pid = fork();
-	if (proc->pid == 0)
+	if ((proc->pid = fork()) == 0)
 	{
 		prepare_exec(job, proc, is_async);
 		execve(path, proc->command->args,

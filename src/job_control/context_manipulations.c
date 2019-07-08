@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/12 16:10:06 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/25 18:27:50 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/08 23:22:24 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,16 @@ void	context_add_fd(t_context *context,
 {
 	struct s_fd_lst	*swap;
 	struct s_fd_lst	*tmp;
+	int				flags;
 
 	tmp = ft_memalloc(sizeof(struct s_fd_lst));
 	if (label)
 		tmp->label = ft_strdup(label);
 	tmp->original = (short)original;
 	tmp->current = (short)actual;
-	fcntl(actual, F_SETFL, O_CLOEXEC);
+	flags = fcntl(actual, F_GETFL);
+	if (flags != -1)
+		fcntl(actual, F_SETFL, flags | O_CLOEXEC);
 	swap = context->fd_list;
 	if (!swap)
 		context->fd_list = tmp;

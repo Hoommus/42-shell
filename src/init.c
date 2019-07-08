@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/16 12:28:13 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/06 16:03:06 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/09 01:28:22 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,8 @@ void			init_shell_context(void)
 	if (fcntl(STDERR_FILENO, F_GETFD) != -1)
 		context_add_fd(g_term->context_original, 2, 2, "stderr");
 	environ_from_array(g_term->context_original->environ, environ);
-	g_term->context_current = context_duplicate(g_term->context_original, XDUP_ENV | XDUP_TERM);
+	g_term->context_current = context_duplicate(g_term->context_original,
+		XDUP_ENV | XDUP_FDS);
 	environ_deallocate_vector(g_term->context_current->environ);
 	free(g_term->context_current->term_config);
 	g_term->context_current->environ = g_term->context_original->environ;
@@ -38,6 +39,8 @@ void			init_shell_context(void)
 	//context_switch(g_term->context_current);
 	g_alias_vector = environ_create_vector(8);
 }
+
+#define LFLAGS (~(ECHO | ECHOK | ECHONL | ECHOCTL | ICANON) | ISIG | IEXTEN)
 
 struct termios	*init_term(void)
 {
@@ -56,8 +59,9 @@ struct termios	*init_term(void)
 		g_term->context_original->term_config = oldterm;
 		tcgetattr(g_term->tty_fd, oldterm);
 		ft_memcpy(newterm, oldterm, sizeof(struct termios));
-		newterm->c_lflag &= ~(ECHO | ECHOK | ECHONL | ECHOCTL | ICANON) | ISIG | IEXTEN;
+		newterm->c_lflag &= LFLAGS;
 		newterm->c_iflag &= ~(IXOFF) | BRKINT;
+		newterm->c_cflag &= ~(CREAD);
 		newterm->c_cc[VMIN] = 1;
 		newterm->c_cc[VTIME] = 0;
 		ioctl(STDOUT_FILENO, TIOCGWINSZ, &window);
@@ -100,7 +104,11 @@ void			init_files(void)
 
 	var = get_env_v(NULL, "HISTFILE");
 	if (var == NULL || var->value == NULL || ft_strlen(var->value) == 0)
+	{
 		g_term->history_file = init_fd_at_home(HISTORY_FILE, 0);
+		set_env_v(g_term->context_current->environ, "HISTFILE",
+			HISTORY_FILE, SCOPE_SHELL_LOCAL);
+	}
 	else
 		g_term->history_file = init_fd_at_home(var->value, 0);
 }

@@ -6,11 +6,10 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:32 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/07 13:26:29 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/08 23:41:18 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <errno.h>
 #include "line_editing.h"
 #include "shell_job_control.h"
 #include "twenty_one_sh.h"
@@ -24,14 +23,11 @@ static int			shell_loop(void)
 {
 	char		*commands;
 
-	g_term->shell_pgid = getpgrp();
-	g_term->shell_term = ft_memalloc(sizeof(struct termios));
-	*g_term->shell_term = *g_term->context_current->term_config;
 	while (true)
 	{
 		if (tcgetpgrp(0) != g_term->shell_pgid)
 			tcsetpgrp(0, g_term->shell_pgid);
-		tcsetattr(0, TCSADRAIN, g_term->shell_term);
+		tcsetattr(0, TCSAFLUSH, g_term->shell_term);
 		g_interrupt = 0;
 		if (g_term->input_state == STATE_NON_INTERACTIVE)
 			read_fd(0, &commands);
@@ -129,8 +125,18 @@ int					main(int argc, char **argv)
 	print_messages();
 	setup_signal_handlers();
 	if (argc == 1)
+	{
+		g_term->context_current->term_config->c_cflag = CREAD;
+		g_term->shell_pgid = getpgrp();
+		g_term->shell_term = ft_memalloc(sizeof(struct termios));
+		*g_term->shell_term = *g_term->context_current->term_config;
 		shell_loop();
+	}
 	else
+	{
+		jc_lock_subshell_state(getpgrp());
+		jc_enable_subshell();
 		run_file(argv[1]);
+	}
 	return (g_term->last_status);
 }

@@ -57,7 +57,7 @@ void					setup_signal_handlers(void)
 		.sa_handler = &handle_sigint
 	}), NULL);
 	sigaction(SIGTSTP, &((struct sigaction){
-		.sa_flags = 0,
+		.sa_flags = SA_RESTART,
 		.sa_handler = &tstp}), NULL);
 	sigchild_set_handler();
 	signal(SIGWINCH, &resize);
@@ -67,5 +67,5 @@ void					setup_signal_handlers(void)
 	sigemptyset(&set);
 	sigaddset(&set, SIGTTOU);
 	sigaddset(&set, SIGTTIN);
-	sigprocmask(SIG_BLOCK, &set, 0);
+//	sigprocmask(SIG_BLOCK, &set, 0);
 }

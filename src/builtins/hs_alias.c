@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/03 21:57:44 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/06 15:57:21 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/08 23:49:26 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ static void			push_name_value(const char *arg)
 		if (arg[i] == '=')
 		{
 			alias = ft_strsub(arg, 0, i);
-			environ_push_entry(g_alias_vector, alias, arg + i + 1, SCOPE_GLOBAL);
+			environ_push_entry(g_alias_vector, alias, arg + i + 1, SCOPE_SHELL_LOCAL);
 			free(alias);
 			return ;
 		}
@@ -80,7 +80,7 @@ int				hs_alias(const char **args)
 	status = 0;
 	if (args == NULL || args[0] == NULL)
 	{
-		print_var_vector(g_alias_vector, SCOPE_GLOBAL);
+		print_var_vector(g_alias_vector, SCOPE_SHELL_LOCAL);
 		return (1);
 	}
 	i = 0;

@@ -94,10 +94,11 @@ int				alterate_filedes(const struct s_command *command,
 	while (++rdr && rdr->type != TOKEN_NOT_APPLICABLE)
 	{
 		if (rdr->type == TOKEN_GREAT)
-			open_at_fd(rdr->left.fd, rdr->right.path, O_CREAT | O_WRONLY, cntxt);
+			open_at_fd(rdr->left.fd, rdr->right.path, O_CREAT | O_WRONLY,
+				cntxt);
 		else if (rdr->type == TOKEN_DGREAT)
-			fcntl(open_at_fd(rdr->left.fd, rdr->right.path,
-				O_CREAT | O_WRONLY | O_APPEND, cntxt), F_SETFL, O_APPEND);
+			open_at_fd(rdr->left.fd, rdr->right.path,
+				O_CREAT | O_WRONLY | O_APPEND, cntxt);
 		else if (rdr->type == TOKEN_CLOBBER)
 			open_at_fd(rdr->left.fd, rdr->right.path, O_CREAT | O_WRONLY |
 				O_EXCL, cntxt);
