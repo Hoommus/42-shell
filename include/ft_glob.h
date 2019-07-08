@@ -6,7 +6,7 @@
 /*   By: mvladymy <mvladymy@student.unit.ua>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/29 14:45:03 by mvladymy          #+#    #+#             */
-/*   Updated: 2019/07/03 03:48:41 by mvladymy         ###   ########.fr       */
+/*   Updated: 2019/07/06 14:23:02 by mvladymy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,6 @@ int				ft_glob(const char *pattern,
 						int flags,
 						int (*errfunc) (const char *epath, int eerrno),
 						glob_t *pglob);
-
 void			ft_globfree(glob_t *pglob);
 
 typedef struct	s_plist {
@@ -33,7 +32,7 @@ typedef struct	s_plist {
 	struct s_plist	*next;
 }				t_plist;
 
-t_plist			*add_path(t_plist **plist_p, char *path);
+t_plist			*add_path(t_plist **plist_p, const char *path);
 void			free_plist(t_plist *plist);
 int				sort_paths(t_plist **plist_p);
 

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/05 17:50:36 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/05 17:34:04 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/07 16:01:38 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,11 +125,7 @@ int exec_command(const t_node *command_node, t_context *new_context, bool is_asy
 		: context_duplicate(g_term->context_original, XDUP_TERM);
 	expand_everything(command);
 	alterate_vars(command, context);
-	if (alterate_filedes(command, context))
-	{
-		context_deep_free(&context);
-		return (1);
-	}
+	rdr_heredocs(context, command->io_redirects);
 	status = 0;
 	if (!g_interrupt && command->args != NULL && command->args[0] != NULL)
 	{

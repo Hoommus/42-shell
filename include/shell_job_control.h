@@ -122,7 +122,7 @@ int						alterate_proc(t_job *job, t_proc *proc);
 t_job					*choose_job(const char *criteria);
 const char				*jc_state_str(enum e_job_state state);
 void					jc_format_job(const t_job *job);
-int						forknrun(t_job *job, t_proc *process, char *path,
+int						forknrun(t_job *job, t_proc *proc, char *path,
 	bool is_async);
 void					close_redundant_fds(t_context *context);
 

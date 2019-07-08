@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/07/07 13:20:07 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/07/07 17:47:42 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,7 @@ FLAGS = -DSH=\"$(NAME)\" \
                -Werror \
                -g
 
-HEADER = -I include/ -I printf/include -I libft/
+HEADERS = -I include/ -I printf/include -I libft/
 SRC_DIR = ./src/
 OBJ_DIR = ./obj/
 
@@ -76,7 +76,7 @@ JOB_CONTROL_SRC = signals_basic.c signals_children.c signals_child_blocker.c \
                   context_manipulations.c context_switch.c \
                   jc_subshell_env.c \
                   jc_headquaters.c jc_state_updates.c \
-                  jc_queue_forknrun.c jc_queue_interface.c \
+                  jc_queue_forknrun.c \
                   pipeline.c jc_job_launcher.c jc_auxiliary.c
 
 EXPANSIONS_DIR = expansions/
@@ -115,7 +115,7 @@ all: $(NAME)
 $(NAME): prepare $(OBJ)
 	make -C $(LIB_DIR)
 	cp $(LIB_DIR)/$(LIB_NAME) ./$(LIB_NAME)
-	$(CC) $(FLAGS) -o $(NAME) $(OBJ) $(HEADER) $(LIB_NAME) -ltermcap
+	$(CC) $(FLAGS) -o $(NAME) $(OBJ) $(HEADERS) $(LIB_NAME) -ltermcap
 
 prepare:
 	@mkdir -p $(OBJ_DIR)$(AST_DIR)
@@ -130,7 +130,7 @@ prepare:
 	@mkdir -p $(OBJ_DIR)$(AUTOCOMPLETE_DIR)
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
-	$(CC) $(FLAGS) $(HEADER) -o $@ -c $< ;
+	$(CC) $(FLAGS) $(HEADERS) -o $@ -c $< ;
 
 install:
 	@if [ grep ~/.brew/bin $PATH 2>/dev/null ] ; \
@@ -151,20 +151,6 @@ clean:
 	@/bin/rm -rf $(OBJ)
 	/bin/rm -rf $(OBJ_DIR)
 
-norme:
-	@echo "<<<===========>>>"
-	norminette $(wildcard $(SRC_DIR)*.c)
-	@echo "<<<===========>>>"
-	norminette $(HEADER)
-	@echo "<<<===========>>>"
-	norminette $(wildcard $(LIB_DIR)/src/*.c)
-	@echo "<<<===========>>>"
-	norminette $(wildcard $(LIB_DIR)/include/*.h)
-	@echo "<<<===========>>>"
-	norminette $(wildcard ./libft/*.c)
-	@echo "<<<===========>>>"
-	norminette $(wildcard ./libft/*.h)
-
 fclean: clean
 	make -C $(LIB_DIR) fclean
 	/bin/rm -f $(NAME)
@@ -175,4 +161,4 @@ re: fclean all
 love:
 	@echo "Not all."
 
-.PHONY: clean all fclean re love norme
+.PHONY: clean all fclean re love

@@ -124,10 +124,10 @@ int					main(int argc, char **argv)
 	history_load(g_term->history_file);
 	argv += parse_args(argc, argv);
 	init_variables();
+	init_hashtable();
 	jc_init(g_term->context_current);
 	print_messages();
 	setup_signal_handlers();
-	init_hashtable();
 	if (argc == 1)
 		shell_loop();
 	else

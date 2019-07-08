@@ -58,10 +58,10 @@ enum e_job_state	poll_pipeline(t_job *job, bool wnohang)
 	{
 		if ((w = waitpid(procs->pid, &procs->status, wflags)) == procs->pid)
 		{
-			if (alterate_proc(job, procs) >= 2)
+			if (alterate_proc(job, procs) >= 2 && (wflags & WNOHANG))
 				break ;
 		}
-//		else if (w == 0 && !procs->is_completed)
+//		else if (w == 0 && !procs->is_completed && procs->is_stopped)
 //		{
 //			job->state = JOB_RUNNING;
 //			procs->is_stopped = false;

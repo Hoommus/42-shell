@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/19 16:39:00 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/27 16:54:53 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/07 19:09:18 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,45 @@ static int	exec_subshell_regular(const t_node *body, t_context *new_context)
 	return (status);
 }
 
-int			exec_subshell(const t_node *node, t_context *new_context, bool is_async)
+static int	run_parent(int f, t_job *job, t_context *context, bool is_async)
+{
+	int		status;
+
+	setpgid((job->pgid = f), f);
+	sigchild_block();
+	job->procs = process_create(NULL, context);
+	job->procs->pid = f;
+	job->command = ft_strdup("(subshell)");
+	if (is_async)
+		jc_register_job(job);
+	tcsetpgrp(0, job->pgid);
+	status = is_async ? 0 : jc_wait(job);
+	tcsetpgrp(0, g_term->shell_pgid);
+	sigchild_unblock();
+	return (status);
+}
+
+static int	decide_what_to_do(int f, t_job *job, const t_node *body,
+	t_context *context)
+{
+	int		status;
+
+	status = 0;
+	if (f == 0)
+		exec_subshell_async(body, context);
+	else if (f == -1)
+		status = (ft_dprintf(2, SH ": fork error in async subshell\n") & 0) | 1;
+	else if (f <= -2)
+	{
+		status = exec_subshell_regular(body, context);
+		jc_job_dealloc(&job);
+	}
+	return (status);
+}
+
+int			exec_subshell(const t_node *node,
+	t_context *new_context,
+	bool is_async)
 {
 	t_context		*context;
 	int				status;
@@ -67,29 +105,10 @@ int			exec_subshell(const t_node *node, t_context *new_context, bool is_async)
 	if (is_async || !(body->node_type == NODE_SEPARATOR && body->right &&
 				body->right->node_type == NODE_COMMAND && body->left == NULL))
 		f = fork();
-	if (f == 0)
-		exec_subshell_async(body, context);
-	else if (f == -1)
-		status = (ft_dprintf(2, SH ": fork error in async subshell\n") & 0) | 1;
-	else if (f <= -2)
-	{
-		status = exec_subshell_regular(body, context);
-		jc_job_dealloc(&job);
-	}
+	if (f <= 0)
+		decide_what_to_do(f, job, body, context);
 	else
-	{
-		setpgid((job->pgid = f), f);
-		sigchild_block();
-		job->procs = process_create(NULL, context);
-		job->procs->pid = f;
-		job->command = ft_strdup("(subshell)");
-		if (is_async)
-			jc_register_job(job);
-		tcsetpgrp(0, job->pgid);
-		status = is_async ? 0 : jc_wait(job);
-		tcsetpgrp(0, g_term->shell_pgid);
-		sigchild_unblock();
-	}
+		run_parent(f, job, context, is_async);
 	jc_unlock_subshell_state(g_term->shell_pgid);
 	jc_disable_subshell();
 	return (status);

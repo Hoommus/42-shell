@@ -29,7 +29,7 @@ void	expand_globs(struct s_command *command)
 	i = 0;
 	while (command->args[i])
 	{
-		if ((glob(command->args[i], GLOB_NOCHECK | GLOB_APPEND,
+		if ((ft_glob(command->args[i], GLOB_NOCHECK | GLOB_APPEND,
 			&errfunc, &globt)) == GLOB_NOCHECK)
 		{
 			globt.gl_pathv[globt.gl_pathc] = command->args[i];
