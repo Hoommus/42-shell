@@ -13,9 +13,9 @@
 #include "shell_builtins.h"
 #include "twenty_one_sh.h"
 
-t_env_vector		*g_alias_vector;
+t_env_vector	*g_alias_vector;
 
-static void			push_name_value(const char *arg)
+static void		push_name_value(const char *arg)
 {
 	size_t		len;
 	size_t		i;
@@ -28,7 +28,8 @@ static void			push_name_value(const char *arg)
 		if (arg[i] == '=')
 		{
 			alias = ft_strsub(arg, 0, i);
-			environ_push_entry(g_alias_vector, alias, arg + i + 1, SCOPE_SHELL_LOCAL);
+			environ_push_entry(g_alias_vector, alias, arg + i + 1,
+				SCOPE_SHELL_LOCAL);
 			free(alias);
 			return ;
 		}
@@ -70,7 +71,6 @@ int				alias_remove_all(void)
 	return (0);
 }
 
-// TODO: make alias name validation
 int				hs_alias(const char **args)
 {
 	u_int32_t	i;

@@ -47,7 +47,8 @@ char		**environ_to_array(t_env_vector *vector, u_int32_t scopes)
 	return (array);
 }
 
-static char	**append_rogue_env(t_env_vector *valt, char **env, u_int32_t scopes, size_t offset)
+static char	**append_rogue_env(t_env_vector *valt, char **env, u_int32_t scopes,
+	size_t offset)
 {
 	const t_var		*vars = valt->array;
 	size_t			i;
@@ -64,7 +65,8 @@ static char	**append_rogue_env(t_env_vector *valt, char **env, u_int32_t scopes,
 ** and populates final array taking into account these alterations
 */
 
-char		**environ_to_array_diff(t_env_vector *valt, const t_env_vector *vshell, u_int32_t scopes)
+char		**environ_to_array_diff(t_env_vector *valt,
+	const t_env_vector *vshell, u_int32_t scopes)
 {
 	t_var				*valt_var;
 	char				**env;

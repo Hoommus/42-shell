@@ -30,8 +30,10 @@ void							handle_tab(union u_char key)
 	if (!buf[0] || g_term->acompl_state == AC_NONE)
 		return ;
 	offset = ft_strlen(buf);
-	state = acompl(buf, buf2, 1024 * sizeof(char), g_term->acompl_state == AC_COMMAND);
-	if (state != ACOMPL_ERROR && state != ACOMPL_NOTHING && ft_strcmp(buf, buf2))
+	state = acompl(buf, buf2, 1024 * sizeof(char),
+		g_term->acompl_state == AC_COMMAND);
+	if (state != ACOMPL_ERROR && state != ACOMPL_NOTHING &&
+		ft_strcmp(buf, buf2))
 	{
 		buff_insert_string_at(g_term->buffer->iterator, buf2 + offset);
 		buffer_redraw_i(g_term->buffer->iterator - (ft_strlen(buf2) - offset));

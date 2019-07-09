@@ -6,7 +6,7 @@
 /*   By: vtarasiu <vtarasiu@student.unit.ua>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/09 04:06:43 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/09 04:06:43 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/09 14:59:01 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,8 @@ static void		sigchild_handler(int sig, siginfo_t *info, void *ignore)
 			if (procs->pid == info->si_pid)
 			{
 				waitpid(procs->pid, &procs->status, WUNTRACED);
-				alterate_proc((t_job *)jobs, procs);
-				break ;
+				if (alterate_proc((t_job *)jobs, procs) >= 2)
+					break ;
 			}
 			procs = procs->next;
 		}
@@ -43,12 +43,14 @@ static void		sigchild_handler(int sig, siginfo_t *info, void *ignore)
 void			sigchild_set_handler(void)
 {
 	static sigset_t			set;
-	static struct sigaction	act = {
-		.sa_mask = 0,
-		.sa_flags = SA_SIGINFO | SA_RESTART,
-		.sa_sigaction = &sigchild_handler
-	};
+	static struct sigaction	act;
 
+	if (act.sa_handler == 0)
+	{
+		act.sa_mask = 0;
+		act.sa_flags = SA_SIGINFO | SA_RESTART;
+		act.sa_sigaction = &sigchild_handler;
+	}
 	if (!sigismember(&set, SIGCHLD))
 		sigaddset(&set, SIGCHLD);
 	act.sa_mask = set;

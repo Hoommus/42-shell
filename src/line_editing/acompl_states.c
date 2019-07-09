@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   acompl_states.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: vtarasiu <vtarasiu@student.unit.ua>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/05 21:02:58 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/06 18:34:26 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/09 14:45:13 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include "line_editing.h"
 #include "twenty_one_sh.h"
 
-static inline void	free_tokens(t_token *list)
+static inline void		free_tokens(t_token *list)
 {
 	t_token		*next;
 
@@ -48,7 +48,7 @@ static inline t_token	*trim(t_token *list)
 	return (list);
 }
 
-char				*acompl_update_state(u_int64_t from_index, char *buf,
+char					*acompl_update_state(u_int64_t from_index, char *buf,
 	size_t bufsize)
 {
 	register t_token	*list;
