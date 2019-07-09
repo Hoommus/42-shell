@@ -3,16 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   hs_fg.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: vtarasiu <vtarasiu@student.unit.ua>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/09 02:30:30 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/09 02:32:20 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/09 18:42:10 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell_job_control.h"
 #include "twenty_one_sh.h"
 
+#include <errno.h>
 t_job		*search_job_id(int id)
 {
 	t_job		*list;
@@ -50,7 +51,8 @@ int			jc_to_fg(t_job *job)
 	{
 		if (segments->is_stopped && !segments->is_completed)
 		{
-			kill(segments->pid, SIGCONT);
+			if (kill(segments->pid, SIGCONT) == -1)
+				ft_dprintf(2, "fg: kill error: %s\n", strerror(errno));
 			segments->is_stopped = false;
 			job->notified = false;
 		}

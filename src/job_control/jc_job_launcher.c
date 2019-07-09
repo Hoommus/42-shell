@@ -6,7 +6,7 @@
 /*   By: vtarasiu <vtarasiu@student.unit.ua>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/09 04:03:21 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/09 04:07:40 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/09 17:44:31 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,7 +156,7 @@ int				jc_wait(t_job *job)
 	t_proc		*procs;
 	int			status;
 
-	poll_pipeline(job, false);
+	poll_pipeline(job, 0);
 	procs = job->procs;
 	while (procs->next)
 		procs = procs->next;
@@ -192,6 +192,8 @@ int				jc_resolve_status(t_job *job)
 		job->state = JOB_TERMINATED;
 		return (WEXITSTATUS(proc->status));
 	}
+	else if (proc->pid == 0)
+		return (proc->status);
 	return (-2048);
 }
 
@@ -211,9 +213,8 @@ int				jc_launch(t_job *job, bool is_async)
 	tcsetattr(0, TCSADRAIN, g_term->shell_term);
 	if (!jc_is_subshell() && (is_async || status == -1024))
 	{
-		job->state = JOB_LAUNCHED;
+		poll_pipeline(job, WNOHANG | WCONTINUED);
 		jc_register_job(job);
-		job->state = JOB_RUNNING;
 	}
 	else if (job->state == JOB_SIGTSTP || job->state == JOB_SIGSTOP ||
 			job->state == JOB_SIGTTIN || job->state == JOB_SIGTTOU)

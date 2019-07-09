@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   hs_bg.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: vtarasiu <vtarasiu@student.unit.ua>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/09 03:42:20 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/09 03:42:43 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/09 16:56:51 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,22 +14,22 @@
 
 void		jc_to_bg(t_job *job)
 {
-	t_proc	*segments;
+	t_proc				*segments;
 
-	job->state = JOB_CONTINUED;
-	jc_format_job(job);
+	tcsetpgrp(0, g_term->shell_pgid);
 	segments = job->procs;
+	kill(-job->pgid, SIGCONT);
 	while (segments)
 	{
 		if (segments->is_stopped && !segments->is_completed)
 		{
-			kill(segments->pid, SIGCONT);
 			segments->is_stopped = false;
+			segments->is_completed = false;
 			job->notified = false;
 		}
 		segments = segments->next;
 	}
-	job->state = JOB_RUNNING;
+	poll_pipeline(job, WNOHANG | WCONTINUED);
 }
 
 int			hs_bg(const char **args)

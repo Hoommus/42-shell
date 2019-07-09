@@ -67,5 +67,4 @@ void					setup_signal_handlers(void)
 	sigemptyset(&set);
 	sigaddset(&set, SIGTTOU);
 	sigaddset(&set, SIGTTIN);
-//	sigprocmask(SIG_BLOCK, &set, 0);
 }

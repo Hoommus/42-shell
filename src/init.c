@@ -36,7 +36,6 @@ void			init_shell_context(void)
 	free(g_term->context_current->term_config);
 	g_term->context_current->environ = g_term->context_original->environ;
 	g_term->context_current->term_config = init_term();
-	//context_switch(g_term->context_current);
 	g_alias_vector = environ_create_vector(8);
 }
 

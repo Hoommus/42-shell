@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_command_glob.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: vtarasiu <vtarasiu@student.unit.ua>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/04 20:47:55 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/05 14:39:30 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/09 17:37:43 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,12 +29,7 @@ void	expand_globs(struct s_command *command)
 	i = 0;
 	while (command->args[i])
 	{
-		if ((ft_glob(command->args[i], GLOB_NOCHECK | GLOB_APPEND,
-			&errfunc, &globt)) == GLOB_NOCHECK)
-		{
-			globt.gl_pathv[globt.gl_pathc] = command->args[i];
-			globt.gl_pathc++;
-		}
+		ft_glob(command->args[i], GLOB_NOCHECK | GLOB_APPEND, &errfunc, &globt);
 		i++;
 	}
 	free_array((void **)command->args);
