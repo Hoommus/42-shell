@@ -38,7 +38,7 @@ t_proc		*process_list_add(t_proc **pipeline, t_proc *segment)
 			if (list->next == NULL)
 			{
 				list->next = segment;
-				break;
+				break ;
 			}
 			list = list->next;
 		}
@@ -46,7 +46,7 @@ t_proc		*process_list_add(t_proc **pipeline, t_proc *segment)
 	return (*pipeline);
 }
 
-void				process_list_destroy(t_proc **pipeline)
+void		process_list_destroy(t_proc **pipeline)
 {
 	t_proc	*list;
 	t_proc	*next;

@@ -1,8 +1,20 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   tree_brace_group.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/07/08 19:22:11 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/07/08 19:22:11 by vtarasiu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "shell_script.h"
 #include "shell_script_parser.h"
 
-t_bresult	*brace_group_build(const t_state *state, struct s_result *last_build)
+t_bresult	*brace_group_build(const t_state *state,
+	struct s_result *last_build)
 {
 	t_node				*node;
 	t_bresult			*bresult;

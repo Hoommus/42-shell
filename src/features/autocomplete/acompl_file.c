@@ -30,7 +30,6 @@ static char		*create_pattern(char *str)
 	return (pattern);
 }
 
-
 static size_t	count_suitable_paths(char *pathv[])
 {
 	size_t		pathi;
@@ -89,7 +88,7 @@ static int		del_common_files(glob_t *pglob)
 	return (0);
 }
 
-int				acompl_file(char *input_str, char* result_buf,
+int				acompl_file(char *input_str, char *result_buf,
 							size_t res_size, bool is_cmd)
 {
 	glob_t	gl;
@@ -104,6 +103,6 @@ int				acompl_file(char *input_str, char* result_buf,
 	else
 		res = filter_paths(&gl.gl_pathv[gl.gl_offs], result_buf, res_size);
 	free(pattern);
-	ft_globfree(&gl);	
-	return (res);	
+	ft_globfree(&gl);
+	return (res);
 }

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/10 12:09:35 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/21 21:36:42 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/09 00:19:41 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ void			context_deep_free(t_context **context)
 void			context_switch(t_context *to_which)
 {
 	struct s_fd_lst		*list;
+	int					flags;
 
 	if (!to_which)
 		to_which = g_term->context_backup;
@@ -63,7 +64,9 @@ void			context_switch(t_context *to_which)
 		else
 		{
 			dup2(list->current, list->original);
-			fcntl(list->current, F_SETFL, O_CLOEXEC);
+			flags = fcntl(list->current, F_GETFL);
+			if (flags != -1)
+				fcntl(list->current, F_SETFL, flags | O_CLOEXEC);
 		}
 		list = list->next;
 	}
@@ -110,7 +113,6 @@ static void		duplicate_fds(t_context *new, const t_context *context,
 				tmp->label = ft_strdup("cloned");
 			tmp->original = list->original;
 			tmp->current = with_dup ? dup(list->current) : list->current;
-			fcntl(tmp->current, F_SETFL, O_CLOEXEC);
 			if (!new->fd_list)
 			{
 				new->fd_list = tmp;
@@ -143,11 +145,11 @@ t_context		*context_duplicate(const t_context *context, int dup_what)
 	if (context->term_config != NULL)
 		ft_memcpy(new->term_config, context->term_config,
 			sizeof(struct termios));
-	if (dup_what | XDUP_ENV)
+	if (dup_what & XDUP_ENV)
 		duplicate_environ(new, context);
 	else
 		new->environ = environ_create_vector(4);
-	if (dup_what | XDUP_FDS)
+	if (dup_what & XDUP_FDS)
 		duplicate_fds(new, context, dup_what);
 	return (new);
 }

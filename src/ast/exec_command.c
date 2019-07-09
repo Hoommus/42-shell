@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/05 17:50:36 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/07 16:01:38 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/08 23:59:57 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,8 @@ static void	expand_everything(const struct s_command *command)
 ** TODO: optimise (how?..) execution if no variables and fds changes are made
 */
 
-int exec_command(const t_node *command_node, t_context *new_context, bool is_async)
+int			exec_command(const t_node *command_node, t_context *new_context,
+	bool is_async)
 {
 	const struct s_command	*command = command_node->command;
 	t_context				*context;
@@ -122,14 +123,14 @@ int exec_command(const t_node *command_node, t_context *new_context, bool is_asy
 	if (command_node->node_type != NODE_COMMAND || command == NULL)
 		exit(ft_dprintf(2, SH ": fatal: cmd node is not actually a command\n"));
 	context = new_context ? new_context
-		: context_duplicate(g_term->context_original, XDUP_TERM);
+		: context_duplicate(g_term->context_original, XDUP_ENV | XDUP_TERM);
 	expand_everything(command);
 	alterate_vars(command, context);
 	rdr_heredocs(context, command->io_redirects);
 	status = 0;
 	if (!g_interrupt && command->args != NULL && command->args[0] != NULL)
 	{
-		jc_tmp_add(process_create((t_command *) command, context));
+		jc_tmp_add(process_create((t_command *)command, context));
 		is_async = jc_is_subshell() ? false : is_async;
 		if (new_context == NULL)
 			status = jc_tmp_finalize(is_async);

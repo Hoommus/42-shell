@@ -6,7 +6,7 @@
 #    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/07/07 17:47:42 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/07/09 00:12:54 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,7 +20,7 @@ FLAGS = -DSH=\"$(NAME)\" \
                -Wall  \
                -Wextra \
                -Werror \
-               -g
+               -g -fsanitize=address
 
 HEADERS = -I include/ -I printf/include -I libft/
 SRC_DIR = ./src/
@@ -47,7 +47,7 @@ AST_SRC = ast_exec_main.c ast_exec_preprocess.c \
           execution.c \
           exec_command.c exec_command_alterators.c exec_command_heredocs.c \
           exec_command_glob.c exec_subshell.c exec_brace_group.c \
-          exec_pipeline.c exec_andor_if.c \
+          exec_pipeline.c exec_or_if.c exec_and_if.c \
           tree_auxillary.c \
           tree_simple_command.c tree_simple_command_rdrs.c tree_subshell.c \
           tree_pipe_sequence.c tree_and_or.c tree_list.c \

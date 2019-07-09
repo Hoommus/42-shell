@@ -16,7 +16,7 @@
 
 static int	create_node(const char *key, const char *value, t_hash_node **node)
 {
-	if (!(*node	= (t_hash_node *)ft_memalloc(sizeof(t_hash_node))))
+	if (!(*node = (t_hash_node *)ft_memalloc(sizeof(t_hash_node))))
 		return (-1);
 	if (!((*node)->key = ft_strdup(key)))
 	{

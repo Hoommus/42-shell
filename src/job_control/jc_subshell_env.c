@@ -1,14 +1,26 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   jc_subshell_env.c                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vtarasiu <vtarasiu@student.unit.ua>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/07/09 04:03:32 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/07/09 04:03:32 by vtarasiu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "shell_job_control.h"
 
 static bool		g_is_subhsell_env;
-static pid_t	who_locked;
+static pid_t	g_who_locked;
 static bool		g_state_lock;
 
 int		jc_lock_subshell_state(pid_t pgid)
 {
-	if (who_locked == 0)
-		who_locked = pgid;
-	if (who_locked != pgid)
+	if (g_who_locked == 0)
+		g_who_locked = pgid;
+	if (g_who_locked != pgid)
 		return (false);
 	if (!g_state_lock)
 	{
@@ -20,10 +32,10 @@ int		jc_lock_subshell_state(pid_t pgid)
 
 int		jc_unlock_subshell_state(pid_t pgid)
 {
-	if (pgid != who_locked)
+	if (pgid != g_who_locked)
 		return (false);
 	g_state_lock = false;
-	who_locked = 0;
+	g_who_locked = 0;
 	return (true);
 }
 

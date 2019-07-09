@@ -47,6 +47,7 @@ void						jc_register_job(t_job *job)
 		list->next = job;
 	}
 	jc_format_job(job);
+	job->notified = true;
 }
 
 void						jc_unregister_job(pid_t pgid)

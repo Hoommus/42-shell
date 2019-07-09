@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/12 16:10:06 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/25 18:27:50 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/09 03:07:42 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,16 @@ void	context_add_fd(t_context *context,
 {
 	struct s_fd_lst	*swap;
 	struct s_fd_lst	*tmp;
+	int				flags;
 
 	tmp = ft_memalloc(sizeof(struct s_fd_lst));
 	if (label)
 		tmp->label = ft_strdup(label);
 	tmp->original = (short)original;
 	tmp->current = (short)actual;
-	fcntl(actual, F_SETFL, O_CLOEXEC);
+	flags = fcntl(actual, F_GETFL);
+	if (flags != -1)
+		fcntl(actual, F_SETFL, flags | O_CLOEXEC);
 	swap = context->fd_list;
 	if (!swap)
 		context->fd_list = tmp;
@@ -43,8 +46,8 @@ void	context_remove_ofd(t_context *context, const int original)
 	struct s_fd_lst	*penultimate;
 
 	penultimate = context->fd_list;
-	ultimate = context->fd_list->next;
-	if (penultimate->original == original)
+	ultimate = context->fd_list ? context->fd_list->next : NULL;
+	if (penultimate && penultimate->original == original)
 	{
 		close(penultimate->current);
 		ft_memdel((void **)&(penultimate->label));

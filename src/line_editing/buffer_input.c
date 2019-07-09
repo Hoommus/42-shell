@@ -99,7 +99,6 @@ char				*read_arbitrary(void)
 	union u_char	input;
 	char			swap[1025];
 
-//	tcsetattr(0, TCSADRAIN, g_term->shell_term);
 	if (g_term->input_state == STATE_HEREDOC)
 	{
 		display_prompt(g_term->input_state);

@@ -6,28 +6,13 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/16 12:28:03 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/10 18:41:13 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/09 02:40:38 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell_history.h"
 #include "twenty_one_sh.h"
 #include <time.h>
-
-int			deal_with_flags(const char **args)
-{
-	return ((int)args);
-}
-
-static void	add_entry(const char **args)
-{
-	char	*whole_command;
-
-	while (*args[0] == '-')
-		args++;
-	whole_command = ft_strarr_join(" ", (char **)args);
-	history_write(whole_command, get_history_fd());
-}
 
 /*
 ** TODO: Replace reallocation with something more clever
@@ -38,6 +23,7 @@ static void	clear_history_hard(void)
 	extern t_history	*g_history;
 	u_int64_t			i;
 	u_int64_t			capacity;
+	struct stat			s;
 
 	capacity = g_history->capacity;
 	i = 0;
@@ -51,8 +37,11 @@ static void	clear_history_hard(void)
 	free(g_history->entries);
 	free(g_history);
 	history_init_vector(capacity);
-	truncate(HISTORY_FILE, 0);
-	//close_wrapper(init_fd_at_home(HISTORY_FILE, O_TRUNC));
+	if (stat(HISTORY_FILE, &s) == 0)
+	{
+		ftruncate(get_history_fd(), s.st_size);
+		lseek(get_history_fd(), 0, SEEK_SET);
+	}
 }
 
 /*
@@ -68,14 +57,12 @@ int			hs_history(const char **args)
 
 	if ((c = flag_validate_short((const char **)args, "cs")))
 	{
-		ft_dprintf(2, "history: invalid argument -%c\nUsage: history -s arg\n"
-				"       history -c\n", c);
+		ft_dprintf(2, "history: invalid argument -%c\nUsage:"
+				"history -c\n", c);
 		return (0);
 	}
 	if (flag_short_present((const char **)args, 'c'))
 		clear_history_hard();
-	if (flag_short_present((const char **)args, 's'))
-		add_entry(args);
 	width = ft_nbrlen((u_int64_t)history_get_size()) + 1;
 	width = width >= 4 ? width : 4;
 	i = 1;

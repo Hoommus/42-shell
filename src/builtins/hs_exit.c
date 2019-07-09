@@ -18,9 +18,11 @@ int					hs_exit(const char **args)
 {
 	if (args && *args)
 	{
+		jc_check_n_notify(false);
 		if (!is_string_numeric(*args, 10) || args[1])
 		{
-			ft_dprintf(2, SH ": exit: %s: single numeric argument required\n", *args);
+			ft_dprintf(2, SH ": exit: %s: single numeric argument required\n",
+				*args);
 			if (jc_is_subshell())
 				return (2);
 			else

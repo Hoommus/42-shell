@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   jc_state_updates.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vtarasiu <vtarasiu@student.unit.ua>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/07/09 04:09:15 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/07/09 04:09:15 by vtarasiu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include <errno.h>
 #include "shell_job_control.h"
@@ -56,7 +67,8 @@ enum e_job_state	poll_pipeline(t_job *job, bool wnohang)
 	procs = job->procs;
 	while (procs)
 	{
-		if ((w = waitpid(procs->pid, &procs->status, wflags)) == procs->pid)
+		if (procs->pid != 0 &&
+			(w = waitpid(procs->pid, &procs->status, wflags)) == procs->pid)
 		{
 			if (alterate_proc(job, procs) >= 2 && (wflags & WNOHANG))
 				break ;

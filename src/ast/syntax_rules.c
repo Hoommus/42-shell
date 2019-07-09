@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/03 16:28:37 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/06/12 13:02:02 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/08 19:19:11 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -192,67 +192,6 @@ const t_rule g_term_rule_dash = {
 	.tree_builder = NULL
 };
 
-/*
-** const t_rule g_for_clause = {
-** 	.token = TOKEN_NOT_APPLICABLE,
-** 	.expands_to = {
-** 		{
-** 			&g_for_token,
-** 			&g_name,
-** 			&g_do_group
-** 		},
-** 		{
-** 			&g_for_token,
-** 			&g_name,
-** 			&g_sequential_sep,
-** 			&g_do_group
-** 		},
-** 		{
-** 			&g_for_token,
-** 			&g_name,
-** 			&g_linebreak,
-** 			&g_in,
-** 			&g_sequential_sep,
-** 			&g_do_group
-** 		},
-** 		{
-** 			&g_for_token,
-** 			&g_name,
-** 			&g_linebreak,
-** 			&g_in,
-** 			&g_wordlist,
-** 			&g_sequential_sep,
-** 			&g_do_group
-** 		}
-** 	},
-** 	.human_readable = "for_clause",
-** 	.tree_builder = NULL
-** };
-**
-**
-** const t_rule g_name = { TOKEN_NAME, {{0}}, "name", NULL };
-** const t_rule g_in = { TOKEN_IN, {{0}}, "in", NULL };
-**
-**  const t_rule g_wordlist = {
-**  	TOKEN_NOT_APPLICABLE,
-**  	.expands_to = {
-**  		{&g_word_token, &g_wordlist_dash}
-**  	},
-**  	.human_readable = "wordlist_alt",
-**  	.tree_builder = NULL
-**  };
-**
-**  const t_rule g_wordlist_dash = {
-**  	TOKEN_NOT_APPLICABLE,
-**  	.expands_to = {
-**  		{&g_word_token, &g_wordlist_dash},
-**  		{&g_empty_token}
-**  	},
-**  	.human_readable = "wordlist_dash",
-**  	.tree_builder = NULL
-**  };
-**
-*/
 const t_rule g_if_clause = {
 	.token = TOKEN_NOT_APPLICABLE,
 	.expands_to = {
@@ -300,7 +239,6 @@ const t_rule g_else_part = {
 	.tree_builder = NULL
 };
 /*
-**
 ** const t_rule g_while_clause = {
 ** 	.token = TOKEN_NOT_APPLICABLE,
 ** 	.expands_to = {
@@ -324,7 +262,6 @@ const t_rule g_else_part = {
 ** No functions in this shell either, but rules are present, right.
 */
 
-
 const t_rule g_function_definition = {
 	.token = TOKEN_NOT_APPLICABLE,
 	.expands_to = {
@@ -347,16 +284,6 @@ const t_rule g_function_body = {
 		{&g_complete_command, &g_redirect_list}
 	}
 };
-
-// const t_rule g_do_group = {
-// 	.token = TOKEN_NOT_APPLICABLE,
-// 	.expands_to = {
-// 		{&g_do_token, &g_compound_list, &g_done_token}
-// 	},
-// 	.human_readable = "do_group",
-// 	.tree_builder = NULL
-// };
-
 
 const t_rule g_brace_group = {
 	.token = TOKEN_NOT_APPLICABLE,

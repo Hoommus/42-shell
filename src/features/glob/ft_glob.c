@@ -27,7 +27,7 @@
 ** - GLOB_DOOFFS
 ** - GLOB_MARK
 ** - GLOB_ONLYDIR
-** - GLOB_APPEND // currentry doesn't work correctly with GLOB_DOOFFS flag
+** - GLOB_APPEND // currently doesn't work correctly with GLOB_DOOFFS flag
 ** - GLOB_NOCHECK
 ** - GLOB_NOMAGIC
 */
@@ -50,7 +50,7 @@ static int	no_match_handler(t_plist **plist, const char *pattern, int flags)
 {
 	if (flags & GLOB_NOCHECK || (flags & GLOB_NOMAGIC && !has_magic(pattern)))
 	{
-		add_path(plist, pattern);	
+		add_path(plist, pattern);
 		return (0);
 	}
 	else

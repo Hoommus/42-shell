@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   jc_job_launcher.c                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vtarasiu <vtarasiu@student.unit.ua>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/07/09 04:03:21 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/07/09 04:07:40 by vtarasiu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include <errno.h>
 #include "shell_job_control.h"
@@ -13,8 +24,9 @@ void			jc_job_dealloc(t_job **job)
 
 t_job			*jc_tmp_add(t_proc *segment)
 {
-	struct s_job_control	*jc = jc_get();
+	struct s_job_control	*jc;
 
+	jc = jc_get();
 	if (jc->tmp_job == NULL)
 		jc->tmp_job = ft_memalloc(sizeof(t_job));
 	process_list_add(&jc->tmp_job->procs, segment);
@@ -70,10 +82,10 @@ static int		forknrun_builtin(t_proc *segment,
 static int		run_builtin(t_proc *segment, bool is_async)
 {
 	extern struct s_builtin	g_builtins[];
-	const char				*bltin = segment->command->args ?
-									segment->command->args[0] : NULL;
 	int						i;
+	const char				*bltin;
 
+	bltin = segment->command->args ? segment->command->args[0] : NULL;
 	i = -1;
 	while (bltin && g_builtins[++i].name)
 		if (ft_strcmp(bltin, g_builtins[i].name) == 0)
@@ -143,18 +155,16 @@ int				jc_wait(t_job *job)
 {
 	t_proc		*procs;
 	int			status;
-	bool		was_blocked;
 
-	if (!(was_blocked = sigchild_is_blocked()))
-		sigchild_block();
 	poll_pipeline(job, false);
 	procs = job->procs;
 	while (procs->next)
 		procs = procs->next;
 	alterate_proc(job, procs);
 	status = procs->status;
-	if (!was_blocked)
-		sigchild_unblock();
+	if (job->state == JOB_SIGTSTP || job->state == JOB_SIGSTOP ||
+		job->state == JOB_SIGTTIN || job->state == JOB_SIGTTOU)
+		return (-1024);
 	return (status);
 }
 
@@ -165,19 +175,19 @@ int				jc_resolve_status(t_job *job)
 	proc = job->procs;
 	while (proc->next)
 		proc = proc->next;
-	if (proc->pid != 0 && proc->status != 0 && WIFSIGNALED(proc->status))
+	if (proc->pid != 0 && WIFSIGNALED(proc->status))
 	{
 		job->state = WTERMSIG(proc->status) + 30;
 		ft_dprintf(2, "%s %s\n", jc_state_str(job->state), job->command);
 		return (WTERMSIG(proc->status));
 	}
-	else if (proc->pid != 0 && proc->status != 0 && WIFSTOPPED(proc->status))
+	else if (proc->pid != 0 && WIFSTOPPED(proc->status))
 	{
 		job->state = WSTOPSIG(proc->status) > 0
-					 ? WSTOPSIG(proc->status) + 30 : JOB_STOPPED;
+					? WSTOPSIG(proc->status) + 30 : JOB_STOPPED;
 		return (WSTOPSIG(proc->status));
 	}
-	else if (proc->pid != 0 && proc->status != 0 && WIFEXITED(proc->status))
+	else if (proc->pid != 0 && WIFEXITED(proc->status))
 	{
 		job->state = JOB_TERMINATED;
 		return (WEXITSTATUS(proc->status));
