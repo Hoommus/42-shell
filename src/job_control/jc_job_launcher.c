@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   jc_job_launcher.c                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vtarasiu <vtarasiu@student.unit.ua>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/07/09 04:03:21 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/07/09 04:07:40 by vtarasiu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include <errno.h>
 #include "shell_job_control.h"
@@ -13,8 +24,9 @@ void			jc_job_dealloc(t_job **job)
 
 t_job			*jc_tmp_add(t_proc *segment)
 {
-	struct s_job_control	*jc = jc_get();
+	struct s_job_control	*jc;
 
+	jc = jc_get();
 	if (jc->tmp_job == NULL)
 		jc->tmp_job = ft_memalloc(sizeof(t_job));
 	process_list_add(&jc->tmp_job->procs, segment);
@@ -70,10 +82,10 @@ static int		forknrun_builtin(t_proc *segment,
 static int		run_builtin(t_proc *segment, bool is_async)
 {
 	extern struct s_builtin	g_builtins[];
-	const char				*bltin = segment->command->args ?
-									segment->command->args[0] : NULL;
 	int						i;
+	const char				*bltin;
 
+	bltin = segment->command->args ? segment->command->args[0] : NULL;
 	i = -1;
 	while (bltin && g_builtins[++i].name)
 		if (ft_strcmp(bltin, g_builtins[i].name) == 0)
@@ -172,7 +184,7 @@ int				jc_resolve_status(t_job *job)
 	else if (proc->pid != 0 && WIFSTOPPED(proc->status))
 	{
 		job->state = WSTOPSIG(proc->status) > 0
-					 ? WSTOPSIG(proc->status) + 30 : JOB_STOPPED;
+					? WSTOPSIG(proc->status) + 30 : JOB_STOPPED;
 		return (WSTOPSIG(proc->status));
 	}
 	else if (proc->pid != 0 && WIFEXITED(proc->status))

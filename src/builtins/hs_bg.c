@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   hs_bg.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/07/09 03:42:20 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/07/09 03:42:43 by vtarasiu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "shell_job_control.h"
 
@@ -29,15 +40,20 @@ int			hs_bg(const char **args)
 	if (jc_is_subshell())
 		return (1);
 	if (!args || !args[0] || args[0][0] != '%' || (args[0] && args[1]))
+	{
 		return ((ft_dprintf(2, "bg: invalid argument(s): "
-			"you must specify a job via single parameter with `%%' prefix\n") & 0) | 1);
+			"you must specify a job via single parameter with "
+ 			"`%%' prefix\n") & 0) | 1);
+	}
 	if (jc_get()->active_jobs == NULL)
 		return ((ft_dprintf(2, "bg: no active jobs\n") & 0) | 1);
 	arg = args[0] + 1;
 	job = choose_job(arg);
 	if (job == NULL)
-		return ((ft_dprintf(2, "bg: no jobs matching criteria: `%%%s'\n", arg) & 0) | 1);
+	{
+		return ((ft_dprintf(2, "bg: no jobs matching criteria: "
+			"`%%%s'\n", arg) & 0) | 1);
+	}
 	jc_to_bg(job);
 	return (0);
-
 }

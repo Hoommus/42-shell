@@ -22,8 +22,8 @@ int	acompl(char *input_str, char *result_buf, size_t res_size, bool is_cmd)
 				result_buf, res_size) != ACOMPL_NOTHING))
 			return (ret);
 		else
-			return (acompl_file(input_str, result_buf, res_size, true));			
+			return (acompl_file(input_str, result_buf, res_size, true));
 	}
 	else
-		return(acompl_file(input_str, result_buf, res_size, false));
+		return (acompl_file(input_str, result_buf, res_size, false));
 }

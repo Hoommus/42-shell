@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   filter_paths.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvladymy <mvladymy@student.unit.ua>        +#+  +:+       +#+        */
+/*   By: vtarasiu <vtarasiu@student.unit.ua>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/03 03:17:00 by mvladymy          #+#    #+#             */
-/*   Updated: 2019/07/06 15:01:02 by mvladymy         ###   ########.fr       */
+/*   Updated: 2019/07/09 03:59:21 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ static char	get_next_same_char(char *pathv[])
 			if (spathv[pathvi][chi] != next_char)
 				return ('\0');
 		}
-		pathvi++;	
+		pathvi++;
 	}
 	chi++;
 	return (next_char);
@@ -55,7 +55,8 @@ int			filter_paths(char *pathv[], char *result_buf, size_t res_size)
 
 	if (!pathv[0])
 		return (ACOMPL_NOTHING);
-	else {
+	else
+	{
 		i = 0;
 		while ((next_char = get_next_same_char(pathv)) && i < res_size)
 		{
@@ -67,4 +68,4 @@ int			filter_paths(char *pathv[], char *result_buf, size_t res_size)
 		return ((pathv[1]) ? ACOMPL_CONTINUE : ACOMPL_END);
 	}
 	return (ACOMPL_ERROR);
- }
+}

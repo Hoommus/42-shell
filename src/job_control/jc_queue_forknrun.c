@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/25 18:31:57 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/07 19:09:18 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/09 01:50:18 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ static void				write_heredocs(const t_io_rdr *io_rdrs)
 	}
 }
 
-static void	prepare_exec(t_job *job, t_proc *process, bool is_async)
+static void				prepare_exec(t_job *job, t_proc *process, bool is_async)
 {
 	pid_t	pgid;
 
@@ -79,7 +79,8 @@ static void	prepare_exec(t_job *job, t_proc *process, bool is_async)
 	close_foreign_fds(job->procs, process);
 }
 
-int			forknrun(t_job *job, t_proc *proc, char *path, bool is_async)
+int						forknrun(t_job *job, t_proc *proc, char *path,
+	bool is_async)
 {
 	if ((proc->pid = fork()) == 0)
 	{
@@ -89,14 +90,14 @@ int			forknrun(t_job *job, t_proc *proc, char *path, bool is_async)
 				jc_get()->shell_context->environ,
 				SCOPE_EXPORT | SCOPE_COMMAND_LOCAL | SCOPE_SCRIPT_GLOBAL));
 		context_switch(jc_get()->shell_context);
-		exit((ft_dprintf(2, SH ": execve error: %s\n", proc->command->args[0]) & 0) | 1);
+		exit((ft_dprintf(2, SH ": execve error: %s\n",
+			proc->command->args[0]) & 0) | 1);
 	}
 	else if (proc->pid == -1)
 		ft_dprintf(2, SH ": fork error: %s\n", proc->command->args[0]);
 	else
 	{
-		if (job->pgid == 0)
-			job->pgid = proc->pid;
+		job->pgid = job->pgid == 0 ? proc->pid : job->pgid;
 		setpgid(proc->pid, is_async ? job->pgid : g_term->shell_pgid);
 		if (!is_async)
 			tcsetpgrp(0, job->pgid);

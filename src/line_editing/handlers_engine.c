@@ -60,6 +60,7 @@ bool							is_key_hooked(union u_char key)
 
 void							handle_eot(union u_char key)
 {
+	jc_check_n_notify(false);
 	if (key.lng == CEOT && g_term->buffer->size == 0
 						&& g_term->input_state != STATE_HEREDOC)
 	{

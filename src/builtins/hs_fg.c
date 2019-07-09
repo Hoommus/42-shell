@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   hs_fg.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/07/09 02:30:30 by vtarasiu          #+#    #+#             */
+/*   Updated: 2019/07/09 02:32:20 by vtarasiu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "shell_job_control.h"
 #include "twenty_one_sh.h"
@@ -81,13 +92,18 @@ int			hs_fg(const char **args)
 	if (jc_is_subshell())
 		return (1);
 	if (!args || !args[0] || args[0][0] != '%' || (args[0] && args[1]))
-		return ((ft_dprintf(2, "fg: invalid argument\n "
-							"usage:\n fg [job_id]\n") & 0) | 1);
+	{
+		return ((ft_dprintf(2, "fg: invalid argument\n"
+			"usage:\n    fg [job_id]\n") & 0) | 1);
+	}
 	if (jc_get()->active_jobs == NULL)
 		return ((ft_dprintf(2, "fg: no active jobs\n") & 0) | 1);
 	arg = args[0] + 1;
 	job = choose_job(arg);
 	if (job == NULL)
-		return ((ft_dprintf(2, "fg: no jobs matching criteria: `%%%s'\n", arg) & 0) | 1);
+	{
+		return ((ft_dprintf(2, "fg: no jobs matching criteria: "
+			"`%%%s'\n", arg) & 0) | 1);
+	}
 	return ((g_term->last_status = jc_to_fg(job)));
 }

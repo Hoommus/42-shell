@@ -94,7 +94,6 @@ inline static size_t	plist_len(t_plist *plist)
 	return (i);
 }
 
-
 int						sort_paths(t_plist **plist_p)
 {
 	size_t	plen;

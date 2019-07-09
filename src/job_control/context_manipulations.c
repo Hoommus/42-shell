@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/12 16:10:06 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/08 23:22:24 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/09 03:07:42 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,8 @@ void	context_remove_ofd(t_context *context, const int original)
 	struct s_fd_lst	*penultimate;
 
 	penultimate = context->fd_list;
-	ultimate = context->fd_list->next;
-	if (penultimate->original == original)
+	ultimate = context->fd_list ? context->fd_list->next : NULL;
+	if (penultimate && penultimate->original == original)
 	{
 		close(penultimate->current);
 		ft_memdel((void **)&(penultimate->label));

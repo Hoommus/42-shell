@@ -29,7 +29,6 @@ const sigset_t	*sigchild_unblock(void)
 	sigset_t	mask;
 
 	sigemptyset(&mask);
-//	sigaddset(&mask, SIGCHLD);
 	sigprocmask(SIG_SETMASK, &mask, &g_old);
 	return (&g_old);
 }

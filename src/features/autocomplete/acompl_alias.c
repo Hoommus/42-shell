@@ -15,7 +15,7 @@
 #include "shell_environ.h"
 
 extern t_env_vector	*g_alias_vector;
- 
+
 int					get_aliasv(char *input_str, char *aliasv[])
 {
 	size_t	input_len;

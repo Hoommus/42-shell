@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   acompl_cmd.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvladymy <mvladymy@student.unit.ua>        +#+  +:+       +#+        */
+/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/03 03:17:00 by mvladymy          #+#    #+#             */
-/*   Updated: 2019/07/06 19:28:33 by mvladymy         ###   ########.fr       */
+/*   Updated: 2019/07/09 03:57:23 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ static void	free_cmdv(char *cmdv[])
 	i = 0;
 	while (cmdv[i])
 		free(cmdv[i++]);
-	free(cmdv); 
+	free(cmdv);
 }
 
 static int	get_cmdv(char *input_str, char **cmdv[])
@@ -53,6 +53,6 @@ int			acompl_cmd(char *input_str, char *result_buf, size_t res_size)
 	if (get_cmdv(input_str, &cmdv))
 		return (ACOMPL_ERROR);
 	ret = filter_paths(cmdv, result_buf, res_size);
-	free_cmdv(cmdv);	
+	free_cmdv(cmdv);
 	return (ret);
 }

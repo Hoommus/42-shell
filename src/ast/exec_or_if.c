@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/11 10:53:11 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/08 20:01:57 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/09 02:27:04 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ static int	decide_what_to_do(int f, const t_node *body)
 }
 
 int			exec_or_if(const t_node *node,
-						   bool is_async)
+						bool is_async)
 {
 	int				status;
 	t_job			*job;

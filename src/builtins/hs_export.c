@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/08 13:19:29 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/04/08 13:19:29 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/09 03:55:13 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,12 +27,13 @@ static int		set_tricky(const char *str)
 	while (str[++j])
 		if (j >= 1024)
 			return ((ft_dprintf(2, "export: var name is too long\n") & 0) | 1);
-		else if ((str[j] == '=' || !str[j]) && is_valid_var(ft_memcpy(tmp, str, j)))
+		else if ((str[j] == '=' || !str[j])
+			&& is_valid_var(ft_memcpy(tmp, str, j)))
 			return (!set_env_v(vector, tmp, str + j + 1, SCOPE_EXPORT));
 		else if (str[j] == '=' && !is_valid_var(tmp))
 		{
 			ft_dprintf(2, "export: '%s' is not a valid variable name\n",
-					   ft_strlen(tmp) == 0 ? str : tmp);
+						ft_strlen(tmp) == 0 ? str : tmp);
 			return (1);
 		}
 	return (0);
