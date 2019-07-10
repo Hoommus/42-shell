@@ -57,7 +57,8 @@ BUILTINS_DIR = builtins/
 BUILTINS_SRC = cd.c builtins.c hs_history.c tokenizer_test.c \
                syntax_test.c hs_set.c hs_unset.c \
                hs_export.c hs_jobs.c hs_fg.c hs_bg.c hs_true.c hs_type.c \
-               hs_false.c hs_alias.c hs_unalias.c hs_exit.c hs_hash.c
+               hs_false.c hs_alias.c hs_unalias.c hs_exit.c hs_hash.c \
+               rn_cd.c rn_cd_adapter.c rn_cd_is_logic.c rn_cd_logic.c rn_pwd.c
 
 INTERFACE_DIR = line_editing/
 INTERFACE_SRC = buffer_drawing.c buffer_input.c  \
