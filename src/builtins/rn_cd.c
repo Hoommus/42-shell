@@ -6,10 +6,11 @@
 /*   By: vtarasiu <vtarasiu@student.unit.ua>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/24 18:55:05 by mvladymy          #+#    #+#             */
-/*   Updated: 2019/07/10 12:16:54 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/10 13:07:39 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <shell_job_control.h>
 #include "twenty_one_sh.h"
 #include "shell_builtins.h"
 
@@ -17,15 +18,25 @@ char			g_pwd[PATH_MAX];
 
 static void		set_pwd_vars(void)
 {
-	char		old_pwd[PATH_MAX];
-	const char	*env_pwd;
+	char			old_pwd[PATH_MAX];
+	const char		*env_pwd;
+	t_var			*pwd_var;
+	t_env_vector	*vector;
 
-	old_pwd[0] = '\0';
-	if ((env_pwd = get_env_var_ad("PWD")))
+	if (jc_is_subshell())
+		vector = g_term->context_current->environ;
+	else
+		vector = g_term->context_original->environ;
+	pwd_var = get_env_v(vector, "PWD");
+	env_pwd = NULL;
+	if (pwd_var)
+		env_pwd = pwd_var->value;
+	ft_bzero(old_pwd, sizeof(old_pwd));
+	if (env_pwd)
 		ft_strlcat(old_pwd, env_pwd, PATH_MAX);
-	set_env_var_ad("PWD", g_pwd);
+	set_env_v(vector, "PWD", g_pwd, SCOPE_EXPORT);
 	if (old_pwd[0])
-		set_env_var_ad("OLDPWD", old_pwd);
+		set_env_v(vector, "OLDPWD", old_pwd, SCOPE_EXPORT);
 }
 
 static t_path	check_path(char *path)

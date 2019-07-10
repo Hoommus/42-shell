@@ -183,7 +183,8 @@ extern const struct s_executor		g_executors_table[];
 */
 
 struct s_token				*tokenize(char *str, const char *delimiters);
-struct s_token				*new_token(const char *value, enum e_token_type type);
+struct s_token				*new_token(const char *value,
+	enum e_token_type type);
 void						add_token(t_token **head, t_token **tail,
 														t_token *to_add);
 t_token						*pop_token(t_token **head, t_token **tail);

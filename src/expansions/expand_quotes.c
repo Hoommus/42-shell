@@ -13,7 +13,6 @@
 #include "expansions_internal.h"
 #include "twenty_one_sh.h"
 
-// TODO: fix that rogue quote at the end of the str
 char	*expand_dquote_internals(char *str, u_int32_t from, u_int32_t to)
 {
 	char	*partial;

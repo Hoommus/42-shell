@@ -22,7 +22,7 @@ int			rn_pwd(const char **argv)
 
 	if (is_logic((char ***)&argv, &logic, "pwd"))
 		return (1);
-	if ((*argv && ft_strcmp(*argv, "-")) ||( *argv && *(argv + 1)))
+	if ((*argv && ft_strcmp(*argv, "-")) || (*argv && *(argv + 1)))
 	{
 		ft_dprintf(STDERR_FILENO, "pwd: too many arguments\n");
 		return (1);

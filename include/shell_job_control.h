@@ -115,7 +115,7 @@ void					jc_job_dealloc(t_job **job);
 
 enum e_job_state		poll_pipeline(t_job *job, int wait_flags);
 int						alterate_proc(t_job *job, t_proc *proc);
-
+int						execute_segments(t_job *job, bool is_async);
 /*
 ** Auxiliary
 */

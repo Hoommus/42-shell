@@ -13,7 +13,6 @@
 #include "shell_job_control.h"
 #include "twenty_one_sh.h"
 
-#include <errno.h>
 t_job		*search_job_id(int id)
 {
 	t_job		*list;
@@ -52,7 +51,7 @@ int			jc_to_fg(t_job *job)
 		if (segments->is_stopped && !segments->is_completed)
 		{
 			if (kill(segments->pid, SIGCONT) == -1)
-				ft_dprintf(2, "fg: kill error: %s\n", strerror(errno));
+				ft_dprintf(2, "fg: kill error for %d\n", segments->pid);
 			segments->is_stopped = false;
 			job->notified = false;
 		}

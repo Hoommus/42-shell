@@ -49,7 +49,7 @@ static size_t	sobaka(const char *src, char *dst, size_t *d_i, size_t max_len)
 	if (src[0] == '.' && (src[1] == '/' || src[1] == '\0'))
 		return (2);
 	else if (src[0] == '.' && src[1] == '.' &&
-			 (src[2] == '/' || src[2] == '\0'))
+			(src[2] == '/' || src[2] == '\0'))
 	{
 		*d_i -= del_dir(dst, *d_i);
 		return (3);

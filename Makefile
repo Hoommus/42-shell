@@ -77,7 +77,7 @@ JOB_CONTROL_SRC = signals_basic.c signals_children.c signals_child_blocker.c \
                   context_manipulations.c context_switch.c \
                   jc_subshell_env.c \
                   jc_headquaters.c jc_state_updates.c \
-                  jc_queue_forknrun.c \
+                  jc_queue_forknrun.c jc_job_memory.c jc_job_segments.c \
                   pipeline.c jc_job_launcher.c jc_auxiliary.c
 
 EXPANSIONS_DIR = expansions/

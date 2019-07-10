@@ -6,7 +6,7 @@
 /*   By: vtarasiu <vtarasiu@student.unit.ua>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/09 04:09:15 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/09 19:10:21 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/10 14:50:33 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,10 @@
 
 static bool			is_completed(t_job *job)
 {
-	t_proc	*list = job->procs;
+	t_proc	*list;
 	bool	is_completed;
 
+	list = job->procs;
 	is_completed = true;
 	while (list)
 	{
@@ -30,6 +31,14 @@ static bool			is_completed(t_job *job)
 	}
 	job->state = is_completed ? JOB_TERMINATED : job->state;
 	return (job->state == JOB_TERMINATED || job->state == JOB_SIGKILL);
+}
+
+static int			alterate_continued(t_job *job, t_proc *proc)
+{
+	job->state = JOB_CONTINUED;
+	proc->is_completed = false;
+	proc->is_stopped = false;
+	return (1);
 }
 
 int					alterate_proc(t_job *job, t_proc *proc)
@@ -56,12 +65,7 @@ int					alterate_proc(t_job *job, t_proc *proc)
 		return (3);
 	}
 	else if (WIFCONTINUED(proc->status))
-	{
-		job->state = JOB_CONTINUED;
-		proc->is_completed = false;
-		proc->is_stopped = false;
-		return (1);
-	}
+		return (alterate_continued(job, proc));
 	return (0);
 }
 

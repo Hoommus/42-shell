@@ -106,9 +106,8 @@ static void		duplicate_fds(t_context *new, const t_context *context,
 	list = context->fd_list;
 	while (list)
 	{
-		if (list->current >= 0)
+		if (list->current >= 0 && (tmp = ft_memalloc(sizeof(struct s_fd_lst))))
 		{
-			tmp = ft_memalloc(sizeof(struct s_fd_lst));
 			if (list->label)
 				tmp->label = ft_strdup("cloned");
 			tmp->original = list->original;
@@ -119,13 +118,11 @@ static void		duplicate_fds(t_context *new, const t_context *context,
 				new_list = tmp;
 			}
 			else
-			{
-				new_list->next = tmp;
-				new_list = new_list->next;
-			}
+				new->fd_list->next = tmp;
 		}
 		list = list->next;
 	}
+	new->fd_list = new_list;
 }
 
 /*

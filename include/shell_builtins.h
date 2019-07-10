@@ -6,7 +6,7 @@
 /*   By: vtarasiu <vtarasiu@student.unit.ua>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:56:22 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/10 11:24:35 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/10 13:19:12 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,8 @@ struct					s_builtin
 };
 
 void					print_var(const t_var *var);
-void					print_var_vector(const t_env_vector *vector, u_int32_t scopes);
+void					print_var_vector(const t_env_vector *vector,
+	u_int32_t scopes);
 /*
 ** Builtins (builtins/ *.c)
 */
@@ -51,6 +52,8 @@ int						hs_false(const char **args);
 
 int						hs_set(const char **args);
 
+int						rn_pwd(const char **argv);
+
 /*
 ** Auxiliary
 */
@@ -62,7 +65,6 @@ typedef enum			e_path {
 	PATH_ISDIR,
 	PATH_NOPERM
 }						t_path;
-
 
 char					*make_logic_path(const char *path);
 int						is_logic(char **argv[], bool *logic, const char *cmd);

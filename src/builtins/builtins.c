@@ -27,6 +27,7 @@ struct s_builtin	g_builtins[] = {
 	{"history", &hs_history},
 	{"help", &hs_help},
 	{"jobs", &hs_jobs},
+	{"pwd", &rn_pwd},
 	{"quit", &hs_exit},
 	{"set", &hs_set},
 	{"tokenizer", &hs_tokenizer},
