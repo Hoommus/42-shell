@@ -81,7 +81,7 @@ int				hs_alias(const char **args)
 	if (args == NULL || args[0] == NULL)
 	{
 		print_var_vector(g_alias_vector, SCOPE_SHELL_LOCAL);
-		return (1);
+		return (0);
 	}
 	i = 0;
 	while (args[i])
