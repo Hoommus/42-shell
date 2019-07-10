@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   context_switch.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: vtarasiu <vtarasiu@student.unit.ua>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/10 12:09:35 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/09 00:19:41 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/10 16:27:24 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,6 +112,7 @@ static void		duplicate_fds(t_context *new, const t_context *context,
 				tmp->label = ft_strdup("cloned");
 			tmp->original = list->original;
 			tmp->current = with_dup ? dup(list->current) : list->current;
+			fcntl(list->current, F_SETFL, fcntl(list->current, F_GETFL) | O_CLOEXEC);
 			if (!new->fd_list)
 			{
 				new->fd_list = tmp;

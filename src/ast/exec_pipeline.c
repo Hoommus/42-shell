@@ -23,8 +23,8 @@ static int			exec_pipeline_terminator(const t_node *node,
 	int			status;
 
 	if (context_right == NULL)
-		context_right = context_duplicate(g_term->context_original, XDUP_TERM);
-	context_left = context_duplicate(g_term->context_original, XDUP_TERM);
+		context_right = context_duplicate(g_term->context_original, XDUP_ENV | XDUP_FDS);
+	context_left = context_duplicate(g_term->context_original, XDUP_ENV | XDUP_FDS);
 	pipe(pp);
 	context_remove_ofd(context_right, 0);
 	context_remove_ofd(context_left, 1);
@@ -54,9 +54,9 @@ static int			exec_pipeline_inner(const t_node *node,
 		node->right->node_type == NODE_SUBSHELL))
 		return (exec_pipeline_terminator(node, context_right, is_async));
 	if (context_right == NULL)
-		context_right = context_duplicate(g_term->context_original, XDUP_TERM);
+		context_right = context_duplicate(g_term->context_original, XDUP_ENV | XDUP_FDS);
 	pipe(pp);
-	context_left = context_duplicate(g_term->context_original, XDUP_TERM);
+	context_left = context_duplicate(g_term->context_original, XDUP_ENV | XDUP_FDS);
 	context_remove_ofd(context_right, 0);
 	context_remove_ofd(context_left, 1);
 	context_add_fd(context_right, 0, pp[0], "pipe");

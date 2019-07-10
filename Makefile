@@ -6,7 +6,7 @@
 #    By: vtarasiu <vtarasiu@student.unit.ua>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/07/10 15:00:37 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/07/10 17:35:58 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,7 @@ FDS = shell(ulimit -n)
 FLAGS = -DSH=\"$(NAME)\" \
                -Wall  \
                -Wextra \
-               -Werror
+               -Werror -g -fsanitize=address
 
 HEADERS = -I include/ -I printf/include -I libft/
 SRC_DIR = ./src/

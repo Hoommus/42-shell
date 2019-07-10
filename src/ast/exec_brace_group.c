@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/06 15:51:01 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/07 19:09:18 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/10 17:35:23 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,5 +107,7 @@ int			exec_brace_group(const t_node *node,
 		decide_what_to_do(f, job, body, context);
 	else
 		run_parent(f, job, context, is_async);
+	if (!new_context)
+		context_deep_free(&context);
 	return (status);
 }
