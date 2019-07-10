@@ -31,7 +31,7 @@ static NINT	exec_and_if_async(const t_node *body)
 	exit(status);
 }
 
-static int	exec_and_if_regular(const t_node *body)
+static int	exec_and_if_regular(const t_node *body, t_job *job)
 {
 	int		status_left;
 	int		status_right;
@@ -40,6 +40,7 @@ static int	exec_and_if_regular(const t_node *body)
 	status_left = exec_node(body->left, NULL, false);
 	if (status_left == 0)
 		status_right = exec_node(body->right, NULL, false);
+	jc_job_dealloc(&job);
 	return (status_right);
 }
 
@@ -87,7 +88,7 @@ int			exec_and_if(const t_node *node,
 	if (is_async)
 		f = fork();
 	if (f == -2)
-		status = exec_and_if_regular(node);
+		status = exec_and_if_regular(node, job);
 	else if (f <= 0)
 		status = decide_what_to_do(f, node);
 	else

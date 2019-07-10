@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/07 12:46:16 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/07 15:00:28 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/10 17:06:53 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,13 @@
 
 t_hash_tab	*g_hash_table;
 
-void		populate_from_dir(const char *dirpath, DIR *dir)
+void		populate_from_dir(const char *const dirpath, DIR *dir)
 {
 	struct dirent	*dirent;
 	struct stat		s;
 	char			path[2048];
 	size_t			prefix_len;
+	char			*swap;
 
 	prefix_len = ft_strlen(dirpath) + 1;
 	ft_bzero(path, sizeof(path));
@@ -35,7 +36,9 @@ void		populate_from_dir(const char *dirpath, DIR *dir)
 			!stat(path, &s) &&
 			!access(path, F_OK | X_OK))
 		{
-			hash_add(g_hash_table, dirent->d_name, path);
+			swap = ft_strdup(dirent->d_name);
+			hash_add(g_hash_table, swap, path);
+			free(swap);
 		}
 	}
 }
@@ -47,17 +50,21 @@ void		init_hashtable(void)
 	char	**split;
 	DIR		*dir;
 
-	hash_init(&g_hash_table, 1600);
+	hash_init(&g_hash_table, 1800);
 	var = get_env_v(g_term->context_current->environ, "PATH");
 	if (!var || !var->value || ft_strlen(var->value) == 0)
 		return ;
 	i = 0;
+	split = NULL;
 	split = ft_strsplit(var->value, ':');
 	while (split && split[i])
 	{
-		if ((dir = opendir(split[i])))
+		dir = NULL;
+		if (split[i] && split[i][0] && (dir = opendir(split[i])))
+		{
 			populate_from_dir(split[i], dir);
-		closedir(dir);
+			closedir(dir);
+		}
 		i++;
 	}
 	free_array((void **)split);

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/19 16:39:00 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/07 19:09:18 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/10 17:36:59 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,7 @@ int			exec_subshell(const t_node *node,
 
 	status = 0;
 	context = new_context ? new_context
-			: context_duplicate(g_term->context_original, XDUP_TERM);
+			: context_duplicate(g_term->context_original, XDUP_ALL);
 	f = -2;
 	job = ft_memalloc(sizeof(t_job));
 	jc_enable_subshell();
@@ -109,6 +109,8 @@ int			exec_subshell(const t_node *node,
 		decide_what_to_do(f, job, body, context);
 	else
 		run_parent(f, job, context, is_async);
+	if (!new_context)
+		context_deep_free(&context);
 	jc_unlock_subshell_state(g_term->shell_pgid);
 	jc_disable_subshell();
 	return (status);

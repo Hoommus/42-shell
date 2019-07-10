@@ -114,12 +114,12 @@ void				run_file(const char *path)
 int					main(int argc, char **argv)
 {
 	init_shell_context();
+	init_variables();
+	init_hashtable();
 	init_files();
 	init_buffer_vector(MAX_INPUT);
 	history_load(g_term->history_file);
 	argv += parse_args(argc, argv);
-	init_variables();
-	init_hashtable();
 	jc_init(g_term->context_current);
 	print_messages();
 	setup_signal_handlers();

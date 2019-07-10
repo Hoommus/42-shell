@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   jc_job_segments.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vtarasiu <vtarasiu@student.unit.ua>        +#+  +:+       +#+        */
+/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/10 14:43:28 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/10 14:43:59 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/10 17:41:17 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,7 @@ static int		run_builtin(t_proc *segment, bool is_async)
 			if (!is_async)
 			{
 				context_switch(segment->context);
+				close_redundant_fds(segment->context);
 				segment->status = g_builtins[i].
 					function((const char **)segment->command->args + 1);
 				context_switch(jc_get()->shell_context);
@@ -122,6 +123,7 @@ int				execute_segments(t_job *job, bool is_async)
 		tcgetattr(0, &termios);
 		*list->context->term_config = termios;
 		close_redundant_fds(list->context);
+		close_foreign_fds(job->procs, (t_proc *)list);
 		list = list->next;
 	}
 	jc_disable_subshell();
