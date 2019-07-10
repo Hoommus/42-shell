@@ -62,6 +62,7 @@ void					setup_signal_handlers(void)
 	sigchild_set_handler();
 	signal(SIGWINCH, &resize);
 	signal(SIGPIPE, &tstp);
+	signal(SIGQUIT, &tstp);
 	signal(SIGTTOU, &sigttou);
 	signal(SIGTTIN, &sigttou);
 	sigemptyset(&set);
