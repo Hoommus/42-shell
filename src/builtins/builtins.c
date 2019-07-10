@@ -30,7 +30,6 @@ struct s_builtin	g_builtins[] = {
 	{"pwd", &rn_pwd},
 	{"quit", &hs_exit},
 	{"set", &hs_set},
-	{"tokenizer", &hs_tokenizer},
 	{"true", &hs_true},
 	{"type", &hs_type},
 	{"unalias", &hs_unalias},
