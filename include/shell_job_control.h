@@ -125,6 +125,7 @@ void					jc_format_job(const t_job *job);
 int						forknrun(t_job *job, t_proc *proc, char *path,
 	bool is_async);
 void					close_redundant_fds(t_context *context);
+void					close_foreign_fds(t_proc *processes, t_proc *current);
 
 /*
 ** Subshells

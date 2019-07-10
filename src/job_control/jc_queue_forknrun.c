@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/25 18:31:57 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/09 01:50:18 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/10 17:41:18 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,12 @@
 #include "shell_job_control.h"
 #include "shell_builtins.h"
 
-static void				close_foreign_fds(t_proc *processes,
+void					close_foreign_fds(t_proc *processes,
 											t_proc *current)
 {
 	struct s_fd_lst	*list;
 
+	(void)current;
 	while (processes)
 	{
 		if (processes != current)
