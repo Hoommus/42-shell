@@ -33,4 +33,3 @@ int	is_logic(char **argv[], bool *logic, const char *cmd)
 	}
 	return (0);
 }
-

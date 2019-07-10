@@ -27,8 +27,7 @@ static int			shell_loop(void)
 	{
 		if (tcgetpgrp(0) != g_term->shell_pgid)
 			tcsetpgrp(0, g_term->shell_pgid);
-		tcsetattr(0, TCSAFLUSH, g_term->shell_term);
-		g_interrupt = 0;
+		tcsetattr(g_interrupt = 0, TCSAFLUSH, g_term->shell_term);
 		if (g_term->input_state == STATE_NON_INTERACTIVE)
 			read_fd(0, &commands);
 		else

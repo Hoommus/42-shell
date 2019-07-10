@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   env_adapter.c                                      :+:      :+:    :+:   */
+/*   rn_cd_adapter.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvladymy <mvladymy@student.unit.ua>        +#+  +:+       +#+        */
+/*   By: vtarasiu <vtarasiu@student.unit.ua>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/09 21:43:46 by mvladymy          #+#    #+#             */
-/*   Updated: 2019/07/09 22:02:56 by mvladymy         ###   ########.fr       */
+/*   Updated: 2019/07/10 13:01:41 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,8 @@ int			set_env_var_ad(char *varname, char *value)
 {
 	if (varname && value)
 	{
-		set_env_v(NULL, varname, value, SCOPE_EXPORT);
+		set_env_v(g_term->context_current->environ, varname, value,
+			SCOPE_EXPORT);
 		return (1);
 	}
 	return (0);

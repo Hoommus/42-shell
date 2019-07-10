@@ -111,7 +111,8 @@ void				handle_alt_right(union u_char key);
 
 enum e_input_state	toggle_quotes(enum e_input_state current, u_int64_t i);
 enum e_input_state	recheck_state(u_int64_t from_index);
-char *acompl_update_state(u_int64_t from_index, char *buf, size_t bufsize);
+char				*acompl_update_state(u_int64_t from_index, char *buf,
+	size_t bufsize);
 /*
 ** Caret positions manipulation (cursor_positions.c)
 */

@@ -179,7 +179,7 @@ struct					s_term
 {
 	enum e_input_state	input_state;
 	enum e_input_state	fallback_input_state;
-	enum e_acompl_state
+	enum				e_acompl_state
 	{
 		AC_NONE = 0,
 		AC_COMMAND = 1,

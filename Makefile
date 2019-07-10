@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+         #
+#    By: vtarasiu <vtarasiu@student.unit.ua>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/07/09 00:12:54 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/07/10 15:00:37 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,8 +19,7 @@ FDS = shell(ulimit -n)
 FLAGS = -DSH=\"$(NAME)\" \
                -Wall  \
                -Wextra \
-               -Werror \
-               -g -fsanitize=address
+               -Werror
 
 HEADERS = -I include/ -I printf/include -I libft/
 SRC_DIR = ./src/
@@ -34,7 +33,7 @@ SHELL_SRC = main.c init.c memory.c auxilia.c       \
             shell_environ.c shell_environ_tools.c shell_environ_vector.c \
             shell_environ_memory.c \
             syscall_wrappers.c \
-            auxiliary_main.c init_hashtable.c
+            auxiliary_main.c init_hashtable.c init_term.c
 
 LEXER_DIR = lexer/
 LEXER_SRC = tokenizer.c tokens_mem.c token_word_types.c \
@@ -77,7 +76,7 @@ JOB_CONTROL_SRC = signals_basic.c signals_children.c signals_child_blocker.c \
                   context_manipulations.c context_switch.c \
                   jc_subshell_env.c \
                   jc_headquaters.c jc_state_updates.c \
-                  jc_queue_forknrun.c \
+                  jc_queue_forknrun.c jc_job_memory.c jc_job_segments.c \
                   pipeline.c jc_job_launcher.c jc_auxiliary.c
 
 EXPANSIONS_DIR = expansions/

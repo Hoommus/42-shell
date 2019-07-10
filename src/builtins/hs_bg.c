@@ -6,7 +6,7 @@
 /*   By: vtarasiu <vtarasiu@student.unit.ua>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/09 03:42:20 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/09 16:56:51 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/10 12:28:02 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,9 +41,9 @@ int			hs_bg(const char **args)
 		return (1);
 	if (!args || !args[0] || args[0][0] != '%' || (args[0] && args[1]))
 	{
-		return ((ft_dprintf(2, "bg: invalid argument(s): "
-			"you must specify a job via single parameter with "
- 			"`%%' prefix\n") & 0) | 1);
+		ft_dprintf(2, "bg: invalid argument\n"
+			"usage:\n    bg [job_id]\n");
+		return (1);
 	}
 	if (jc_get()->active_jobs == NULL)
 		return ((ft_dprintf(2, "bg: no active jobs\n") & 0) | 1);
