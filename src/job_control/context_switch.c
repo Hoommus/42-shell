@@ -3,40 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   context_switch.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vtarasiu <vtarasiu@student.unit.ua>        +#+  +:+       +#+        */
+/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/10 12:09:35 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/10 16:27:24 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/10 18:05:09 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "twenty_one_sh.h"
-
-/*
-** TODO: make environ context switches more intelligent - make diffs possible
-*/
-
-void			context_deep_free(t_context **context)
-{
-	struct s_fd_lst		*list;
-	struct s_fd_lst		*swap;
-
-	if (context == NULL || *context == NULL)
-		return ;
-	environ_deallocate_vector((*context)->environ);
-	list = (*context)->fd_list;
-	while (list)
-	{
-		swap = list->next;
-		if (list->current > 2)
-			close(list->current);
-		free(list->label);
-		free(list);
-		list = swap;
-	}
-	ft_memdel((void **)&((*context)->term_config));
-	ft_memdel((void **)context);
-}
 
 /*
 ** If to_which is NULL, restores context from backup with pretty much the same
@@ -95,6 +69,18 @@ static void		duplicate_environ(t_context *new_context,
 	}
 }
 
+struct s_fd_lst	*get_tmp_node(struct s_fd_lst *list, bool with_dup)
+{
+	struct s_fd_lst		*tmp;
+
+	tmp = ft_memalloc(sizeof(struct s_fd_lst));
+	if (list->label)
+		tmp->label = ft_strdup("cloned");
+	tmp->original = list->original;
+	tmp->current = with_dup ? dup(list->current) : list->current;
+	return (tmp);
+}
+
 static void		duplicate_fds(t_context *new, const t_context *context,
 	bool with_dup)
 {
@@ -106,24 +92,22 @@ static void		duplicate_fds(t_context *new, const t_context *context,
 	list = context->fd_list;
 	while (list)
 	{
-		if (list->current >= 0 && (tmp = ft_memalloc(sizeof(struct s_fd_lst))))
+		if (list->current >= 0)
 		{
-			if (list->label)
-				tmp->label = ft_strdup("cloned");
-			tmp->original = list->original;
-			tmp->current = with_dup ? dup(list->current) : list->current;
-			fcntl(list->current, F_SETFL, fcntl(list->current, F_GETFL) | O_CLOEXEC);
+			tmp = get_tmp_node(list, with_dup);
 			if (!new->fd_list)
 			{
 				new->fd_list = tmp;
 				new_list = tmp;
 			}
 			else
-				new->fd_list->next = tmp;
+			{
+				new_list->next = tmp;
+				new_list = new_list->next;
+			}
 		}
 		list = list->next;
 	}
-	new->fd_list = new_list;
 }
 
 /*
