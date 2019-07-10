@@ -17,7 +17,7 @@
 struct s_builtin	g_builtins[] = {
 	{"alias", &hs_alias},
 	{"bg", &hs_bg},
-	{"cd", &hs_cd},
+	{"cd", &rn_cd},
 	{"echo", &hs_echo},
 	{"export", &hs_export},
 	{"exit", &hs_exit},

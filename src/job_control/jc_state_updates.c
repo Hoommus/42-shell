@@ -6,7 +6,7 @@
 /*   By: vtarasiu <vtarasiu@student.unit.ua>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/09 04:09:15 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/09 18:09:47 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/09 19:10:21 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ static bool			is_completed(t_job *job)
 		list = list->next;
 	}
 	job->state = is_completed ? JOB_TERMINATED : job->state;
-	return (job->state == JOB_TERMINATED);
+	return (job->state == JOB_TERMINATED || job->state == JOB_SIGKILL);
 }
 
 int					alterate_proc(t_job *job, t_proc *proc)
@@ -80,12 +80,6 @@ enum e_job_state	poll_pipeline(t_job *job, int wait_flags)
 			if (alterate_proc(job, procs) >= 2 && (wflags & WNOHANG))
 				break ;
 		}
-//		else if (w == 0 && !procs->is_completed && procs->is_stopped)
-//		{
-//			job->state = JOB_RUNNING;
-//			procs->is_stopped = false;
-//			job->notified = false;
-//		}
 		procs = procs->next;
 	}
 	return (job->state);

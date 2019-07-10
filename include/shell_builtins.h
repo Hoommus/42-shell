@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   shell_builtins.h                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: vtarasiu <vtarasiu@student.unit.ua>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/15 15:56:22 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/04 12:58:48 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/10 11:24:35 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ void					print_var_vector(const t_env_vector *vector, u_int32_t scopes);
 int						hs_hash(const char **args);
 int						hs_alias(const char **args);
 int						hs_unalias(const char **args);
-int						hs_cd(const char **args);
+int						rn_cd(const char **argv);
 int						hs_echo(const char **args);
 int						hs_export(const char **args);
 int						hs_unset(const char **args);
@@ -50,5 +50,23 @@ int						hs_true(const char **args);
 int						hs_false(const char **args);
 
 int						hs_set(const char **args);
+
+/*
+** Auxiliary
+*/
+
+typedef enum			e_path {
+	PATH_OK,
+	PATH_NOEXIST,
+	PATH_NOTDIR,
+	PATH_ISDIR,
+	PATH_NOPERM
+}						t_path;
+
+
+char					*make_logic_path(const char *path);
+int						is_logic(char **argv[], bool *logic, const char *cmd);
+const char				*get_env_var_ad(char *varname);
+int						set_env_var_ad(char *varname, char *value);
 
 #endif
