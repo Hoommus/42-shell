@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   context_switch.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vtarasiu <vtarasiu@student.unit.ua>        +#+  +:+       +#+        */
+/*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/10 12:09:35 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/10 16:27:24 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/09 00:19:41 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,24 +106,26 @@ static void		duplicate_fds(t_context *new, const t_context *context,
 	list = context->fd_list;
 	while (list)
 	{
-		if (list->current >= 0 && (tmp = ft_memalloc(sizeof(struct s_fd_lst))))
+		if (list->current >= 0)
 		{
+			tmp = ft_memalloc(sizeof(struct s_fd_lst));
 			if (list->label)
 				tmp->label = ft_strdup("cloned");
 			tmp->original = list->original;
 			tmp->current = with_dup ? dup(list->current) : list->current;
-			fcntl(list->current, F_SETFL, fcntl(list->current, F_GETFL) | O_CLOEXEC);
 			if (!new->fd_list)
 			{
 				new->fd_list = tmp;
 				new_list = tmp;
 			}
 			else
-				new->fd_list->next = tmp;
+			{
+				new_list->next = tmp;
+				new_list = new_list->next;
+			}
 		}
 		list = list->next;
 	}
-	new->fd_list = new_list;
 }
 
 /*

@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/12 16:10:06 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/09 03:07:42 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/10 18:11:53 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,4 +109,26 @@ bool	context_is_fd_present(const t_context *context, const int original)
 		list = list->next;
 	}
 	return (false);
+}
+
+void	context_deep_free(t_context **context)
+{
+	struct s_fd_lst		*list;
+	struct s_fd_lst		*swap;
+
+	if (context == NULL || *context == NULL)
+		return ;
+	environ_deallocate_vector((*context)->environ);
+	list = (*context)->fd_list;
+	while (list)
+	{
+		swap = list->next;
+		if (list->current > 2)
+			close(list->current);
+		free(list->label);
+		free(list);
+		list = swap;
+	}
+	ft_memdel((void **)&((*context)->term_config));
+	ft_memdel((void **)context);
 }
