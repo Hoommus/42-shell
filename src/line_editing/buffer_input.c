@@ -15,14 +15,23 @@
 
 static void			deal_with_printable(const char *arr)
 {
+	bool		needs_updates = carpos_get(POS_CURRENT)->col >= g_term->ws_col - 2;
+
 	buff_insert_single_at(g_term->buffer->iterator, arr);
-	carpos_update(POS_LAST);
+	if (needs_updates)
+		carpos_update(POS_LAST);
 	write(1, arr, ft_strlen((char *)arr));
-	carpos_update(POS_CURRENT);
+	if (needs_updates)
+		carpos_update(POS_CURRENT);
 	if (carpos_get(POS_LAST)->col == g_term->ws_col - 1)
 	{
 		tputs(tgetstr("sf", NULL), 1, &ft_putc);
 		caret_move(1, D_RIGHT);
+	}
+	if (!needs_updates)
+	{
+		carpos_get(POS_CURRENT)->col += 1;
+		return ;
 	}
 	carpos_update(POS_CURRENT);
 	if (carpos_get(POS_LAST)->row == carpos_get(POS_CURRENT)->row

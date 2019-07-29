@@ -6,7 +6,7 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/31 14:45:32 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/08 23:41:18 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/29 17:49:06 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,8 @@ void				init_variables(void)
 	ft_bzero(host, sizeof(host));
 	gethostname(host, 1024);
 	set_env_v(vector, "HOST", host, SCOPE_SHELL_LOCAL);
-	host[ft_strchr(host, '.') - host] = 0;
+	if (ft_strchr(host, '.') != NULL)
+		host[ft_strchr(host, '.') - host] = 0;
 	set_env_v(vector, "SHORT_HOST", host, SCOPE_SHELL_LOCAL);
 	set_env_v(vector, "BUILD", swap = ft_itoa(BUILD), SCOPE_SHELL_LOCAL);
 	set_env_v(vector, "BUILD_DATE", BUILD_DATE, SCOPE_SHELL_LOCAL);
@@ -115,7 +116,7 @@ int					main(int argc, char **argv)
 {
 	init_shell_context();
 	init_variables();
-	init_hashtable();
+//	init_hashtable();
 	init_files();
 	init_buffer_vector(MAX_INPUT);
 	history_load(g_term->history_file);

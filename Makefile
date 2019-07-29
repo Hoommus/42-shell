@@ -12,14 +12,16 @@
 
 NAME = 42sh
 
-CC = clang
+CC = clang-8
 
 FDS = shell(ulimit -n)
 
 FLAGS = -DSH=\"$(NAME)\" \
                -Wall  \
                -Wextra \
-               -Werror -g# -fsanitize=address
+               -Werror # -g3  -fsanitize=address
+
+LIBS = -ltermcap -lcurses
 
 HEADERS = -I include/ -I printf/include -I libft/
 SRC_DIR = ./src/
@@ -115,7 +117,7 @@ all: $(NAME)
 $(NAME): prepare $(OBJ)
 	make -C $(LIB_DIR)
 	cp $(LIB_DIR)/$(LIB_NAME) ./$(LIB_NAME)
-	$(CC) $(FLAGS) -o $(NAME) $(OBJ) $(HEADERS) $(LIB_NAME) -ltermcap
+	$(CC) $(FLAGS) -o $(NAME) $(OBJ) $(HEADERS) $(LIB_NAME) $(LIBS)
 
 prepare:
 	@mkdir -p $(OBJ_DIR)$(AST_DIR)
@@ -130,7 +132,7 @@ prepare:
 	@mkdir -p $(OBJ_DIR)$(AUTOCOMPLETE_DIR)
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
-	$(CC) $(FLAGS) $(HEADERS) -o $@ -c $< ;
+	$(CC) $(FLAGS) $(HEADERS) -o $@ -c $<
 
 install:
 	@if [ grep ~/.brew/bin $PATH 2>/dev/null ] ; \

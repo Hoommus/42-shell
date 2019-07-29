@@ -53,7 +53,7 @@ void					setup_signal_handlers(void)
 	action.sa_handler = &handle_sigint;
 	sigaction(SIGINT, &((struct sigaction){
 		.sa_flags = 0,
-		.sa_mask = 0,
+		.sa_mask = {0},
 		.sa_handler = &handle_sigint
 	}), NULL);
 	sigaction(SIGTSTP, &((struct sigaction){

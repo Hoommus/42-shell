@@ -31,6 +31,13 @@
 
 # define BUFFER_SIZE 512
 
+# ifdef __linux__
+
+typedef __intmax_t		intmax_t;
+typedef __uintmax_t		uintmax_t;
+
+# endif
+
 int				g_symbols;
 long long		g_written;
 int				g_output;

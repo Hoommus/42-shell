@@ -28,7 +28,6 @@
 # include <termios.h>
 # include <termcap.h>
 # include <limits.h>
-# include <sys/termios.h>
 
 # include <stdbool.h>
 # include <stdnoreturn.h>

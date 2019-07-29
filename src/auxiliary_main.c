@@ -26,7 +26,8 @@ int					display_normal_prompt(void)
 	if (home && home->value && ft_strcmp(cwd, home->value) == 0 &&
 		(cwd[ft_strlen(cwd)] == '/' || cwd[ft_strlen(cwd)] == 0))
 		ft_strcpy(cwd, "~");
-	host[ft_strchr(host, '.') - host] = 0;
+	if (ft_strchr(host, '.') != NULL)
+		host[ft_strchr(host, '.') - host] = 0;
 	user = get_env_v(NULL, "USER");
 	size = ft_printf(SHELL_PROMPT,
 		user ? user->value : "$USER", host,

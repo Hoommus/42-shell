@@ -18,6 +18,10 @@
 # include <stdlib.h>
 # include <limits.h>
 
+# ifndef __printflike
+#  define __printflike(a, b) __attribute__((format(printf, a, b)))
+# endif
+
 # define PRTF int ft_printf(const char *restrict format, ...) __printflike(1, 2)
 # define DRTF int ft_dprintf(int fd, const char *format, ...) __printflike(2, 3)
 

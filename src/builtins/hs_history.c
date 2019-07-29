@@ -52,7 +52,7 @@ int			hs_history(const char **args)
 {
 	char					c;
 	int						width;
-	u_int64_t				i;
+	unsigned long long			i;
 	struct s_history_entry	*entry;
 
 	if ((c = flag_validate_short((const char **)args, "cs")))

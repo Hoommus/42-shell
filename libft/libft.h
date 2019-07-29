@@ -21,6 +21,12 @@
 # define LIBFT_WHTSP "\n\t \r\a"
 # define ABS(a) ((a) < 0 ? -(a) : (a))
 
+# ifdef __linux__
+
+typedef __intmax_t		intmax_t;
+
+# endif
+
 typedef struct	s_list
 {
 	void			*content;

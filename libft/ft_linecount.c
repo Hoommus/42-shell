@@ -17,6 +17,10 @@
 ** line_width characters wide.
 */
 
+#ifndef INT64_MAX
+# define INT64_MAX (~0ULL)
+#endif
+
 size_t	linecount(const char *str, int64_t line_width)
 {
 	int64_t		i;

@@ -47,7 +47,7 @@ void			sigchild_set_handler(void)
 
 	if (act.sa_handler == 0)
 	{
-		act.sa_mask = 0;
+		act.sa_mask = (sigset_t){0};
 		act.sa_flags = SA_SIGINFO | SA_RESTART;
 		act.sa_sigaction = &sigchild_handler;
 	}
