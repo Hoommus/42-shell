@@ -6,7 +6,7 @@
 #    By: vtarasiu <vtarasiu@student.unit.ua>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/03/24 10:11:17 by vtarasiu          #+#    #+#              #
-#    Updated: 2019/07/10 17:35:58 by vtarasiu         ###   ########.fr        #
+#    Updated: 2019/07/25 12:28:23 by vtarasiu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,7 @@ FDS = shell(ulimit -n)
 FLAGS = -DSH=\"$(NAME)\" \
                -Wall  \
                -Wextra \
-               -Werror -g -fsanitize=address
+               -Werror -g# -fsanitize=address
 
 HEADERS = -I include/ -I printf/include -I libft/
 SRC_DIR = ./src/
@@ -31,7 +31,7 @@ LIB_NAME = libftprintf.a
 SHELL_SRC = main.c init.c memory.c auxilia.c       \
             service_routines.c args_parsing.c string_hash.c \
             shell_environ.c shell_environ_tools.c shell_environ_vector.c \
-            shell_environ_memory.c init_term.c \
+            shell_environ_memory.c \
             syscall_wrappers.c \
             auxiliary_main.c init_hashtable.c init_term.c
 
@@ -161,4 +161,7 @@ re: fclean all
 love:
 	@echo "Not all."
 
+
+.NOTPARALLEL: prepare
 .PHONY: clean all fclean re love
+

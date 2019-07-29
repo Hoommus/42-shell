@@ -6,37 +6,11 @@
 /*   By: vtarasiu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/10 12:09:35 by vtarasiu          #+#    #+#             */
-/*   Updated: 2019/07/09 00:19:41 by vtarasiu         ###   ########.fr       */
+/*   Updated: 2019/07/20 20:00:17 by vtarasiu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "twenty_one_sh.h"
-
-/*
-** TODO: make environ context switches more intelligent - make diffs possible
-*/
-
-void			context_deep_free(t_context **context)
-{
-	struct s_fd_lst		*list;
-	struct s_fd_lst		*swap;
-
-	if (context == NULL || *context == NULL)
-		return ;
-	environ_deallocate_vector((*context)->environ);
-	list = (*context)->fd_list;
-	while (list)
-	{
-		swap = list->next;
-		if (list->current > 2)
-			close(list->current);
-		free(list->label);
-		free(list);
-		list = swap;
-	}
-	ft_memdel((void **)&((*context)->term_config));
-	ft_memdel((void **)context);
-}
 
 /*
 ** If to_which is NULL, restores context from backup with pretty much the same
